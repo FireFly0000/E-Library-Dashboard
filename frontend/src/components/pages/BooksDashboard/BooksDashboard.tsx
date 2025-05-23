@@ -27,6 +27,17 @@ const BooksDashboard: React.FC = () => {
     }
   };
 
+  //Handle if the author is new or existing
+  const handleIsNewAuthorChange = (checked: boolean) => {
+    if (checked) {
+      setAuthorName("");
+      setAuthorCountry("");
+      setAuthorDateOfBirth("");
+      setAuthorId(0);
+    }
+    setIsNewAuthor(checked);
+  };
+
   // File upload handler
   const handleUploadBook = async () => {
     if (selectedFile) {
@@ -38,6 +49,10 @@ const BooksDashboard: React.FC = () => {
             dateOfBirth: authorDateOfBirth,
           }
         : null;
+
+      console.log("Author", author);
+      console.log("AuthorId", authorId);
+
       formData.append("file", selectedFile);
       formData.append("title", title);
       formData.append("authorId", String(authorId));
@@ -60,7 +75,6 @@ const BooksDashboard: React.FC = () => {
 
     setTitle(""); // Clear the title input after upload
     setIsNewAuthor(false); // Reset the new author toggle
-    console.log("Parent", upLoadFlag);
   };
 
   return (
@@ -94,7 +108,7 @@ const BooksDashboard: React.FC = () => {
           <input
             type="checkbox"
             checked={isNewAuthor}
-            onChange={(e) => setIsNewAuthor(e.target.checked)}
+            onChange={(e) => handleIsNewAuthorChange(e.target.checked)}
             className="toggle-switch"
           />
         </div>
@@ -123,7 +137,7 @@ const BooksDashboard: React.FC = () => {
           </>
         )}
 
-        <button onClick={handleUploadBook} className="upload-button">
+        <button onClick={handleUploadBook} className="default-button">
           Submit
         </button>
       </div>

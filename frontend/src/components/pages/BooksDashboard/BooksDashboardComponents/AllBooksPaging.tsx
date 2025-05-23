@@ -44,7 +44,6 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
   };
 
   useEffect(() => {
-    console.log("Child", upLoadFlag);
     const fetchBooks = async () => {
       const result = await getAllBooksPaging(pageIndex, keyword, sortBy);
       setBooks(result.data.data); // books array
@@ -109,6 +108,7 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
       <button
         onClick={() => setPageIndex(pageIndex - 1)}
         disabled={pageIndex <= 1}
+        className="paging-button"
       >
         Prev
       </button>
@@ -119,6 +119,7 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
       <button
         onClick={() => setPageIndex(pageIndex + 1)}
         disabled={pageIndex >= totalPages}
+        className="paging-button"
       >
         Next
       </button>

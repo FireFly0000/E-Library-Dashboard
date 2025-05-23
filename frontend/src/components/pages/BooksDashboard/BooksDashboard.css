@@ -96,7 +96,7 @@
   left: 3em;
 }
 
-.upload-button {
+.default-button {
   width: 100%;
   padding: 12px;
   background-color: #007bff;
@@ -106,6 +106,19 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.paging-button {
+  width: 30%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px;
 }
 
 .upload-button:hover {
