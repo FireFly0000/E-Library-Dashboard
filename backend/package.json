@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "build": "yarn prisma generate && tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.787.0",

@@ -12,7 +12,8 @@ app.listen(PORT, () => {
 });
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://e-library-dashboard-fe-deployed.vercel.app",
+    //origin: "http://localhost:5173",
     credentials: true,
   })
 ); // Allow requests from the React app

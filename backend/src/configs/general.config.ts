@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config();
+
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config(); // Only load from .env in development
+}
 
 export const general = {
   DATABASE_URL: process.env.DATABASE_URL,
