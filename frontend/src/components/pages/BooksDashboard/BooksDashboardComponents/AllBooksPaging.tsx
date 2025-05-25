@@ -31,6 +31,20 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [keyword, setKeyword] = useState("");
   const [sortBy, setSortBy] = useState("createdAt DESC");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // State to track window width
+
+  // Effect to update windowWidth on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const getAllBooksPaging = async (
     pageIndex: number,
@@ -60,50 +74,72 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
         placeholder="Search title..."
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
+        className="search-input"
       />
 
-      <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        className="select-dropdown"
+      >
         <option value="createdAt DESC">Newest First</option>
         <option value="createdAt ASC">Oldest First</option>
         <option value="title ASC">Title A-Z</option>
         <option value="title DESC">Title Z-A</option>
       </select>
 
-      <table className="book-table">
-        <thead>
-          <tr>
-            <th>Book ID</th>
-            <th>Created At</th>
-            <th>Title</th>
-            <th>Author's Name</th>
-            <th>PDF</th>
-          </tr>
-        </thead>
-        <tbody>
-          {books.map((book: Book) => (
-            <tr key={book.id}>
-              <td>{book.id}</td>
-              <td>{new Date(book.createdAt).toLocaleDateString()}</td>
-              <td>{book.title}</td>
-              <td>{book.author?.name || "Unknown"}</td>
-              <td>
-                {book.fileName ? (
-                  <a
-                    href={book.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="book-link"
-                  >
-                    {book.fileName}
-                  </a>
-                ) : (
-                  "—"
-                )}
-              </td>
+      <div className="responsive-table-container">
+        <table className="book-table">
+          <thead>
+            <tr>
+              <th>Book ID</th>
+              <th>Created At</th>
+              <th>{windowWidth > 440 ? "Title" : "Title (PDF)"}</th>
+              <th>Author's Name</th>
+              {windowWidth > 440 && <th>PDF</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {books.map((book: Book) => (
+              <tr key={book.id}>
+                <td>{book.id}</td>
+                <td>{new Date(book.createdAt).toLocaleDateString()}</td>
+                <td>
+                  {windowWidth > 440 ? (
+                    book.title
+                  ) : (
+                    <a
+                      href={book.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="book-link"
+                    >
+                      {book.title}
+                    </a>
+                  )}
+                </td>
+                <td>{book.author?.name || "Unknown"}</td>
+                {windowWidth > 440 && (
+                  <td className="book-file-link">
+                    {book.fileName ? (
+                      <a
+                        href={book.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="book-link"
+                      >
+                        {windowWidth < 1200 ? "PDF" : book.fileName}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <button
         onClick={() => setPageIndex(pageIndex - 1)}
