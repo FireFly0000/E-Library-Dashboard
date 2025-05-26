@@ -88,58 +88,56 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
         <option value="title DESC">Title Z-A</option>
       </select>
 
-      <div className="responsive-table-container">
-        <table className="book-table">
-          <thead>
-            <tr>
-              <th>Book ID</th>
-              <th>Created At</th>
-              <th>{windowWidth > 440 ? "Title" : "Title (PDF)"}</th>
-              <th>Author's Name</th>
-              {windowWidth > 440 && <th>PDF</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {books.map((book: Book) => (
-              <tr key={book.id}>
-                <td>{book.id}</td>
-                <td>{new Date(book.createdAt).toLocaleDateString()}</td>
-                <td>
-                  {windowWidth > 440 ? (
-                    book.title
-                  ) : (
+      <table className="book-table">
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Created At</th>
+            <th>{windowWidth > 440 ? "Title" : "Title (PDF)"}</th>
+            <th>Author's Name</th>
+            {windowWidth > 440 && <th>PDF</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {books.map((book: Book) => (
+            <tr key={book.id}>
+              <td>{book.id}</td>
+              <td>{new Date(book.createdAt).toLocaleDateString()}</td>
+              <td>
+                {windowWidth > 440 ? (
+                  book.title
+                ) : (
+                  <a
+                    href={book.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="book-link"
+                  >
+                    {book.title}
+                  </a>
+                )}
+              </td>
+              <td>{book.author?.name || "Unknown"}</td>
+              {windowWidth > 440 && (
+                <td className="book-file-link">
+                  {book.fileName ? (
                     <a
                       href={book.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="book-link"
                     >
-                      {book.title}
+                      {windowWidth < 1200 ? "PDF" : book.fileName}
                     </a>
+                  ) : (
+                    "—"
                   )}
                 </td>
-                <td>{book.author?.name || "Unknown"}</td>
-                {windowWidth > 440 && (
-                  <td className="book-file-link">
-                    {book.fileName ? (
-                      <a
-                        href={book.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="book-link"
-                      >
-                        {windowWidth < 1200 ? "PDF" : book.fileName}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <button
         onClick={() => setPageIndex(pageIndex - 1)}
