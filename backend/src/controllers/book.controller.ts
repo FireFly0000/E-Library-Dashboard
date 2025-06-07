@@ -1,7 +1,7 @@
 import { bookSchema, BookWithSignedUrl } from "../types/book.type";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../configs/aws.config";
-import configs from "../configs/index";
+import configs from "../configs";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "../configs/db.config";
 
@@ -56,6 +56,7 @@ export const getAllBooksPaging = async (req, res) => {
       include: { author: true },
     });
 
+    /*for bookVersion =====================================
     // Generate signed URLs for each book file
     const booksWithUrls: BookWithSignedUrl[] = [];
 
@@ -66,13 +67,13 @@ export const getAllBooksPaging = async (req, res) => {
       };
       const command = new GetObjectCommand(getObjectParams);
       const signedUrl = await getSignedUrl(s3, command, {
-        expiresIn: 3600, // URL expiration time in seconds
+        expiresIn: 3600, // URL expiration time in seconds (1 hour)
       });
       booksWithUrls.push({
         ...book,
         fileUrl: signedUrl,
       });
-    }
+    }*/
 
     const totalPage = Math.ceil(totalRecord / pageSize);
 
@@ -84,7 +85,7 @@ export const getAllBooksPaging = async (req, res) => {
         page_size: pageSize,
         total_page: totalPage,
         total_record: totalRecord,
-        data: booksWithUrls,
+        data: books,
       },
     });
   } catch (e) {
@@ -139,7 +140,7 @@ const uploadFileToS3 = async (file): Promise<string> => {
 
 //Create book
 export const createBook = async (req, res) => {
-  const fileName = await uploadFileToS3(req.file); // Upload the file to S3
+  /*const fileName = await uploadFileToS3(req.file); // Upload the file to S3
 
   // Create book data object
   // Use the fileName from S3 as the file name in the database
@@ -181,7 +182,7 @@ export const createBook = async (req, res) => {
     const newBook = await db.book.create({
       data: {
         title: bookData.title,
-        fileName: bookData.fileName,
+        //fileName: bookData.fileName,
         author: {
           connect: {
             id: authorId,
@@ -195,7 +196,9 @@ export const createBook = async (req, res) => {
       .json({ message: "New book created successfully", data: newBook });
   } catch (e) {
     res.status(500).json({ error: "Failed to create book" });
-  }
+  }*/
+
+  res.status(501).json({ error: "Not implemented yet" });
 };
 
 //===================================== create book =======================================

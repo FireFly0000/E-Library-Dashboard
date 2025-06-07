@@ -1,22 +1,25 @@
-import express from "express";
-import authorRouter from "./routes/author.router";
-import bookRouter from "./routes/book.router";
+import express, { Application } from "express";
 import cors from "cors";
+import configs from "./configs/index";
+import routers from "./routes/index";
 
-const app = express();
-const PORT = process.env.PORT || 8080;
+const app: Application = express();
+const PORT = configs.general.PORT;
+const DOMAIN_NAME = configs.general.DOMAIN_NAME;
 
 app.use(express.json());
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 app.use(
   cors({
-    origin: "https://e-library-dashboard-fe-deployed.vercel.app",
+    origin: DOMAIN_NAME,
     //origin: "http://localhost:5173",
     credentials: true,
   })
 ); // Allow requests from the React app
 
-app.use("/api/authors", authorRouter);
-app.use("/api/books", bookRouter);
+app.use("/api/auth", routers.authRouter);
+app.use("/api/authors", routers.authorRouter);
+app.use("/api/books", routers.bookRouter);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

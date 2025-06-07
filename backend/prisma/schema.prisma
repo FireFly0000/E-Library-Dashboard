@@ -12,26 +12,94 @@ datasource db {
   //directUrl = env("DIRECT_URL")
 }
 
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique @db.VarChar(50)
+  email       String   @unique @db.VarChar(50)
+  password    String   @db.Text
+  url_avatar  String?  @db.Text
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  is_verify   Boolean  @default(false)
+  
+  bookVersions BookVersion[]
+
+  @@index([email], name: "idx_email")
+  @@index([username], name: "idx_username")
+}
+
 model Author {
-  id        Int      @id @default(autoincrement())
-  name      String
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(51)
   dateOfBirth DateTime @map("date_of_birth")
-  country   String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  country   String    @db.VarChar(50)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
   books     Book[]
 
-   @@index([name, dateOfBirth, country]) // To speed up searches and reduce duplicates
+  @@index([name], name: "idx_author_name")
+  @@index([country], name: "idx_author_country")
+}
+
+model BookVersion {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  fileName  String   @map("file_name")
+  viewCount Int      @default(0) @map("view_count")
+  commentCount Int   @default(0) @map("comment_count")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user      User   @relation(fields: [userId], references: [id])
+  book      Book   @relation(fields: [bookId], references: [id])
+
+  @@index([userId], name: "idx_book_versions_user_id")
+  @@index([createdAt], name: "idx_book_versions_created_at")
+}
+
+enum CategoryCode {
+  FIC  // Fiction
+  SCI  // Science
+  BIO  // Biography
+  ROM   // Romance
+  FANT // Fantasy
+  THR  // Thriller
+  HIST // Historical
+  MYST  // Mystery
+  HORR // Horror
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(50)
+  categoryCode CategoryCode @unique @map("category_code")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  books     Book[]
+
+  @@index([name], name: "idx_category_name")
 }
 
 model Book {
-  id        Int      @id @default(autoincrement())
-  title     String
-  authorId  Int @map("author_id")
-  fileName String @map("file_name")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  author    Author   @relation(fields: [authorId], references: [id])
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(100)
+  authorId    Int          @map("author_id")
+  categoryId  Int          @map("category_id")
+  description String       @db.Text
+  thumbnail   String       @db.Text
+  slug        String       @unique @db.VarChar(100)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  author      Author       @relation(fields: [authorId], references: [id])
+  Category    Category     @relation(fields: [categoryId], references: [id])
+  
+  versions    BookVersion[]
 
-  @@index([title, authorId, createdAt]) // To speed up searches and reduce duplicates
+  @@index([title], name: "idx_book_title")
+  @@index([authorId], name: "idx_book_author_id")
+  @@index([createdAt], name: "idx_book_created_at")
 }
