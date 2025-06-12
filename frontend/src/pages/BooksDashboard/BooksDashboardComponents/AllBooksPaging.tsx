@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 type Author = {
   id: number;
@@ -32,6 +34,13 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
   const [keyword, setKeyword] = useState("");
   const [sortBy, setSortBy] = useState("createdAt DESC");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth); // State to track window width
+
+  const filterOptions = [
+    { key: 0, label: "Newest First", value: "createdAt DESC" },
+    { key: 1, label: "Oldest First", value: "createdAt ASC" },
+    { key: 2, label: "Title A-Z", value: "title ASC" },
+    { key: 3, label: "Title Z-A", value: "title DESC" },
+  ];
 
   // Effect to update windowWidth on resize
   useEffect(() => {
@@ -77,16 +86,13 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
         className="search-input"
       />
 
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-        className="select-dropdown"
-      >
-        <option value="createdAt DESC">Newest First</option>
-        <option value="createdAt ASC">Oldest First</option>
-        <option value="title ASC">Title A-Z</option>
-        <option value="title DESC">Title Z-A</option>
-      </select>
+      <CustomSelect
+        options={filterOptions}
+        getValue={(item) => item.value}
+        getLabel={(item) => item.label}
+        getKey={(item) => item.key}
+        changeKey={(key) => setSortBy(filterOptions[key].value)}
+      />
 
       <table className="book-table">
         <thead>
@@ -139,24 +145,25 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
         </tbody>
       </table>
 
-      <button
-        onClick={() => setPageIndex(pageIndex - 1)}
-        disabled={pageIndex <= 1}
-        className="paging-button"
+      <Button
+        onClick={() =>
+          pageIndex > 1 ? setPageIndex(pageIndex - 1) : setPageIndex(pageIndex)
+        }
       >
         Prev
-      </button>
-      <span>
-        {" "}
-        Page {pageIndex} of {totalPages}{" "}
+      </Button>
+      <span className="text-[var(--foreground)] my-2.5">
+        Page {pageIndex} of {totalPages}
       </span>
-      <button
-        onClick={() => setPageIndex(pageIndex + 1)}
-        disabled={pageIndex >= totalPages}
-        className="paging-button"
+      <Button
+        onClick={() =>
+          pageIndex < totalPages
+            ? setPageIndex(pageIndex + 1)
+            : setPageIndex(pageIndex)
+        }
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 };

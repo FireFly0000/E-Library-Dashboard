@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+.custom-select-root {
+  @apply border-[var(--border)] border-solid border-[1px] shadow-[0_0_0_2px_transparent] 
+  w-[200px] cursor-pointer mt-2.5 py-3 px-2 rounded-lg mb-4 bg-[var(--input)] text-[var(--foreground)]
+  focus:border-[var(--primary)] relative flex select-none;
+}
+
+.custom-select-current {
+  @apply flex w-full cursor-pointer items-center justify-between;
+}
+
+.custom-select-icon {
+  @apply w-[20px] h-[20px];
+}
+
+.custom-select-options-container {
+  @apply bg-[var(--card)] text-[var(--foreground)] 
+  flex flex-col absolute w-full 
+  shadow-[0px_4px_10px_rgba(0,0,0,0.1)] 
+  mt-[20%] right-0.25 gap-2 rounded-[5px] 
+  border-[var(--foreground)] border-solid border;
+}
+
+.custom-select-options-container div {
+  width: 100%;
+  padding: 5px;
+}
+
+.custom-select-options-container div:hover {
+  cursor: pointer;
+  background-color: var(--primary);
+}

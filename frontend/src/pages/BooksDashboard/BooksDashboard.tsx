@@ -6,6 +6,7 @@ import AllBooksPaging from "./BooksDashboardComponents/AllBooksPaging";
 import axios from "axios";
 import { SlideDown } from "react-slidedown";
 import "react-slidedown/lib/slidedown.css";
+import { Button } from "@/components/ui/button";
 
 const BooksDashboard: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -13,7 +14,6 @@ const BooksDashboard: React.FC = () => {
   const [isNewAuthor, setIsNewAuthor] = useState<boolean>(false);
   const [authorName, setAuthorName] = useState<string>("");
   const [authorCountry, setAuthorCountry] = useState<string>("");
-  const [authorDateOfBirth, setAuthorDateOfBirth] = useState<string>("");
   const [authorId, setAuthorId] = useState<number>(0);
   const [upLoadFlag, setUploadFlag] = useState<boolean>(false);
 
@@ -32,7 +32,6 @@ const BooksDashboard: React.FC = () => {
     if (checked) {
       setAuthorName("");
       setAuthorCountry("");
-      setAuthorDateOfBirth("");
       setAuthorId(0);
     }
     setIsNewAuthor(checked);
@@ -46,7 +45,6 @@ const BooksDashboard: React.FC = () => {
         ? {
             name: authorName,
             country: authorCountry,
-            dateOfBirth: authorDateOfBirth,
           }
         : null;
 
@@ -120,7 +118,6 @@ const BooksDashboard: React.FC = () => {
               <NewAuthorInput
                 setAuthorName={setAuthorName}
                 setAuthorCountry={setAuthorCountry}
-                setAuthorDateOfBirth={setAuthorDateOfBirth}
               />
             </>
           )}
@@ -132,14 +129,13 @@ const BooksDashboard: React.FC = () => {
               setAuthorId={setAuthorId}
               setAuthorName={setAuthorName}
               setAuthorCountry={setAuthorCountry}
-              setAuthorDateOfBirth={setAuthorDateOfBirth}
             />
           </>
         )}
 
-        <button onClick={handleUploadBook} className="default-button">
+        <Button onClick={handleUploadBook} size="lg" className="w-full">
           Submit
-        </button>
+        </Button>
       </div>
       {/* Upload book section ends here */}
 

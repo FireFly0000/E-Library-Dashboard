@@ -6,21 +6,18 @@ type ExistingAuthorInputProps = {
   setAuthorId: (id: number) => void;
   setAuthorName: (name: string) => void;
   setAuthorCountry: (country: string) => void;
-  setAuthorDateOfBirth: (date: string) => void;
 };
 
 type Author = {
   id: number;
   name: string;
   country: string;
-  dateOfBirth: string;
 };
 
 const ExistingAuthorInput: React.FC<ExistingAuthorInputProps> = ({
   setAuthorId,
   setAuthorName,
   setAuthorCountry,
-  setAuthorDateOfBirth,
 }) => {
   const [authors, setAuthors] = useState([]);
   const [selectedVal, setSelectedVal] = useState<string>("");
@@ -48,7 +45,6 @@ const ExistingAuthorInput: React.FC<ExistingAuthorInputProps> = ({
     setAuthorId(author.id);
     setAuthorName(author.name);
     setAuthorCountry(author.country);
-    setAuthorDateOfBirth(author.dateOfBirth);
     setAuthors([]); // Clear the authors list after selection
     setSelectedVal(`${author.name} (${author.country}) - id: ${author.id}`); // Set the selected value to the input field
   };
