@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+.hello-div {
+  @apply px-10 py-3 text-lg bg-[var(--primary)] text-[var(--button-text)];
+}

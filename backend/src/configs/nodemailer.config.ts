@@ -193,7 +193,7 @@ export function setSignUpEmail(link: string) {
                                                         <table class="image_block block-1" width="100%" border="0" cellpadding="15" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
                                                             <tr>
                                                                 <td class="pad">
-                                                                    <div class="alignment" align="center" style="line-height:10px"><img class="fullWidth" src="https://asset.cloudinary.com/dkv4gihl5/11a22645242da551c2dd0b9e1d6481c4" style="height: auto; display: block; border: 0; max-width: 374px; width: 100%;" width="374" alt="Resetting Password" title="Email Verification"></div>
+                                                                    <div class="alignment" align="center" style="line-height:10px"><img class="fullWidth" src="https://img.freepik.com/free-vector/library-interior-empty-room-reading-with-books-wooden-shelves_33099-1722.jpg?semt=ais_hybrid&w=740" style="height: auto; display: block; border: 0; max-width: 374px; width: 100%;" width="374" alt="Resetting Password" title="Email Verification"></div>
                                                                 </td>
                                                             </tr>
                                                         </table>
