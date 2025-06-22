@@ -1,11 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import BooksDashboard from "./pages/BooksDashboard/BooksDashboard";
-import axios from "axios";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/hooks/hooks";
+import { authActions } from "@/redux/slices/index";
 import { ThemeProvider } from "./components/ThemeProvider";
+import Cookies from "js-cookie";
+import HomePage from "./pages/HomePage/HomePage";
+import BooksDashboard from "./pages/BooksDashboard/BooksDashboard";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
-
-axios.defaults.baseURL = "http://localhost:8080";
+import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import PrivateRoute from "./routes/PrivateRoute";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import NavBar from "./components/NavBar";
+import { Toaster } from "react-hot-toast";
 
 //axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
 
@@ -14,17 +21,39 @@ axios.defaults.baseURL = "http://localhost:8080";
 //axios.defaults.baseURL = "https://bkdelibserver.duckdns.org";
 
 function App() {
+  const dispatch = useAppDispatch();
+
+  //const isLogin = useAppSelector((state) => state?.authSlice?.isLogin) ?? false;
+
+  useEffect(() => {
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken) {
+      dispatch(authActions.getMe());
+    } else {
+      dispatch(authActions.setIsAuthChecked());
+    }
+  }, [dispatch]);
+
   return (
     <ThemeProvider>
-      <div className="bg-background flex min-h-svh flex-col items-center justify-center overflow-x-hidden">
+      <div className="bg-background flex min-h-svh flex-col items-center justify-start overflow-x-hidden">
+        <Toaster position="bottom-right" />
         <Router>
           <Routes>
-            <Route path="/dashboard" element={<BooksDashboard />} />
-            <Route path="/" element={<ProfilePage />} />
+            <Route element={<NavBar />}>
+              <Route element={<PrivateRoute />}>
+                <Route path="/dashboard" element={<BooksDashboard />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+              <Route path="/" element={<HomePage />} />
+            </Route>
+
             <Route
               path="/verify-email/:token"
               element={<EmailVerification />}
             />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
           </Routes>
         </Router>
       </div>

@@ -113,6 +113,47 @@
   --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
+/* Scrollbar's styling */
+::-webkit-scrollbar {
+  @apply h-[10px]
+  w-[10px];
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/70;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground;
+}
+
+/*Text input styling*/
+.form-input {
+  border: 1px solid var(--border);
+  background-color: var(--input);
+  @apply border text-[16px] p-3 rounded-lg 
+  text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none
+  
+  focus:ring-[var(--ring)]
+  transition-[color,box-shadow] 
+  focus:ring-[1px];
+}
+
+/*Default card styling*/
+.default-card-container {
+  @apply mt-[30px] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex flex-col;
+  background-color: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

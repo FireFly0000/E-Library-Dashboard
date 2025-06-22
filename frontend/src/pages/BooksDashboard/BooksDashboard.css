@@ -31,18 +31,6 @@
   @apply text-[17px] mb-1.5;
 }
 
-.form-input {
-  border: 1px solid var(--border);
-  background-color: var(--input);
-  @apply border text-[15px] transition-[border-color] duration-[0.3s] px-3 py-2.5 rounded-lg 
-  text-[var(--foreground)];
-}
-
-.form-input:focus {
-  border-color: var(--primary);
-  outline: none;
-}
-
 .file-input {
   @apply pl-3 pr-0 py-1.5;
 }
@@ -85,13 +73,6 @@
   w-[90vw] max-w-screen-xl 
   mt-5 mb-10 mx-0 p-[30px] rounded-2xl
   border-[var(--border)] border-solid border;
-}
-
-.search-input {
-  @apply border-[var(--border)] border-solid border focus:border-[var(--primary)]
-  shadow-[0_0_0_2px_transparent] w-[200px] p-3 rounded-lg 
-  bg-[var(--input)] text-[var(--foreground)];
-  outline: none;
 }
 /* Book table styling */
 

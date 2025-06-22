@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ValidationError } from "joi";
 import { convertJoiErrorToString } from "../commons/index";
-import { registrationSchema } from "../validations/auth";
+import { registrationSchema, loginSchema } from "../validations/auth";
 import service from "../services/index";
 
 class AuthController {
@@ -39,6 +39,39 @@ class AuthController {
 
     return res.status(response.getStatusCode()).json(response);
   };
+
+  //login controller
+  login = async (req: Request, res: Response): Promise<Response> => {
+    const errorValidate: ValidationError | undefined = loginSchema.validate(
+      req.body
+    ).error;
+
+    if (errorValidate) {
+      return res.status(400).json({
+        status_code: 400,
+        message: convertJoiErrorToString(errorValidate),
+        success: false,
+      });
+    }
+
+    const response = await service.AuthService.login(req);
+
+    return res.status(response.getStatusCode()).json(response);
+  };
+
+  //refresh token controller
+  async refreshToken(req: Request, res: Response): Promise<Response> {
+    const response = await service.AuthService.refreshToken(req);
+
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  //getMe (get user info) controller
+  async getMe(req: Request, res: Response): Promise<Response> {
+    const response = await service.AuthService.getMe(req);
+
+    return res.status(response.getStatusCode()).json(response);
+  }
 }
 
 export default AuthController;

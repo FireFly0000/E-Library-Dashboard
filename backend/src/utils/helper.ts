@@ -10,7 +10,7 @@ export const sendVerificationEmail = async (
 ): Promise<Boolean> => {
   // Create a JWT token for email verification
   const token = jwt.sign(payload, configs.general.JWT_SECRET_KEY, {
-    expiresIn: configs.general.TOKEN_ACCESS_EXPIRED_TIME,
+    expiresIn: configs.general.TOKEN_EMAIL_EXPIRED_TIME,
   });
 
   // Create a verification link and send the email
@@ -27,3 +27,20 @@ export const sendVerificationEmail = async (
   const isSendEmailSuccess = sendMail(mailOptions);
   return isSendEmailSuccess;
 };
+
+export function formatAuthorName(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/) // Split by one or more spaces
+    .map((word) =>
+      word
+        .split(".")
+        .map((segment) =>
+          segment
+            ? segment[0].toUpperCase() + segment.slice(1).toLowerCase()
+            : ""
+        )
+        .join(".")
+    )
+    .join(" ");
+}
