@@ -33,3 +33,29 @@ export class ResponseError extends ResponseBase {
     super(status_code, message, success);
   }
 }
+
+export class ResponseSuccessPaginated<T> extends ResponseBase {
+  private data?: T;
+  private total_records: number;
+  private total_pages: number;
+  private page: number;
+  private limit: number;
+
+  constructor(
+    status_code: number,
+    message: string,
+    success: boolean,
+    data?: T,
+    total_records?: number,
+    total_pages?: number,
+    page?: number,
+    limit?: number
+  ) {
+    super(status_code, message, success);
+    this.data = data;
+    this.total_records = total_records || 0;
+    this.total_pages = total_pages || 0;
+    this.page = page || 1;
+    this.limit = limit || 10;
+  }
+}

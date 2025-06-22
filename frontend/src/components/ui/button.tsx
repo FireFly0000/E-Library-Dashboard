@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center py-5 justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-normal transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center leading-none justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-normal transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -13,18 +13,21 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "border text-foreground bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-foreground dark:hover:bg-accent/50",
         secondary:
           "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-foreground underline-offset-4 hover:underline hover:text-foreground/80 transition-all duration-300",
+        plain:
+          "bg-transparent text-foreground hover:text-foreground/90 transition-colors duration-200",
       },
       size: {
-        default: "h-9 px-4 has-[>svg]:px-3 text-base",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-sm",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4 text-lg",
-        xl: "h-10 rounded-md px-6 has-[>svg]:px-4 text-xl",
+        default: "h-9 px-4 has-[>svg]:px-3 text-base py-5",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5 text-sm py-5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4 text-lg py-5",
+        xl: "h-10 rounded-md px-6 has-[>svg]:px-4 text-xl py-5",
+        xxl: "h-10 rounded-md px-6 has-[>svg]:px-4 text-2xl py-6",
         icon: "size-9",
       },
     },

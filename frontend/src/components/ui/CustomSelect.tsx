@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import "@/styles/CustomSelect.css";
+import clsx from "clsx";
 
 type CustomSelectProps<Item> = {
   options: Item[];
@@ -8,6 +9,7 @@ type CustomSelectProps<Item> = {
   getLabel: (option: Item) => ReactNode;
   getValue: (option: Item) => ReactNode;
   changeKey: (key: number) => void;
+  className?: string;
 };
 
 function CustomSelect<ItemType>({
@@ -15,6 +17,7 @@ function CustomSelect<ItemType>({
   getKey,
   getLabel,
   changeKey,
+  className,
 }: CustomSelectProps<ItemType>) {
   const filterWrapperRef = useRef<HTMLDivElement | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -48,7 +51,7 @@ function CustomSelect<ItemType>({
 
   return (
     <div
-      className="custom-select-root"
+      className={clsx("custom-select-root", className)}
       ref={filterWrapperRef}
       onClick={toggleDropdown}
       tabIndex={0}

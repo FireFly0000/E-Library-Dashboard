@@ -1,3 +1,5 @@
+import { error } from "console";
+
 export const errorMessages = {
   validationFail: "Validation fail",
   internalServer: "Internal server",
@@ -34,8 +36,11 @@ export const errorMessages = {
   emailMustBeString: "Email must be a string",
   inCorrectEmail: "Incorrect email",
   errorSendEmail:
-    "Email sending failed, please login to the account you just registered to be sent confirmation email again",
-  resendVerificationEmail: "Resend verification email successfully",
+    "Email sending failed, please login again to receive a new confirmation email",
+  emailNotFound: "Email not found",
+  errorSendEmail2: "Error sending email, please try again",
+  errorSendEmail3:
+    "Unverified account.\nError sending email, please login again to receive a new confirmation email",
 
   // Verified Email
   verifiedEmail: "This account has been verified before",
@@ -54,27 +59,7 @@ export const errorMessages = {
   UsernameMustBeString: "Username must be a string",
   UsernameIsRequired: "Username is required",
   tooLongUsername: "Username is too long",
-
-  // Lastname
-  //lastNameMustBeString: "Last Name must be a string",
-  //lastNameIsRequired: "Last Name is required",
-  //tooLongLastName: "Last name is too long",
-
-  // Course
-  courseIdIsRequired: "Course id is required",
-  courseIdMustBeAnInt: "Course id must be an integer",
-  courseIdMustBeNumber: "Course id must be a number",
-  createCourseFailed: "Create a new failed course",
-  courseNotFound: "Course Not Found",
-
-  // Section
-  sectionIdIsRequired: "Section id is required",
-  sectionIdMustBeAnInt: "Section id must be an integer",
-  sectionIdMustBeNumber: "Section id must be a number",
-  sectionNotFound: "Section Not Found",
-
-  // Lesson
-  lessonNotFound: "Lesson Not Found",
+  usernameAlreadyExists: "Username already exists",
 
   // Reset password
   expiredToken: "This link is expired",
@@ -118,25 +103,9 @@ export const errorMessages = {
   // Upload Image
   imageUploadError: "Upload Image Error",
 
-  //Rating
-  ratingError: "You have already rated",
-  contentRatingTooLong:
-    "Content rating is too long, maxium 100 characters only",
-  contentRatingType: "Content rating must be string",
-  ratingScoreRequired: "Rating score is required",
-  ratingScoreType: "Rating score must be a number",
-  ratingScoreMustBeAnInt: "Rating score must be an integer",
-  ratingScoreMinError: "Rating score must be in 1-5",
-  ratingScoareMaxError: "Rating score must be in 1-5",
-
-  //Subscribe course
-  authorSubscribeError: "You can't subscribe your own course",
-  authorUnsubscribeError: "You can't unsubscribe your own course",
-  unsubscribeUser: "You haven't subscribed course yet",
-  subscribeUser: "You have already subscribed",
-
   //Auth
   loginAgain: "Please login again",
+  unauthorized: "Unauthorized",
 
   //reOrder
   reOrderRequired: "Your reOrder is missing",
@@ -144,6 +113,14 @@ export const errorMessages = {
   orderDuplicate: "Order item must be unique",
 
   orderNotValid: "Order List is not valid",
+
+  //Author
+  authorNameMustBeString: "Author name must be a string",
+  authorNameIsRequired: "Author name is required",
+  authorNameTooShort: "Author name is too short",
+  authorCountryMustBeString: "Author's country must be a string",
+  authorCountryIsRequired: "Author's country is required",
+  createdAuthorFailed: "Created author failed, please try again",
 };
 
 export const successMessages = {
@@ -161,13 +138,14 @@ export const successMessages = {
 
   // Email
   verificationForgotPassword: "Sent a verification code to your email",
+  resendVerificationEmail: "Resend verification email successfully",
 
   // Verified Email
   verifiedEmail: "Account verification successful",
   verifiedEmailBefore: "This account has been verified before",
 
   // Password
-  changePasswordSuccessfully: "Change password succesfully",
+  changePasswordSuccessfully: "Change password successfully",
 
   // Login
   successLogin: "Logged in successfully",
@@ -175,29 +153,17 @@ export const successMessages = {
   // Sign-up
   signUpSuccess: "Signup successful, please check your email",
 
-  // Register Course
-  registerCourseSuccess: "Subcribe successfully",
-  unRegisterCourseSuccess: "Unsubcribe successfully",
-
   // Reset password
   resetPasswordSuccess: "Reset successfully, please login your account",
-
-  // Course
-  createCourseSuccess: "Create a new successful course",
-  searchMyCourseSuccess: "Search My Course Successfully",
-  deleteCourseSuccess: "Course Deleted Successfully",
-
-  // Category
-  getAllCategoriesSuccess: "Get All Categories Successfully",
-  getCategoryByIdSuccess: "Get Category By Id Successfully",
-  createCategorySuccess: "Category Created Successfully",
-  retrievedCategorySuccess: "Categories Retrieved Successfully",
-  updatedCategorySuccess: "Category Updated Successfully",
-  deletedCategorySuccess: "Category Deleted Successfully",
 
   // Upload Image
   imageUploadSuccess: "Upload Image Successfully",
 
   // reOrder
   sectionReorderSuccess: "Reorder lessons successfully",
+
+  // Author
+  getAllAuthors: "Get all authors successfully",
+  filterAuthorsByName: "Filter authors by name successfully",
+  newAuthorCreated: "New author created successfully",
 };

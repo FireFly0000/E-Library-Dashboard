@@ -83,7 +83,7 @@ const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
         placeholder="Search title..."
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        className="search-input"
+        className="form-input"
       />
 
       <CustomSelect

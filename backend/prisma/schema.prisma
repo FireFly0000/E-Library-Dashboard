@@ -23,6 +23,8 @@ model User {
   is_verify   Boolean  @default(false)
   
   bookVersions BookVersion[]
+  comments Comment[]
+  readingList ReadingList[] @relation("UserReadingList")
 
   @@index([email], name: "idx_email")
   @@index([username], name: "idx_username")
@@ -31,7 +33,6 @@ model User {
 model Author {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(51)
-  dateOfBirth DateTime @map("date_of_birth")
   country   String    @db.VarChar(50)
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -40,23 +41,6 @@ model Author {
 
   @@index([name], name: "idx_author_name")
   @@index([country], name: "idx_author_country")
-}
-
-model BookVersion {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  bookId    Int      @map("book_id")
-  fileName  String   @map("file_name")
-  viewCount Int      @default(0) @map("view_count")
-  commentCount Int   @default(0) @map("comment_count")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  
-  user      User   @relation(fields: [userId], references: [id])
-  book      Book   @relation(fields: [bookId], references: [id])
-
-  @@index([userId], name: "idx_book_versions_user_id")
-  @@index([createdAt], name: "idx_book_versions_created_at")
 }
 
 enum CategoryCode {
@@ -93,13 +77,80 @@ model Book {
   slug        String       @unique @db.VarChar(100)
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
+  commentCount Int   @default(0) @map("comment_count")
+  viewCount   Int          @default(0) @map("view_count")
+  likeCount   Int          @default(0) @map("like_count")
   
   author      Author       @relation(fields: [authorId], references: [id])
   Category    Category     @relation(fields: [categoryId], references: [id])
   
   versions    BookVersion[]
+  comments Comment[]
+  readingList ReadingList[] @relation("BookReadingList")
 
   @@index([title], name: "idx_book_title")
   @@index([authorId], name: "idx_book_author_id")
   @@index([createdAt], name: "idx_book_created_at")
+  @@index([viewCount], name: "idx_book_view_count")
+}
+
+model BookVersion {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  fileName  String   @map("file_name")
+  viewCount Int      @default(0) @map("view_count")
+  likeCount    Int      @default(0) @map("like_count")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user      User   @relation(fields: [userId], references: [id])
+  book      Book   @relation(fields: [bookId], references: [id])
+
+  @@index([userId], name: "idx_book_versions_user_id")
+  @@index([createdAt], name: "idx_book_versions_created_at")
+  @@index([viewCount], name: "idx_book_versions_view_count")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  parentId  Int?     @map("parent_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user      User     @relation(fields: [userId], references: [id])
+  book      Book     @relation(fields: [bookId], references: [id])
+
+  parent    Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[]  @relation("CommentReplies")
+
+  @@index([userId], name: "idx_comment_user_id")
+  @@index([bookId], name: "idx_comment_book_id")
+  @@index([parentId], name: "idx_comment_parent_id")
+  @@index([createdAt], name: "idx_comment_created_at")
+}
+
+enum ReadingStatus {
+  TO_READ
+  OPENED
+  ABANDONED
+}
+
+model ReadingList {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  status ReadingStatus @default(TO_READ)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user      User     @relation("UserReadingList",fields: [userId], references: [id])
+  book      Book     @relation("BookReadingList",fields: [bookId], references: [id])
+
+  @@index([userId], name: "idx_reading_list_user_id")
+  @@index([bookId], name: "idx_reading_list_book_id")
+  @@unique([userId, bookId])
 }
