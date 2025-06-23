@@ -2,12 +2,14 @@ import express, { Application } from "express";
 import cors from "cors";
 import configs from "./configs/index";
 import routers from "./routes/index";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 const PORT = configs.general.PORT;
 const DOMAIN_NAME = configs.general.DOMAIN_NAME;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: DOMAIN_NAME,

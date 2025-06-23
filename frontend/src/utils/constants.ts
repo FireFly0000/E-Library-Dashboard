@@ -57,6 +57,7 @@ export const errorMessages = {
 
   //Auth
   loginAgain: "Please login again",
+  badRequest: "Bad request",
 };
 
 export const successMessages = {

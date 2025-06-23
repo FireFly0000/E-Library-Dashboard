@@ -76,25 +76,6 @@ export const resendVerifyEmail = createAsyncThunk<
   }
 });
 
-/*export const refreshToken = async () => {
-  try {
-    const response = await AuthApis.refreshToken();
-    console.log("Response from refreshToken:", response);
-    if (response) {
-      if (response.status >= 200 && response.status <= 299) {
-        Cookies.set("accessToken", response.data.data.accessToken);
-        Cookies.set("refreshToken", response.data.data.refreshToken);
-      } else {
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        window.location.href = "/login";
-      }
-    }
-  } catch (error) {
-    console.error("Error refreshing token:", error);
-  }
-};*/
-
 export const getMe = () => async (dispatch: AppDispatch) => {
   try {
     const response = await AuthApis.getMe();
@@ -103,7 +84,6 @@ export const getMe = () => async (dispatch: AppDispatch) => {
       if (response.status >= 200 && response.status <= 299) {
         dispatch(setUser(response.data.data));
       } else {
-        console.log("Get me error");
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
         window.location.href = "/";
@@ -115,7 +95,6 @@ export const getMe = () => async (dispatch: AppDispatch) => {
 };
 
 export const logout = () => async (dispatch: AppDispatch) => {
-  console.log("Logout action triggered");
   dispatch(
     setUser({
       username: "",

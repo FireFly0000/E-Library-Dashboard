@@ -26,7 +26,7 @@ export const errorMessages = {
   wrongConfirmPasswordIsRequired: "Wrong Confirm Password is required",
   passwordMustBeString: "Password must be a string",
   passWordAndConfirmPasswordMustBeSameRequired:
-    "Password and comfirm password must be same required !",
+    "Password and confirm password must be same required !",
 
   // Email
   emailNotExist: "Email does not exist",
@@ -49,6 +49,7 @@ export const errorMessages = {
   // Login
   loginFailed: "Email or password is invalid",
   signUpFailed: "Sign Up Failed",
+  serverFailed: "Server Failed, please try again",
 
   // User
   userNotFound: " User is not found ",
@@ -64,55 +65,11 @@ export const errorMessages = {
   // Reset password
   expiredToken: "This link is expired",
   errorToken: "This link is error",
-  errorMatchingPasssword: "Password ",
-
-  // Slug
-  slugIsUsed: "This slug is already in use",
-  courseSlugIsRequired: "Course Slug is required",
-  courseSlugMalformed: "Course Slug malformed",
-  courseSlugMustBeString: "Course Slug must be a string",
-
-  // Title
-  courseTitleIsRequired: "Title is required",
-  courseTitleMustBeString: "Title must be a string",
-  courseTitleIsTooLong: "Title is too long, maximum 100 characters only",
-
-  // Status
-  statusIsRequired: "Status is required",
-  statusMustBeBoolean: "Status must be a boolean",
-
-  // Description
-  descriptionIsRequired: "Description is required",
-  descriptionMustBeString: "Description must be a string",
-  tooLongDescription: "Description is too long",
-  tooshortDescription: "Description is too short",
-
-  // Summary
-  summaryIsRequired: "Summary is required",
-  summaryMustBeString: "Summary must be a string",
-
-  // Category
-  categoryArrayNumber: "Categories must be a array int",
-  // export const MESSAGE_ERROR_CATEGORIES_ARRAY_NUMBER = "Categories must be a array int";
-  categoryIsRequired: "Categories is required",
-  categoryNotFound: "Category Not Found",
-
-  // Thumbnail
-  thumbnailIsRequired: "Thumbnail is required",
-
-  // Upload Image
-  imageUploadError: "Upload Image Error",
+  errorMatchingPassword: "Password ",
 
   //Auth
   loginAgain: "Please login again",
   unauthorized: "Unauthorized",
-
-  //reOrder
-  reOrderRequired: "Your reOrder is missing",
-  orderExisted: "Order was Existed",
-  orderDuplicate: "Order item must be unique",
-
-  orderNotValid: "Order List is not valid",
 
   //Author
   authorNameMustBeString: "Author name must be a string",

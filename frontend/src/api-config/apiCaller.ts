@@ -34,12 +34,14 @@ axiosPublic.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const config = error?.config as CustomAxiosRequestConfig;
+    console.log(config._retry);
     if (error?.response?.status === 401 && !config._retry) {
       config._retry = true;
       const response = await AuthApis.refreshToken();
       const accessToken = response.data.data.accessToken;
       if (accessToken) {
         Cookies.set("accessToken", accessToken);
+        console.log(response.data.data.refreshToken);
         Cookies.set("refreshToken", response.data.data.refreshToken);
         config.headers.set("Authorization", `Bearer ${accessToken}`);
         return axiosInstance(config);
@@ -54,7 +56,6 @@ axiosPublic.interceptors.response.use(
     ) {
       console.log("error refresh", error.response);
       store.dispatch(authActions.logout()); // need to use store outside of component
-      Cookies.remove("refreshToken");
       Cookies.remove("accessToken");
       window.location.href = "/";
     }
@@ -78,6 +79,7 @@ export const apiCaller = (
     },
     url: `${path}`,
     data,
+    //withCredentials: true,
   });
 };
 

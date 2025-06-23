@@ -3,6 +3,7 @@ import {
   ResponseBase,
   ResponseError,
   ResponseSuccess,
+  ResponseWithToken,
 } from "../commons/response";
 import { db } from "../configs/db.config";
 import i18n from "../utils/i18next";
@@ -161,10 +162,17 @@ const login = async (req: Request): Promise<ResponseBase> => {
           expiresIn: configs.general.TOKEN_REFRESH_EXPIRED_TIME,
         }
       );
+      if (!accessToken || !refreshToken) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.serverFailed"),
+          false
+        );
+      }
 
       //Return the access token and refresh token.
       //Store the refresh token in Redis
-      return new ResponseSuccess(
+      return new ResponseWithToken(
         200,
         i18n.t("successMessages.successLogin"),
         true,
@@ -370,7 +378,7 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
       const userInformation = {
         user_id: userFound.id,
         email: userFound.email,
-        first_name: userFound.username,
+        username: userFound.username,
         url_avatar: userFound.url_avatar,
       };
       return new ResponseSuccess(
