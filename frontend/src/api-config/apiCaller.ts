@@ -1,22 +1,25 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import type { InternalAxiosRequestConfig } from "axios";
-import { AuthApis } from "@/apis";
+import type {
+  InternalAxiosRequestConfig,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import i18n from "@/utils/i18next";
 import type { AxiosError } from "axios";
 import { Response } from "@/types/response";
 import store from "@/redux/store";
 import { authActions } from "@/redux/slices";
 
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
-const axiosPublic = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
-});
+const baseURL = import.meta.env.VITE_BASE_URL;
 
-const axiosInstance = axios.create();
+const axiosPublic = axios.create({
+  baseURL: baseURL,
+});
 
 axiosPublic.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
@@ -36,25 +39,36 @@ axiosPublic.interceptors.response.use(
     const config = error?.config as CustomAxiosRequestConfig;
     if (error?.response?.status === 401 && !config._retry) {
       config._retry = true;
-      const response = await AuthApis.refreshToken();
-      const accessToken = response.data.data.accessToken;
-      if (accessToken) {
-        Cookies.set("accessToken", accessToken);
-        Cookies.set("refreshToken", response.data.data.refreshToken);
-        config.headers.set("Authorization", `Bearer ${accessToken}`);
-        return axiosInstance(config);
+      try {
+        const response = await axios.get(`${baseURL}/auth/refresh`, {
+          withCredentials: true,
+        });
+        const accessToken = response.data.data.accessToken;
+        if (accessToken) {
+          Cookies.set("accessToken", accessToken);
+          config.headers = {
+            ...config.headers,
+            Authorization: `Bearer ${accessToken}`,
+          };
+          return axiosPublic(config);
+        }
+      } catch (refreshError) {
+        const error = refreshError as AxiosResponse;
+        store.dispatch(authActions.logout()); // need to use store outside of component
+        Cookies.remove("accessToken");
+        window.location.href = "/";
+        return Promise.reject(error);
       }
     }
 
     if (
-      error.response &&
-      error.response.data &&
-      (error.response.data as Response<unknown>).message ===
-        i18n.t("errorMessages.loginAgain")
+      (error.response &&
+        error.response.data &&
+        (error.response.data as Response<unknown>).message ===
+          i18n.t("errorMessages.loginAgain")) ||
+      i18n.t("errorMessages.badRequest")
     ) {
-      console.log("error refresh", error.response);
       store.dispatch(authActions.logout()); // need to use store outside of component
-      Cookies.remove("refreshToken");
       Cookies.remove("accessToken");
       window.location.href = "/";
     }
@@ -68,16 +82,15 @@ export const apiCaller = (
   path: string,
   data?: Record<string, unknown>
 ) => {
-  const refreshToken = Cookies.get("refreshToken");
   return axiosPublic({
     method,
     headers: {
       "Access-Control-Allow-Credentials": true,
       "Access-Control-Allow-Origin": "*",
-      refreshToken: `rfToken=${refreshToken}`,
     },
     url: `${path}`,
     data,
+    withCredentials: true,
   });
 };
 

@@ -3,6 +3,7 @@ import {
   ResponseBase,
   ResponseError,
   ResponseSuccess,
+  ResponseWithToken,
 } from "../commons/response";
 import { db } from "../configs/db.config";
 import i18n from "../utils/i18next";
@@ -18,6 +19,7 @@ import { MyJwtPayload } from "../types/decodeToken.type";
 import { sendVerificationEmail } from "../utils/helper";
 import { JwtPayload } from "jsonwebtoken";
 import { RequestHasLogin } from "../types/request.type";
+import redis from "../configs/redis.config";
 
 const register = async (req: Request): Promise<ResponseBase> => {
   try {
@@ -162,9 +164,17 @@ const login = async (req: Request): Promise<ResponseBase> => {
         }
       );
 
+      if (!accessToken || !refreshToken) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.serverFailed"),
+          false
+        );
+      }
+
       //Return the access token and refresh token.
       //Store the refresh token in Redis
-      return new ResponseSuccess(
+      return new ResponseWithToken(
         200,
         i18n.t("successMessages.successLogin"),
         true,
@@ -300,19 +310,30 @@ const resendVerificationEmail = async (req: Request): Promise<ResponseBase> => {
 
 const refreshToken = async (req: Request): Promise<ResponseBase> => {
   try {
-    const rfTokenRaw = req.headers.refreshtoken as string;
-    const rfToken = rfTokenRaw.split("=")[1];
+    const oldToken = req.cookies.refreshToken;
 
-    if (!rfToken) {
-      return new ResponseError(401, i18n.t("errorMessages.badRequest"), false);
+    if (!oldToken) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
     }
+
+    //Check if refresh token is blacklisted
+    const isBlacklisted = await redis.get(`bl_${oldToken}`);
+    if (isBlacklisted) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+
     const decoded = jwt.verify(
-      rfToken,
+      oldToken,
       configs.general.JWT_SECRET_KEY
     ) as MyJwtPayload;
     if (!decoded) {
-      return new ResponseError(401, i18n.t("errorMessages.badRequest"), false);
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
     }
+
+    // Blacklist old token with same expiry time
+    const { exp } = jwt.decode(oldToken);
+    const ttl = exp - Math.floor(Date.now() / 1000);
+    await redis.set(`bl_${oldToken}`, "true", "EX", ttl);
 
     //if current refreshToken is valid, generate new tokens
     const newAccessToken = jwt.sign(
@@ -331,7 +352,7 @@ const refreshToken = async (req: Request): Promise<ResponseBase> => {
       }
     );
 
-    return new ResponseSuccess(
+    return new ResponseWithToken(
       200,
       i18n.t("successMessages.requestSuccess"),
       true,
@@ -370,7 +391,7 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
       const userInformation = {
         user_id: userFound.id,
         email: userFound.email,
-        first_name: userFound.username,
+        username: userFound.username,
         url_avatar: userFound.url_avatar,
       };
       return new ResponseSuccess(
@@ -381,8 +402,55 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
       );
     }
 
-    return new ResponseError(401, i18n.t("errorMessages.UnAuthorized"), false);
+    return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
   } catch (error: any) {
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const logout = async (req: RequestHasLogin): Promise<ResponseBase> => {
+  try {
+    if (!req.user_id) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.unauthorized"),
+        false
+      );
+    }
+
+    const token = req.cookies.refreshToken;
+
+    //Blacklisting current refreshToken
+    if (token) {
+      try {
+        const { exp } = jwt.decode(token);
+        const ttl = exp - Math.floor(Date.now() / 1000);
+        await redis.set(`bl_${token}`, "true", "EX", ttl);
+      } catch (error) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.blacklistFailed"),
+          false
+        );
+      }
+    } else {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.cantFindToken"),
+        false
+      );
+    }
+
+    return new ResponseSuccess(
+      200,
+      i18n.t("successMessages.logoutSuccess"),
+      true
+    );
+  } catch (error) {
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),
@@ -398,6 +466,7 @@ const AuthService = {
   login,
   refreshToken,
   getMe,
+  logout,
 };
 
 export default AuthService;

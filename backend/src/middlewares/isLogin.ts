@@ -49,7 +49,7 @@ export const isLogin = async (
       return;
     }
     if (error instanceof TokenExpiredError) {
-      res.status(401).json({ message: "expired" });
+      res.status(401).json({ message: error.message });
       return;
     } else if (error instanceof JsonWebTokenError) {
       res.status(401).json({ message: error.message });

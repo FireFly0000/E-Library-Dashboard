@@ -11,7 +11,6 @@ const EmailVerification = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log("API CALLED");
     dispatch(authActions.verifyEmail(token ?? ""));
   }, [token, dispatch]);
 

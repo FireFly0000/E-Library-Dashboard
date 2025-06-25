@@ -13,6 +13,14 @@ export class ResponseBase {
   public getStatusCode() {
     return this.status_code;
   }
+
+  public getMessage() {
+    return this.message;
+  }
+
+  public getSuccess() {
+    return this.success;
+  }
 }
 
 export class ResponseSuccess<T> extends ResponseBase {
@@ -57,5 +65,41 @@ export class ResponseSuccessPaginated<T> extends ResponseBase {
     this.total_pages = total_pages || 0;
     this.page = page || 1;
     this.limit = limit || 10;
+  }
+}
+
+type TokenPayload = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export class ResponseWithToken extends ResponseBase {
+  private data?: TokenPayload;
+
+  constructor(
+    status_code: number,
+    message: string,
+    success: boolean,
+    data?: TokenPayload
+  ) {
+    super(status_code, message, success);
+    this.data = data;
+  }
+
+  public getRefreshToken() {
+    return this.data?.refreshToken;
+  }
+
+  public toJSON() {
+    return {
+      status_code: this.getStatusCode(),
+      message: this.getMessage(),
+      success: this.getSuccess(),
+      data: this.data
+        ? {
+            accessToken: this.data.accessToken,
+          }
+        : undefined,
+    };
   }
 }

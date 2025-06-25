@@ -22,5 +22,8 @@ authRouter.get("/refresh", (req, res) => {
 authRouter.get("/me", isLogin, (req, res) => {
   controllers.authController.getMe(req, res);
 });
+authRouter.get("/logout", isLogin, (req, res) => {
+  controllers.authController.logout(req, res);
+});
 
 export default authRouter;

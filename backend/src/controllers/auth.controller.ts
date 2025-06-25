@@ -3,6 +3,9 @@ import { ValidationError } from "joi";
 import { convertJoiErrorToString } from "../commons/index";
 import { registrationSchema, loginSchema } from "../validations/auth";
 import service from "../services/index";
+import { ResponseWithToken } from "../commons/response";
+import ms from "ms";
+import configs from "../configs/index";
 
 class AuthController {
   //register or signup controller
@@ -55,6 +58,20 @@ class AuthController {
     }
 
     const response = await service.AuthService.login(req);
+    if (response instanceof ResponseWithToken) {
+      const refreshExpiration = ms(
+        configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
+      );
+
+      res.cookie("refreshToken", response.getRefreshToken(), {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: refreshExpiration,
+      });
+
+      return res.status(response.getStatusCode()).json(response.toJSON());
+    }
 
     return res.status(response.getStatusCode()).json(response);
   };
@@ -62,6 +79,30 @@ class AuthController {
   //refresh token controller
   async refreshToken(req: Request, res: Response): Promise<Response> {
     const response = await service.AuthService.refreshToken(req);
+    if (response instanceof ResponseWithToken) {
+      const refreshExpiration = ms(
+        configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
+      );
+
+      res.cookie("refreshToken", response.getRefreshToken(), {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: refreshExpiration,
+      });
+
+      return res.status(response.getStatusCode()).json(response.toJSON());
+    }
+
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  async logout(req: Request, res: Response): Promise<Response> {
+    const response = await service.AuthService.logout(req);
+
+    if (response.getStatusCode() === 200) {
+      res.clearCookie("refreshToken");
+    }
 
     return res.status(response.getStatusCode()).json(response);
   }
@@ -69,7 +110,6 @@ class AuthController {
   //getMe (get user info) controller
   async getMe(req: Request, res: Response): Promise<Response> {
     const response = await service.AuthService.getMe(req);
-
     return res.status(response.getStatusCode()).json(response);
   }
 }
