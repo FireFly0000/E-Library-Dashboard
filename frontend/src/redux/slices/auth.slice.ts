@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import { AuthApis } from "@/apis";
 import { AxiosResponse } from "axios";
 import { AppDispatch } from "../store";
+import toast from "react-hot-toast";
 
 type AuthSlice = {
   user: User;
@@ -81,20 +82,34 @@ export const getMe = () => async (dispatch: AppDispatch) => {
     const response = await AuthApis.getMe();
 
     if (response) {
-      if (response.status >= 200 && response.status <= 299) {
+      if (response.status === 200) {
         dispatch(setUser(response.data.data));
       } else {
         Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        window.location.href = "/";
       }
     }
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    const axiosError = error as AxiosResponse;
+    const data = axiosError.data as Response<null>;
+    toast.error(data.message as string);
   }
 };
 
-export const logout = () => async (dispatch: AppDispatch) => {
+export const logout = createAsyncThunk<
+  Response<null>,
+  void,
+  { rejectValue: Response<null> }
+>("auth/logout", async (_, ThunkAPI) => {
+  try {
+    const response = await AuthApis.logout();
+    return response.data as Response<null>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
+/*
   dispatch(
     setUser({
       username: "",
@@ -104,8 +119,7 @@ export const logout = () => async (dispatch: AppDispatch) => {
   );
   dispatch(setLogout());
   Cookies.remove("accessToken");
-  Cookies.remove("refreshToken");
-};
+  */
 
 const initialState: AuthSlice = {
   user: {
@@ -136,10 +150,6 @@ export const authSlice = createSlice({
       state.isLogin = true;
       state.isAuthChecked = true;
     },
-    setLogout: (state) => {
-      state.isLogin = false;
-      state.isAuthChecked = true;
-    },
     setIsAuthChecked: (state) => {
       state.isAuthChecked = true;
     },
@@ -168,7 +178,6 @@ export const authSlice = createSlice({
     });
     builder.addCase(login.fulfilled, (state, action) => {
       Cookies.set("accessToken", action.payload.data?.accessToken as string);
-      Cookies.set("refreshToken", action.payload.data?.refreshToken as string);
       state.isLogin = true;
 
       state.isLoading = false;
@@ -177,6 +186,27 @@ export const authSlice = createSlice({
       state.isLoading = false;
     });
 
+    //logout
+    builder.addCase(logout.pending, (state) => {
+      state.error = "";
+      state.success = "";
+      state.isLoading = true;
+    });
+    builder.addCase(logout.fulfilled, (state) => {
+      Cookies.remove("accessToken");
+      state.user.email = "";
+      state.user.id = undefined;
+      state.user.username = "";
+
+      state.isLogin = false;
+      state.isLoading = false;
+      state.isAuthChecked = true;
+    });
+    builder.addCase(logout.rejected, (state) => {
+      state.isLoading = false;
+    });
+
+    //verify email
     builder.addCase(verifyEmail.pending, (state) => {
       state.error = "";
       state.success = "";
@@ -208,7 +238,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setUser, setLogout, setUrlAvatar, setIsAuthChecked } =
-  authSlice.actions;
+export const { setUser, setUrlAvatar, setIsAuthChecked } = authSlice.actions;
 
 export default authSlice.reducer;

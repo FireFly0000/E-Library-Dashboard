@@ -25,11 +25,7 @@ const getAllAuthorsPaging = async (
     const userId = req.user_id;
 
     if (!userId) {
-      return new ResponseError(
-        401,
-        i18n.t("errorMessages.unauthorized"),
-        false
-      );
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
     }
     const pageSize = 10; // Fixed page size
 
@@ -105,7 +101,7 @@ export const filterAuthorsByName = async (
         authors
       );
     }
-    return new ResponseError(401, i18n.t("errorMessages.unauthorized"), false);
+    return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, e.toString(), false);
@@ -128,11 +124,7 @@ export const createAuthor = async (
     const userId = req.user_id;
 
     if (!userId) {
-      return new ResponseError(
-        401,
-        i18n.t("errorMessages.unauthorized"),
-        false
-      );
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
     }
 
     const authorData: CreateAuthorParams = {

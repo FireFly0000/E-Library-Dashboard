@@ -1,5 +1,3 @@
-import { error } from "console";
-
 export const errorMessages = {
   validationFail: "Validation fail",
   internalServer: "Internal server",
@@ -12,6 +10,7 @@ export const errorMessages = {
   emailTokenExpired: "The verification link has expired",
   tokenVerifiedCode: "The verification link is not correct",
   tokenGenerateCode: "This verification link was never generated",
+  cantFindToken: "Can't find token",
 
   // Password
   wrongPassword: "Wrong password",
@@ -78,6 +77,9 @@ export const errorMessages = {
   authorCountryMustBeString: "Author's country must be a string",
   authorCountryIsRequired: "Author's country is required",
   createdAuthorFailed: "Created author failed, please try again",
+
+  //redis
+  blacklistFailed: "Blacklisting token failed",
 };
 
 export const successMessages = {
@@ -106,6 +108,9 @@ export const successMessages = {
 
   // Login
   successLogin: "Logged in successfully",
+
+  //logout
+  logoutSuccess: "Logout Successfully",
 
   // Sign-up
   signUpSuccess: "Signup successful, please check your email",

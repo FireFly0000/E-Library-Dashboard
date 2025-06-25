@@ -32,7 +32,6 @@ const LoginPage = () => {
         toast.success(response.payload.message);
         dispatch(authActions.getMe());
       } else {
-        console.log(response.payload?.message);
         toast.error(response.payload?.message as string);
       }
     });
