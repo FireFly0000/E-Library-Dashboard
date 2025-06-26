@@ -109,18 +109,6 @@ export const logout = createAsyncThunk<
   }
 });
 
-/*
-  dispatch(
-    setUser({
-      username: "",
-      email: "",
-      id: undefined,
-    })
-  );
-  dispatch(setLogout());
-  Cookies.remove("accessToken");
-  */
-
 const initialState: AuthSlice = {
   user: {
     email: "",
