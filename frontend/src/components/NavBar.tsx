@@ -5,13 +5,20 @@ import { authActions } from "@/redux/slices/index";
 import ELibLogo from "/book-svgrepo-com.svg";
 import { Outlet } from "react-router-dom";
 import ThemeModeToggle from "@/components/ThemeToggle";
+import toast from "react-hot-toast";
 
 const NavBar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(authActions.logout());
+    dispatch(authActions.logout()).then((response) => {
+      if (response.payload?.status_code === 200) {
+        toast.success(response.payload.message);
+      } else {
+        toast.error(response.payload?.message as string);
+      }
+    });
     navigate("/");
   };
 

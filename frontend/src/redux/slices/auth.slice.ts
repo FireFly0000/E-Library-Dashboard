@@ -126,8 +126,8 @@ export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    setUrlAvatar: (state, payload: PayloadAction<string>) => {
-      state.user.url_avatar = payload.payload;
+    setUrlAvatar: (state, action: PayloadAction<string>) => {
+      state.user.url_avatar = action.payload;
     },
     setUser: (state, action: PayloadAction<User>) => {
       state.user.email = action.payload.email;
