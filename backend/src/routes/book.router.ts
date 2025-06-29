@@ -5,17 +5,18 @@ import {
   createBook,
   getAllBooksPaging,
 } from "../controllers/book.controller";
-import multer from "multer";
+import { uploadBookFileMdw } from "middlewares/multer";
+import { isLogin } from "middlewares/isLogin";
+//import multer from "multer";
+//const storage = multer.memoryStorage();
+//const upload = multer({ storage: storage });
 
 const bookRouter = Router();
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 bookRouter.get("/", getAllBooks);
 bookRouter.get("/paging", getAllBooksPaging);
 bookRouter.get("/:id", getBookById);
-bookRouter.post("/", upload.single("file"), createBook);
+bookRouter.post("/", isLogin, uploadBookFileMdw, createBook);
 //bookRouter.put("/:id", updateBook);
 //bookRouter.delete("/:id", deleteBook);
 
