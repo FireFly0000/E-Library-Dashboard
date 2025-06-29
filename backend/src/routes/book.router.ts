@@ -1,22 +1,19 @@
 import { Router } from "express";
-import {
-  getAllBooks,
-  getBookById,
-  createBook,
-  getAllBooksPaging,
-} from "../controllers/book.controller";
+import controllers from "../controllers/index";
 import { uploadBookFileMdw } from "middlewares/multer";
 import { isLogin } from "middlewares/isLogin";
 //import multer from "multer";
 //const storage = multer.memoryStorage();
 //const upload = multer({ storage: storage });
 
-const bookRouter = Router();
+const bookRouter: Router = Router();
 
-bookRouter.get("/", getAllBooks);
-bookRouter.get("/paging", getAllBooksPaging);
-bookRouter.get("/:id", getBookById);
-bookRouter.post("/", isLogin, uploadBookFileMdw, createBook);
+bookRouter.post("/", isLogin, uploadBookFileMdw, (req, res) => {
+  controllers.bookController.createAuthor(req, res);
+});
+//bookRouter.get("/", getAllBooks);
+//bookRouter.get("/paging", getAllBooksPaging);
+//bookRouter.get("/:id", getBookById);
 //bookRouter.put("/:id", updateBook);
 //bookRouter.delete("/:id", deleteBook);
 

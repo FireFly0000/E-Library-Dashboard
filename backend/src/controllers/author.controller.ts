@@ -5,8 +5,8 @@ import {
   filterAuthorsByNameSchema,
   createAuthorSchema,
 } from "../validations/author";
-import service from "../services/index";
-import { ValidationError } from "joi";
+import services from "../services/index";
+//import { ValidationError } from "joi";
 
 class AuthorController {
   // Get all authors with paging controller
@@ -24,7 +24,7 @@ class AuthorController {
       });
     }
 
-    const response = await service.AuthorService.getAllAuthorsPaging(
+    const response = await services.AuthorService.getAllAuthorsPaging(
       req,
       value
     );
@@ -46,7 +46,7 @@ class AuthorController {
       });
     }
 
-    const response = await service.AuthorService.filterAuthorsByName(
+    const response = await services.AuthorService.filterAuthorsByName(
       req,
       value
     );
@@ -64,7 +64,7 @@ class AuthorController {
       });
     }
 
-    const response = await service.AuthorService.createAuthor(req, value);
+    const response = await services.AuthorService.createAuthor(req, value);
     return res.status(response.getStatusCode()).json(response);
   };
 }
