@@ -10,6 +10,7 @@ import { s3 } from "../configs/aws.config";
 import slugify from "slugify";
 import sharp from "sharp";
 import redis from "../configs/redis.config";
+import { Response } from "express";
 
 export const sendVerificationEmail = async (
   payload: MyJwtPayload
@@ -175,3 +176,8 @@ export const parseSearchTitleAndAuthor = (
 
   return { title: input.trim(), author: "" };
 };
+
+//for streaming AI generated text
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -182,6 +182,9 @@ export const successMessages = {
   getBookVersions: "Get book versions successfully",
   viewCountedForCurrentSession: "View counted for current session already",
   viewsIncrementSuccessfully: "Views Increment Successfully",
+
+  //Ai services
+  AIContentGeneratedSuccessfully: "AI Content generated successfully",
 };
 
 export const allowedCountries = [
