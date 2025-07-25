@@ -1,6 +1,10 @@
 import Joi, { ObjectSchema } from "joi";
-
+import { allowedCategoryCodes } from "../types/book.type";
 import i18n from "../utils/i18next";
+import { Author } from "@prisma/client";
+import { allowedCountries } from "../utils/constant";
+
+export type AuthorWithPopularity = Author & { popularity: number };
 
 export type GetAllAuthorsPaging = {
   search?: string;
@@ -16,38 +20,34 @@ const allowedSortFields = [
   "created_at ASC",
 ];
 
-const allowedCategoryCodes = [
-  "FIC", // Fiction
-  "SCI", // Science
-  "BIO", // Biography
-  "ROM", // Romance
-  "FANT", // Fantasy
-  "THR", // Thriller
-  "HIST", // Historical
-  "MYST", // Mystery
-  "HORR", // Horror
-];
-
 export const getAllAuthorsPagingSchema: ObjectSchema<GetAllAuthorsPaging> =
   Joi.object({
     search: Joi.string().allow("").optional(),
-    country: Joi.string().allow("").optional(),
+    country: Joi.string()
+      .valid(...allowedCountries)
+      .allow("All")
+      .default("All")
+      .optional(),
     sortBy: Joi.string()
       .valid(...allowedSortFields)
       .default("created_at DESC"),
     category: Joi.string()
       .valid(...allowedCategoryCodes)
-      .allow("")
-      .optional(),
+      .allow("All")
+      .default("All")
+      .messages({
+        "any.only": i18n.t("errorMessages.invalidCategoryCode"),
+        "string.base": i18n.t("errorMessages.categoryMustBeString"),
+      }),
     page_index: Joi.number().integer().min(1).default(1),
   });
 
-export type FilterAuthorsByName = {
+//Search authors by name for uploading book
+export type SearchAuthorsByName = {
   name: string;
-  withBooks?: boolean;
 };
 
-export const filterAuthorsByNameSchema: ObjectSchema<FilterAuthorsByName> =
+export const searchAuthorsByNameSchema: ObjectSchema<SearchAuthorsByName> =
   Joi.object({
     name: Joi.string()
       .required()
@@ -55,9 +55,9 @@ export const filterAuthorsByNameSchema: ObjectSchema<FilterAuthorsByName> =
         "string.base": i18n.t("errorMessages.authorNameMustBeString"),
         "any.required": i18n.t("errorMessages.authorNameIsRequired"),
       }),
-    withBooks: Joi.boolean().default(false),
   });
 
+//Create author schema
 export type CreateAuthor = {
   name: string;
   country: string;
@@ -66,16 +66,22 @@ export type CreateAuthor = {
 export const createAuthorSchema: ObjectSchema<CreateAuthor> = Joi.object({
   name: Joi.string()
     .required()
+    .allow(null)
     .min(3)
+    .trim()
     .messages({
       "string.base": i18n.t("errorMessages.authorNameMustBeString"),
       "any.required": i18n.t("errorMessages.authorNameIsRequired"),
       "string.min": i18n.t("errorMessages.authorNameTooShort"),
     }),
   country: Joi.string()
+    .valid(...allowedCountries)
+    .allow(null)
     .required()
+    .trim()
     .messages({
       "string.base": i18n.t("errorMessages.authorCountryMustBeString"),
       "any.required": i18n.t("errorMessages.authorCountryIsRequired"),
+      "any.only": i18n.t("errorMessages.invalidCountry"), // Add this
     }),
 });

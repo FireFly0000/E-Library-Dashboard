@@ -1,24 +1,45 @@
-import { z } from "zod";
-import { Book } from "@prisma/client";
+export const allowedCategoryCodes = [
+  "FIC", // Fiction
+  "SCI", // Science
+  "BIO", // Biography
+  "ROM", // Romance
+  "FANT", // Fantasy
+  "THR", // Thriller
+  "HIST", // Historical
+  "MYST", // Mystery
+  "HORR", // Horror
+];
 
-export const bookSchema = z
-  .object({
-    title: z.string().min(1, "Title is required"),
-    authorId: z
-      .number()
-      .int()
-      .nonnegative("Author ID must be a non-negative integer")
-      .default(0),
-    fileName: z.string().min(1, "fileName is required"),
-    author: z
-      .object({
-        name: z.string().min(1, "Author name is required"),
-        country: z.string().min(1, "Country is required"),
-        dateOfBirth: z.string().min(1, "Date of birth is required"),
-      })
-      .optional()
-      .nullable(),
-  })
-  .strict();
+export type BookResponse = {
+  id: number;
+  title: string;
+  authorId: number;
+  categoryId: number;
+  thumbnailUrl: string;
+  viewCount: number;
+};
 
-export type BookWithSignedUrl = Book & { fileUrl: string };
+export type SearchTitleAndAuthorResponse = {
+  id: number;
+  title: string;
+  author: string; //author's name
+  thumbnailUrl: string;
+};
+
+type BookVersion = {
+  id: number;
+  fileUrl: string;
+  contributorName: string;
+  viewCount: number;
+  createdAt: Date;
+};
+
+export type BookInfo = {
+  title: string;
+  authorName: string;
+  authorCountry: string;
+  description: string;
+  thumbnailUrl: string;
+  totalViews: number;
+  versions: BookVersion[];
+};

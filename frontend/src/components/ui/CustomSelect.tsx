@@ -10,6 +10,7 @@ type CustomSelectProps<Item> = {
   getValue: (option: Item) => ReactNode;
   changeKey: (key: number) => void;
   className?: string;
+  variant?: "default" | "highlight";
 };
 
 function CustomSelect<ItemType>({
@@ -18,6 +19,7 @@ function CustomSelect<ItemType>({
   getLabel,
   changeKey,
   className,
+  variant,
 }: CustomSelectProps<ItemType>) {
   const filterWrapperRef = useRef<HTMLDivElement | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -51,7 +53,12 @@ function CustomSelect<ItemType>({
 
   return (
     <div
-      className={clsx("custom-select-root", className)}
+      className={clsx(
+        variant === "highlight"
+          ? "custom-select-root-highlight"
+          : "custom-select-root-default",
+        className
+      )}
       ref={filterWrapperRef}
       onClick={toggleDropdown}
       tabIndex={0}

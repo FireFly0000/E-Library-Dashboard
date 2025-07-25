@@ -1,4 +1,4 @@
-import apiCaller from "@/api-config/axiosInstance";
+import { apiCaller } from "@/api-config/axiosInstance";
 import { Register as RegisterType, Login as LoginType } from "../types/auth";
 import i18n from "../utils/i18next";
 

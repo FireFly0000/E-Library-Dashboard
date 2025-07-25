@@ -8,6 +8,7 @@ import { authActions } from "@/redux/slices";
 import store from "@/redux/store";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -112,10 +113,11 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-const apiCaller = (
+export const apiCaller = (
   method: string,
   path: string,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown> | FormData,
+  setUploadProgress?: (percent: number) => void
 ) => {
   return axiosInstance({
     method,
@@ -125,8 +127,49 @@ const apiCaller = (
     },
     url: `${path}`,
     data,
+    onUploadProgress: (progressEvent) => {
+      const total = progressEvent.total ?? 1;
+      const percent = Math.round((progressEvent.loaded * 100) / total);
+      if (setUploadProgress) {
+        setUploadProgress(percent);
+      }
+    },
     withCredentials: true,
   });
 };
 
-export default apiCaller;
+export const RtkBaseQuery =
+  (
+    { baseUrl }: { baseUrl: string } = { baseUrl: "" }
+  ): BaseQueryFn<{
+    url: string;
+    method: string;
+    data?: Record<string, unknown>;
+  }> =>
+  async ({ url, method, data }) => {
+    try {
+      const response = await axiosInstance({
+        method,
+        headers: {
+          "Access-Control-Allow-Credentials": true,
+          "Access-Control-Allow-Origin": "*",
+        },
+        url: baseUrl + `${url}`,
+        data,
+        withCredentials: true,
+      });
+      return response as AxiosResponse;
+    } catch (error) {
+      const axiosError = error as AxiosResponse;
+
+      return {
+        error: {
+          status: axiosError.status ?? 500,
+          data: {
+            message: axiosError.data?.message ?? "Unknown error",
+            success: axiosError.data?.success,
+          },
+        },
+      };
+    }
+  };

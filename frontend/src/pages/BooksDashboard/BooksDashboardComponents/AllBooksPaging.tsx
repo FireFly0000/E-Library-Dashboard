@@ -1,170 +1,173 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Button } from "@/components/ui/button";
 import CustomSelect from "@/components/ui/CustomSelect";
+import Select from "react-select";
+import ReactSelectStyles from "@/styles/ReactSelectStyles";
+import Pagination from "@/components/Pagination";
+import {
+  BooksSortByOptions,
+  BooksCategoryOptions,
+  countryList,
+} from "@/utils/constants";
+import { Book, BooksPaginationParams } from "@/types/books";
+//import debounce from "lodash/debounce";
+import { useGetBooksPagingQuery } from "@/services/bookApis";
+import { useRtkQueryErrorToast } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { bookActions } from "@/redux/slices";
+import { useNavigate } from "react-router-dom";
+import MobileAdvancedFilters from "./MobileAdvancedFilters";
 
-type Author = {
-  id: number;
-  name: string;
-  country: string;
-  dateOfBirth: Date;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type Book = {
-  id: number;
-  title: string;
-  authorId: number;
-  fileName: string;
-  createdAt: Date;
-  updatedAt: Date;
-  author: Author;
-  fileUrl: string;
-};
-
-type AllBooksPagingProps = {
-  upLoadFlag: boolean;
-};
-
-const AllBooksPaging: React.FC<AllBooksPagingProps> = ({ upLoadFlag }) => {
-  const [books, setBooks] = useState([]);
+const AllBooksPaging: React.FC = () => {
+  const [books, setBooks] = useState<Book[]>([]);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [keyword, setKeyword] = useState("");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt DESC");
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth); // State to track window width
+  const [country, setCountry] = useState("All");
+  const [category, setCategory] = useState("All");
+  const dispatch = useAppDispatch();
+  const bookUploaded = useAppSelector((state) => state.bookSlice.bookUploaded);
+  const navigate = useNavigate();
 
-  const filterOptions = [
-    { key: 0, label: "Newest First", value: "createdAt DESC" },
-    { key: 1, label: "Oldest First", value: "createdAt ASC" },
-    { key: 2, label: "Title A-Z", value: "title ASC" },
-    { key: 3, label: "Title Z-A", value: "title DESC" },
-  ];
+  const { data, error, isLoading, refetch } = useGetBooksPagingQuery({
+    search: debouncedSearch,
+    page_index: pageIndex,
+    country,
+    category,
+    sortBy,
+  } as BooksPaginationParams);
+  useRtkQueryErrorToast(error);
 
-  // Effect to update windowWidth on resize
+  //update books
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
+    if (data?.data) {
+      setBooks(data.data);
+      setTotalPages(data.total_pages);
+    }
+  }, [data]);
 
-    window.addEventListener("resize", handleResize);
+  // Debounce effect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      clearTimeout(handler);
     };
-  }, []);
+  }, [search]);
 
-  const getAllBooksPaging = async (
-    pageIndex: number,
-    keyword: string,
-    sortBy: string
-  ) => {
-    const response = await axios.get(
-      `/api/books/paging?page_index=${pageIndex}&key_word=${keyword}&sort_by=${sortBy}`
-    );
-    return response.data;
-  };
-
+  //Set page to 1 when filters applied
   useEffect(() => {
-    const fetchBooks = async () => {
-      const result = await getAllBooksPaging(pageIndex, keyword, sortBy);
-      setBooks(result.data.data); // books array
-      setTotalPages(result.data.total_page);
-    };
+    setPageIndex(1);
+  }, [debouncedSearch, country, category, sortBy]);
 
-    fetchBooks();
-  }, [pageIndex, keyword, sortBy, upLoadFlag]); // Added upLoadFlag to dependencies
+  //Refetch when a new book is added
+  useEffect(() => {
+    if (bookUploaded) {
+      refetch();
+      dispatch(bookActions.setBookUploaded(false));
+    }
+  }, [bookUploaded, refetch, dispatch]);
 
   return (
-    <div className="all-books-paging-container">
-      <input
-        type="text"
-        placeholder="Search title..."
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        className="form-input"
-      />
+    <section className="all-books-paging-container">
+      <div className="flex justify-between items-start w-full">
+        {/*basic filters*/}
+        <div className="flex flex-col lg:flex-row items-start justify-center gap-5">
+          <input
+            type="text"
+            placeholder="Search title..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="form-input"
+          />
 
-      <CustomSelect
-        options={filterOptions}
-        getValue={(item) => item.value}
-        getLabel={(item) => item.label}
-        getKey={(item) => item.key}
-        changeKey={(key) => setSortBy(filterOptions[key].value)}
-      />
+          <CustomSelect
+            options={BooksSortByOptions}
+            getValue={(item) => item.value}
+            getLabel={(item) => item.label}
+            getKey={(item) => item.key}
+            changeKey={(key) => setSortBy(BooksSortByOptions[key].value)}
+            className="w-[200px]"
+          />
+        </div>
 
-      <table className="book-table">
-        <thead>
-          <tr>
-            <th>Book ID</th>
-            <th>Created At</th>
-            <th>{windowWidth > 440 ? "Title" : "Title (PDF)"}</th>
-            <th>Author's Name</th>
-            {windowWidth > 440 && <th>PDF</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {books.map((book: Book) => (
-            <tr key={book.id}>
-              <td>{book.id}</td>
-              <td>{new Date(book.createdAt).toLocaleDateString()}</td>
-              <td>
-                {windowWidth > 440 ? (
-                  book.title
-                ) : (
-                  <a
-                    href={book.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="book-link"
-                  >
-                    {book.title}
-                  </a>
-                )}
-              </td>
-              <td>{book.author?.name || "Unknown"}</td>
-              {windowWidth > 440 && (
-                <td className="book-file-link">
-                  {book.fileName ? (
-                    <a
-                      href={book.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="book-link"
-                    >
-                      {windowWidth < 1200 ? "PDF" : book.fileName}
-                    </a>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-              )}
-            </tr>
+        {/*advanced filters for desktop 1280px or above*/}
+        <div className="hidden xl:flex items-center justify-center gap-5 mt-2 relative">
+          <label className="text-based text-foreground absolute bottom-[110%] left-0">
+            Category
+          </label>
+          <Select
+            options={BooksCategoryOptions}
+            onChange={(e) => {
+              if (e) setCategory(e.value);
+            }}
+            styles={ReactSelectStyles}
+            placeholder={category}
+            className="w-[200px]"
+          />
+
+          <label className="text-based text-foreground absolute  bottom-[110%] left-55">
+            Country
+          </label>
+          <Select
+            options={countryList}
+            onChange={(e) => {
+              if (e) setCountry(e.label);
+            }}
+            styles={ReactSelectStyles}
+            placeholder={country}
+            className="w-[200px]"
+          />
+        </div>
+
+        {/*advanced filters for mobile*/}
+        <MobileAdvancedFilters
+          setCategory={setCategory}
+          setCountry={setCountry}
+        />
+      </div>
+
+      {!isLoading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 items-center gap-8 place-items-center my-8 w-full">
+          {books.map((book: Book, index) => (
+            <div
+              key={index}
+              className="book-version-item"
+              onClick={() => navigate(`/book-versions/${book.id}`)}
+              title={book.title}
+            >
+              <img
+                className="w-full sm:w-[70%] object-cover"
+                src={book.thumbnailUrl}
+                alt={book.title}
+                onLoad={(e) =>
+                  e.currentTarget.classList.remove("animate-pulse")
+                }
+                loading="lazy"
+              />
+
+              <span className="w-40 sm:w-60 lg:w-40 xl:w-70 truncate text-center">
+                {book.title}
+              </span>
+              <span className="text-xs xl:text-base leading-none text-center">
+                {book.viewCount} views
+              </span>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      ) : (
+        <span className="text-foreground text-2xl text-center">Loading...</span>
+      )}
 
-      <Button
-        onClick={() =>
-          pageIndex > 1 ? setPageIndex(pageIndex - 1) : setPageIndex(pageIndex)
-        }
-      >
-        Prev
-      </Button>
-      <span className="text-[var(--foreground)] my-2.5">
-        Page {pageIndex} of {totalPages}
-      </span>
-      <Button
-        onClick={() =>
-          pageIndex < totalPages
-            ? setPageIndex(pageIndex + 1)
-            : setPageIndex(pageIndex)
-        }
-      >
-        Next
-      </Button>
-    </div>
+      <Pagination
+        currentPage={pageIndex}
+        totalPages={totalPages}
+        onPageChange={setPageIndex}
+      />
+    </section>
   );
 };
 

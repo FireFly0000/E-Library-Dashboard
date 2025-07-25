@@ -5,30 +5,30 @@ import {
   forwardRef,
   useRef,
 } from "react";
-//import debounce from "lodash/debounce";
-import { useSearchAuthorsByNameQuery } from "@/services/authorApis";
-import { Author } from "@/types/authors";
+import { BookSearchTitleAndAuthor } from "@/types/books";
+import { useGetBooksSearchByTitleAndAuthorQuery } from "@/services/bookApis";
 import { useRtkQueryErrorToast } from "@/hooks/hooks";
+//import debounce from "lodash/debounce";
 
-type ExistingAuthorInputProps = {
-  setAuthorId: (id: number) => void;
+type ExistingBookInputProps = {
+  setBookId: (id: number) => void;
   disabled: boolean;
 };
 
-export type ExistingAuthorInputRef = {
+export type ExistingBookInputRef = {
   clearInput: () => void;
 };
 
-const ExistingAuthorInput = forwardRef<
-  ExistingAuthorInputRef,
-  ExistingAuthorInputProps
->(({ setAuthorId, disabled }, ref) => {
-  const [authors, setAuthors] = useState<Author[]>([]);
+const ExistingBookInput = forwardRef<
+  ExistingBookInputRef,
+  ExistingBookInputProps
+>(({ setBookId, disabled }, ref) => {
+  const [books, setBooks] = useState<BookSearchTitleAndAuthor[]>([]);
   const [selectedVal, setSelectedVal] = useState<string>("");
   const [debouncedVal, setDebouncedVal] = useState<string>("");
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { data, error } = useSearchAuthorsByNameQuery(debouncedVal, {
+  const { data, error } = useGetBooksSearchByTitleAndAuthorQuery(debouncedVal, {
     skip: debouncedVal.trim() === "" || isSelected, // prevent API call when input is empty
   });
   useRtkQueryErrorToast(error);
@@ -36,12 +36,12 @@ const ExistingAuthorInput = forwardRef<
   //Update data from API here
   useEffect(() => {
     if (debouncedVal.trim() === "") {
-      setAuthors([]);
+      setBooks([]);
       return;
     }
 
     if (data?.data) {
-      setAuthors(data.data);
+      setBooks(data.data);
     }
   }, [data, debouncedVal]);
 
@@ -63,7 +63,7 @@ const ExistingAuthorInput = forwardRef<
     clearInput: () => {
       setSelectedVal("");
       setDebouncedVal("");
-      setAuthors([]);
+      setBooks([]);
       setIsSelected(false);
       if (inputRef.current) {
         inputRef.current.value = "";
@@ -71,16 +71,16 @@ const ExistingAuthorInput = forwardRef<
     },
   }));
 
-  const handleSelectAuthor = (author: Author) => {
-    setAuthorId(author.id);
-    setAuthors([]); // Clear the authors list after selection
-    setSelectedVal(`${author.name} (${author.country}) - id: ${author.id}`); // Set the selected value to the input field
-    setIsSelected(true);
+  const handleSelectBook = (book: BookSearchTitleAndAuthor) => {
+    setBookId(book.id);
+    setBooks([]); // Clear the books list after selection
+    setSelectedVal(`${book.title} by ${book.author}`); // Set the selected value to the input field
+    setIsSelected(true); // freeze input
   };
 
   return (
     <div className="input-field-container">
-      <label className="form-label">3. Search Existing Author</label>
+      <label className="form-label">2. Search Existing Book</label>
       <input
         type="text"
         className={`form-input ${disabled ? "opacity-50" : ""}`}
@@ -90,26 +90,28 @@ const ExistingAuthorInput = forwardRef<
         onClick={() => {
           setSelectedVal(""); // Clear the input to allow new search
           setDebouncedVal("");
-          setAuthors([]); // Also clear the list in case it's stale
+          setBooks([]); // Also clear the list in case it's stale
           setIsSelected(false);
         }}
         value={selectedVal} // Set the input value to the selected value
-        placeholder="Search author by name..."
+        placeholder="Book's title by author's name..."
         disabled={disabled}
         ref={inputRef}
       />
 
-      {authors.length ? (
+      {books.length ? (
         <div className="author-list">
-          {authors.map((author: Author) => (
+          {books.map((book: BookSearchTitleAndAuthor) => (
             <div
-              key={author.id}
-              className="author-item"
-              onClick={() => handleSelectAuthor(author)}
+              key={book.id}
+              className="book-search-item"
+              onClick={() => handleSelectBook(book)}
             >
-              <p>
-                {author.name} {`(${author.country})`} - id: {author.id}
-              </p>
+              <img src={book.thumbnailUrl} className="w-15 object-contain" />
+              <div className="flex flex-col justify-center">
+                <p>{book.title}</p>
+                <p className="italic">By {book.author}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -120,4 +122,4 @@ const ExistingAuthorInput = forwardRef<
   );
 });
 
-export default ExistingAuthorInput;
+export default ExistingBookInput;

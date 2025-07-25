@@ -41,6 +41,7 @@ model Author {
 
   @@index([name], name: "idx_author_name")
   @@index([country], name: "idx_author_country")
+  @@unique([name, country], name: "idx_unique_author_name_country")
 }
 
 enum CategoryCode {
@@ -65,6 +66,7 @@ model Category {
   books     Book[]
 
   @@index([name], name: "idx_category_name")
+  @@index([categoryCode], name: "idx_category_code")
 }
 
 model Book {
@@ -82,7 +84,7 @@ model Book {
   likeCount   Int          @default(0) @map("like_count")
   
   author      Author       @relation(fields: [authorId], references: [id])
-  Category    Category     @relation(fields: [categoryId], references: [id])
+  category    Category     @relation(fields: [categoryId], references: [id])
   
   versions    BookVersion[]
   comments Comment[]

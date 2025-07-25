@@ -37,9 +37,21 @@ const ReactSelectStyles: StylesConfig<
     ...base,
     backgroundColor: "var(--background)",
   }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: "var(--background)",
+    border: "2px solid var(--foreground)", // 👈 sets the border color
+  }),
   placeholder: (base) => ({
     ...base,
     color: "var(--muted-foreground)", // 🔍 ensures visibility in light mode
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: "var(--foreground)", // or any CSS variable or color code
+    "&:hover": {
+      color: "var(--primary)", // optional hover color
+    },
   }),
 };
 
