@@ -55,6 +55,39 @@ export const bookApi = createApi({
       }),
       providesTags: ["AI-services"],
     }),
+
+    /*StreamAIContent: builder.query({
+      queryFn: () => ({ data: "" }), //Initial empty data
+      async onCacheEntryAdded(
+        { content, language, title, service }: AIServicesParams,
+        { cacheDataLoaded, updateCachedData, cacheEntryRemoved }
+      ) {
+        await cacheDataLoaded; // Wait for initial data (if any) to load
+        const baseURL = import.meta.env.VITE_BASE_URL;
+
+        const url = new URL(`${baseURL}/books/ai-services`);
+        url.searchParams.set("content", content);
+        url.searchParams.set("language", language);
+        url.searchParams.set("title", title);
+        url.searchParams.set("service", service);
+
+        const eventSource = new EventSource(url.toString());
+
+        eventSource.onmessage = (e) => {
+          updateCachedData((draft) => {
+            return draft + e.data;
+          });
+        };
+
+        eventSource.onerror = (error) => {
+          console.error("SSE Error:", error);
+          eventSource.close();
+        };
+
+        await cacheEntryRemoved; // Wait for the cache entry to be removed
+        eventSource.close(); // Close the SSE connection
+      },
+    }),*/
   }),
 });
 

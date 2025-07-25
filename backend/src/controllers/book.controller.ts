@@ -128,9 +128,11 @@ class BookController {
     return res.status(response.getStatusCode()).json(response);
   };
 
-  translateContent = async (req: Request, res: Response): Promise<Response> => {
+  AIContentServices = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
     const { error, value } = AIContentSchema.validate(req.query);
-
     if (error) {
       return res.status(400).json({
         status_code: 400,

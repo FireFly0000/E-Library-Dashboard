@@ -622,7 +622,12 @@ const AIContentServices = async (
     //  console.log(chunk.text);
     //}
 
-    return new ResponseSuccess(200, "testing", true, response.text);
+    return new ResponseSuccess(
+      200,
+      i18n.t("successMessages.AIContentGeneratedSuccessfully"),
+      true,
+      response.text
+    );
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);

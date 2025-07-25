@@ -63,6 +63,13 @@ const PDFReader: React.FC<PDFReaderProps> = ({
     }
   }, [isLoading, data]);
 
+  //Close Modal if AI services error
+  useEffect(() => {
+    if (error) {
+      setAIContentOpen(false);
+    }
+  }, [error]);
+
   //Highlight text for AI service
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
