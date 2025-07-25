@@ -1,19 +1,41 @@
 import { Router } from "express";
 import controllers from "../controllers/index";
-import { uploadBookFileMdw } from "middlewares/multer";
-import { isLogin } from "middlewares/isLogin";
+import {
+  uploadBookAssetsMdw,
+  enforceUploadLimits,
+} from "../middlewares/multer";
+import { isLogin } from "../middlewares/isLogin";
+import { viewerIdentifier } from "../middlewares/viewerIdentifier";
 //import multer from "multer";
 //const storage = multer.memoryStorage();
 //const upload = multer({ storage: storage });
 
 const bookRouter: Router = Router();
 
-bookRouter.post("/", isLogin, uploadBookFileMdw, (req, res) => {
-  controllers.bookController.createAuthor(req, res);
+bookRouter.post(
+  "/",
+  isLogin,
+  uploadBookAssetsMdw,
+  enforceUploadLimits,
+  (req, res) => {
+    controllers.bookController.createBook(req, res);
+  }
+);
+bookRouter.get("/paging", (req, res) => {
+  controllers.bookController.getAllBooksPaging(req, res);
 });
-//bookRouter.get("/", getAllBooks);
-//bookRouter.get("/paging", getAllBooksPaging);
-//bookRouter.get("/:id", getBookById);
+bookRouter.get("/title-by-author", isLogin, (req, res) => {
+  controllers.bookController.getBooksByTitleAndAuthor(req, res);
+});
+bookRouter.get("/book-versions", (req, res) => {
+  controllers.bookController.getBookVersions(req, res);
+});
+bookRouter.post("/update-view-count", viewerIdentifier, (req, res) => {
+  controllers.bookController.updateBooksViews(req, res);
+});
+bookRouter.get("/ai-services", (req, res) => {
+  controllers.bookController.translateContent(req, res);
+});
 //bookRouter.put("/:id", updateBook);
 //bookRouter.delete("/:id", deleteBook);
 

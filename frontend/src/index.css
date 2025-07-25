@@ -126,7 +126,7 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/70;
+  @apply bg-muted-foreground/70 cursor-pointer;
 }
 
 /* Handle on hover */
@@ -140,7 +140,20 @@
   background-color: var(--input);
   @apply border text-[16px] p-3 rounded-lg 
   text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none
-  
+  placeholder:text-[var(--muted-foreground)]
+
+  focus:ring-[var(--ring)]
+  transition-[color,box-shadow] 
+  focus:ring-[1px];
+}
+
+.text-area {
+  border: 1px solid var(--border);
+  background-color: var(--input);
+  @apply border text-[16px] p-3 rounded-none
+  text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none
+  placeholder:text-[var(--muted-foreground)]
+
   focus:ring-[var(--ring)]
   transition-[color,box-shadow] 
   focus:ring-[1px];

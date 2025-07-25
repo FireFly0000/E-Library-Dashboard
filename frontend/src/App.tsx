@@ -4,7 +4,6 @@ import { useAppDispatch } from "@/hooks/hooks";
 import { authActions } from "@/redux/slices/index";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Cookies from "js-cookie";
-import HomePage from "./pages/HomePage/HomePage";
 import BooksDashboard from "./pages/BooksDashboard/BooksDashboard";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
@@ -13,6 +12,7 @@ import PrivateRoute from "./routes/PrivateRoute";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import NavBar from "./components/NavBar";
 import { Toaster } from "react-hot-toast";
+import BookVersionsDashboard from "./pages/BookVersionsDashboard/BookVersionsDashboard";
 
 //axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
 
@@ -42,10 +42,13 @@ function App() {
           <Routes>
             <Route element={<NavBar />}>
               <Route element={<PrivateRoute />}>
-                <Route path="/dashboard" element={<BooksDashboard />} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<BooksDashboard />} />
+              <Route
+                path="/book-versions/:bookId"
+                element={<BookVersionsDashboard />}
+              />
             </Route>
 
             <Route

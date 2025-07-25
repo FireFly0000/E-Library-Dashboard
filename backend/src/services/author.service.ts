@@ -10,50 +10,56 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { RequestHasLogin } from "../types/request.type";
 import {
   GetAllAuthorsPaging as GetAllAuthorsPagingParams,
-  FilterAuthorsByName as FilterAuthorsByNameParams,
+  SearchAuthorsByName as SearchAuthorsByNameParams,
   CreateAuthor as CreateAuthorParams,
+  AuthorWithPopularity,
 } from "../validations/author";
 import { formatAuthorName } from "../utils/helper";
 
 //Get all authors paging (without books)
 const getAllAuthorsPaging = async (
-  req: RequestHasLogin,
   params: GetAllAuthorsPagingParams
 ): Promise<ResponseBase> => {
   try {
     const { search, country, sortBy, page_index, category } = params;
-    const userId = req.user_id;
 
-    if (!userId) {
-      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
-    }
     const pageSize = 10; // Fixed page size
 
-    const authorsData: [] = await db.$queryRawUnsafe(
+    let sortOption = "a.created_at DESC";
+    if (sortBy.includes("created_at")) {
+      sortOption = `a.${sortBy}`;
+    }
+
+    const authorsData: AuthorWithPopularity[] = await db.$queryRawUnsafe(
       `
       SELECT a.*, COALESCE(SUM(b."view_count"), 0) AS popularity
       FROM "Author" a
       LEFT JOIN "Book" b ON b."author_id" = a."id"
       LEFT JOIN "Category" c ON c."id" = b."category_id"
       WHERE (a."name" ILIKE $1 AND a."country" ILIKE $2)
-      AND (c."category_code" = $3 OR $3 = '') 
+      AND (c."category_code" = $3::"CategoryCode" OR $3 IS NULL) 
       GROUP BY a.id
-      ORDER BY ${sortBy}
+      ORDER BY ${sortOption}
       LIMIT ${pageSize} OFFSET ${(page_index - 1) * pageSize}
     `,
       `%${search || ""}%`,
-      `%${country || ""}%`,
-      category || ""
+      `%${country === "All" ? "" : country}%`,
+      category === "All" ? null : category
     );
 
     const totalRecords = authorsData.length;
     const totalPages = Math.ceil(totalRecords / pageSize);
 
+    const normalizedAuthorsData = authorsData.map((author) => ({
+      ...author,
+      popularity: Number(author.popularity),
+    }));
+
     return new ResponseSuccessPaginated(
       200,
       i18n.t("successMessages.getAllAuthors"),
       true,
-      authorsData,
+      normalizedAuthorsData,
       totalRecords, // Total number of authors returned
       totalPages, // Total number of pages
       page_index, // Current page index
@@ -63,7 +69,7 @@ const getAllAuthorsPaging = async (
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);
     }
-
+    console.log(error);
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),
@@ -72,13 +78,13 @@ const getAllAuthorsPaging = async (
   }
 };
 
-//filter authors by name
-export const filterAuthorsByName = async (
+//Search authors by name
+export const searchAuthorsByName = async (
   req: RequestHasLogin,
-  params: FilterAuthorsByNameParams
+  params: SearchAuthorsByNameParams
 ): Promise<ResponseBase> => {
   try {
-    const { name, withBooks } = params;
+    const { name } = params;
     const userId = req.user_id;
 
     if (userId) {
@@ -88,9 +94,6 @@ export const filterAuthorsByName = async (
             contains: name,
             mode: "insensitive", // Case insensitive search
           },
-        },
-        include: {
-          books: withBooks, // Include books if needed
         },
       });
 
@@ -165,7 +168,7 @@ export const createAuthor = async (
 
 const AuthorService = {
   getAllAuthorsPaging,
-  filterAuthorsByName,
+  searchAuthorsByName,
   createAuthor,
 };
 export default AuthorService;

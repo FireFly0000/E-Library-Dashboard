@@ -39,8 +39,13 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start mt-10 gap- text-center w-full text-[var(--foreground)] px-5">
-      <img src={ELibLogo} alt="App's logo" className="w-[10%] min-w-[200px]" />
+    <div className="flex flex-col items-center justify-start mt-10 gap- text-center w-full text-[var(--foreground)] px-2 md:px-5">
+      <img
+        src={ELibLogo}
+        alt="App's logo"
+        className="w-[7%] md:w-[10%] min-w-[200px] cursor-pointer"
+        onClick={() => (window.location.href = "/")}
+      />
       <Formik<LoginType>
         initialValues={initialValues}
         validationSchema={loginValidationSchema}
@@ -49,7 +54,7 @@ const LoginPage = () => {
         }
       >
         {({ isSubmitting }) => (
-          <Form className="default-card-container w-[80vw] max-w-[400px] gap-5 px-12 py-10">
+          <Form className="default-card-container w-[80vw] max-w-[400px] gap-5 px-4 md:px-12 py-10">
             <span className="text-2xl">Login</span>
             {keys.map((key) => (
               <>
@@ -70,6 +75,12 @@ const LoginPage = () => {
             <Button size="lg" type="submit" disabled={isSubmitting}>
               Submit
             </Button>
+            <span
+              className="text-primary underline cursor-pointer"
+              onClick={() => (window.location.href = "/register")}
+            >
+              Doesn't have an account? Register
+            </span>
             <span className="-my-2">{isLoading ? "Loading..." : ""}</span>
           </Form>
         )}

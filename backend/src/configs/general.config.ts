@@ -19,4 +19,5 @@ export const general = {
   AWS_S3_BUCKET_REGION: process.env.AWS_S3_BUCKET_REGION,
   EMAIL_SERVER: process.env.EMAIL_SERVER,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+  GOOGLE_AI_KEY: process.env.GOOGLE_AI_KEY,
 };

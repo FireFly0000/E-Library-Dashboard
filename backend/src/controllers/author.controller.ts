@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { convertJoiErrorToString } from "../commons/index";
 import {
   getAllAuthorsPagingSchema,
-  filterAuthorsByNameSchema,
+  searchAuthorsByNameSchema,
   createAuthorSchema,
 } from "../validations/author";
 import services from "../services/index";
@@ -24,19 +24,16 @@ class AuthorController {
       });
     }
 
-    const response = await services.AuthorService.getAllAuthorsPaging(
-      req,
-      value
-    );
+    const response = await services.AuthorService.getAllAuthorsPaging(value);
     return res.status(response.getStatusCode()).json(response);
   };
 
   //filter authors by name controller
-  filterAuthorsByName = async (
+  searchAuthorsByName = async (
     req: Request,
     res: Response
   ): Promise<Response> => {
-    const { error, value } = filterAuthorsByNameSchema.validate(req.query);
+    const { error, value } = searchAuthorsByNameSchema.validate(req.query);
 
     if (error) {
       return res.status(400).json({
@@ -46,7 +43,7 @@ class AuthorController {
       });
     }
 
-    const response = await services.AuthorService.filterAuthorsByName(
+    const response = await services.AuthorService.searchAuthorsByName(
       req,
       value
     );
