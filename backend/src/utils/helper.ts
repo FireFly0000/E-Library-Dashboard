@@ -10,7 +10,7 @@ import { s3 } from "../configs/aws.config";
 import slugify from "slugify";
 import sharp from "sharp";
 import redis from "../configs/redis.config";
-import { Response } from "express";
+import crypto from "crypto";
 
 export const sendVerificationEmail = async (
   payload: MyJwtPayload
@@ -180,4 +180,14 @@ export const parseSearchTitleAndAuthor = (
 //for streaming AI generated text
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function hashAIRedisKey(
+  content: string,
+  service: string,
+  language: string,
+  bookTitle: string
+): string {
+  const raw = `${content}_${bookTitle}_${service}_${language}`;
+  return crypto.createHash("sha256").update(raw).digest("hex");
 }

@@ -20,6 +20,7 @@ import {
   uploadFileToS3,
   getFileUrlFromS3,
   parseSearchTitleAndAuthor,
+  hashAIRedisKey,
 } from "../utils/helper";
 import { generateBookSlug } from "../utils/helper";
 import { CategoryCode } from "@prisma/client";
@@ -601,22 +602,43 @@ const AIContentServices = async (
   try {
     const { content, title, language, service } = params;
 
-    const formatPrompt = `Format the response as HTML fragment only (no <html> or <head> or <body> tags, do not begin with \`\`\`html), 
-    suitable for rendering in a Tailwind-based React frontend. Must use bullet points with sections for clarity. Do not add any padding and border`;
+    const redisKey = hashAIRedisKey(content, service, language, title);
+    const cacheKey = `bookAIServices_${redisKey}`;
+    const cachedResponse = await redis.get(cacheKey);
+
+    if (cachedResponse) {
+      return new ResponseSuccess(
+        200,
+        i18n.t("successMessages.AIContentGeneratedSuccessfully"),
+        true,
+        cachedResponse
+      );
+    }
+
+    const formatPrompt = `Format the response as HTML fragment only (no <html> or <head> or <body> tags, do not begin with \`\`\`html),
+    suitable for rendering in a Tailwind-based React frontend. 
+    
+    1,The main content must be separated sections with bullet points in each section for clarity. 
+    2,The bullet point must be <li></li> only do not use <ul></ul>. 
+    3,Must add space between sections, and each section must have a bold header.
+    5,Must include a brief intro before the sections and a summary after the sections 
+    5,Do not add any padding, border, and all text must be of color text-foreground`;
 
     const contentPrompt =
       service === "translate"
-        ? `Translate the below chunk of content from the book ${title} into the language ${language}. Just give the translation, doesn't need any intro.\n${content}`
+        ? `Translate the below chunk of content from the book ${title} into the language ${language}. Just give the translation, don't add anything else.\n${content}`
         : service === "discuss"
-        ? `Discuss the below content from the book ${title} in the language ${language}. ${formatPrompt}.\n${content}.`
+        ? `${formatPrompt}. Discuss the below content from the book ${title} in the language ${language}.\n${content}.`
         : service === "summarize"
-        ? `Summarize the context of the below content from the book ${title} in the language ${language}. ${formatPrompt}.\n${content}.`
+        ? `${formatPrompt}. Summarize the context of the below content from the book ${title} in the language ${language}.\n${content}.`
         : `Nothing`;
 
     const response = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
       contents: contentPrompt,
     });
+
+    await redis.set(cacheKey, response.text, "EX", 60 * 15); //expires in 15 mins
 
     //for await (const chunk of response) {
     //  console.log(chunk.text);

@@ -2431,7 +2431,7 @@ ms@^2.1.3:
     js-cookie "^3.0.5"
     lodash "^4.17.21"
     lucide-react "^0.513.0"
-    my-app "file:C:/Users/wktfi/AppData/Local/Yarn/Cache/v6/npm-my-app-0.0.0-3037eb63-02cb-4dd5-bf16-351f417072b4-1753382725869/node_modules/my-app"
+    my-app "file:C:/Users/wktfi/AppData/Local/Yarn/Cache/v6/npm-my-app-0.0.0-7bd69f17-38f8-49d9-a600-f0aaf9437043-1753501102285/node_modules/my-app"
     pdfjs-dist "^5.3.93"
     react "^19.0.0"
     react-datepicker "^8.4.0"

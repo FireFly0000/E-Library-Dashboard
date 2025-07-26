@@ -1,6 +1,6 @@
 import { apiCaller } from "@/api-config/axiosInstance";
 import i18n from "../utils/i18next";
-import { UpdateViewsParams } from "@/types/books";
+import { BookAIServicesParams, UpdateViewsParams } from "@/types/books";
 
 const createBook = async (
   values: FormData,
@@ -22,4 +22,11 @@ const updateViews = async (values: UpdateViewsParams) => {
   return response;
 };
 
-export { createBook, updateViews };
+const bookAiServices = async (values: BookAIServicesParams) => {
+  const { content, language, title, service } = values;
+  const path = `books/ai-services?content=${content}&language=${language}&title=${title}&service=${service}`;
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
+export { createBook, updateViews, bookAiServices };
