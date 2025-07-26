@@ -62,7 +62,7 @@ const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Modal Content */}
-        <div>{children}</div>
+        {children}
       </div>
     </div>
   );

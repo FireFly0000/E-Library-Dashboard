@@ -74,7 +74,7 @@ export type UpdateViewsParams = {
 };
 
 //AI services
-export type AIServicesParams = {
+export type BookAIServicesParams = {
   content: string;
   language: string;
   title: string;

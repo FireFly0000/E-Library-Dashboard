@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { BookApis } from "@/apis";
 import toast from "react-hot-toast";
 import { UpdateViewsParams } from "@/types/books";
+import { BookAIServicesParams } from "@/types/books";
 
 type BookSlice = {
   bookUploaded: boolean;
@@ -37,6 +38,20 @@ export const updateViewCount = createAsyncThunk<
   try {
     const response = await BookApis.updateViews(body);
     return response.data as Response<null>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
+export const bookAIServices = createAsyncThunk<
+  Response<string>,
+  BookAIServicesParams,
+  { rejectValue: Response<null> }
+>("books/ai-services", async (body, ThunkAPI) => {
+  try {
+    const response = await BookApis.bookAiServices(body);
+    return response.data as Response<string>;
   } catch (error) {
     const axiosError = error as AxiosResponse<Response<null>>;
     return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
@@ -89,6 +104,20 @@ export const bookSlice = createSlice({
     });
 
     builder.addCase(updateViewCount.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action?.payload?.message ?? "Unknown error";
+    });
+
+    //bookAIServices
+    builder.addCase(bookAIServices.pending, (state) => {
+      state.isLoading = true;
+    });
+
+    builder.addCase(bookAIServices.fulfilled, (state) => {
+      state.isLoading = false;
+    });
+
+    builder.addCase(bookAIServices.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action?.payload?.message ?? "Unknown error";
     });

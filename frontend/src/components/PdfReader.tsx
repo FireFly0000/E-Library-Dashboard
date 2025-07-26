@@ -3,15 +3,23 @@ import { useState, useRef, useEffect } from "react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { Button } from "./ui/button";
-import { ArrowRight, ArrowLeft, Plus, Minus, Download } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Plus,
+  Minus,
+  Download,
+  LoaderCircle,
+} from "lucide-react";
 import CustomSelect from "./ui/CustomSelect";
 import { readModes } from "@/utils/constants";
-import { useAIContentServicesQuery } from "@/services/bookApis";
-import { useRtkQueryErrorToast } from "@/hooks/hooks";
 import Select from "react-select";
 import { languageList } from "@/utils/constants";
 import ReactSelectStyles from "@/styles/ReactSelectStyles";
 import Modal from "./Modal";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { bookActions } from "@/redux/slices";
+import toast from "react-hot-toast";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -41,34 +49,43 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   const [AILanguage, setAILanguage] = useState("English");
   const [AIContentOpen, setAIContentOpen] = useState(false);
   const [AIContentData, setAIContentData] = useState("");
+  const isAILoading = useAppSelector((state) => state.bookSlice.isLoading);
+  const dispatch = useAppDispatch();
 
-  const shouldFetch = !!(highlightedText && AIServiceOption && AIContentOpen); // Control when to run query
-  const { data, error, isLoading } = useAIContentServicesQuery(
-    {
-      title: title!,
-      content: highlightedText,
-      service: AIServiceOption,
-      language: AILanguage,
-    },
-    {
-      skip: !shouldFetch,
-    }
-  );
-  useRtkQueryErrorToast(error);
-
-  // Update rendered content only when data finishes loading
+  //Toast AI error message and close AI content modal
+  const AIErrorMessage = useAppSelector((state) => state.bookSlice.error);
   useEffect(() => {
-    if (!isLoading && data?.data) {
-      setAIContentData(data.data);
-    }
-  }, [isLoading, data]);
-
-  //Close Modal if AI services error
-  useEffect(() => {
-    if (error) {
+    if (AIErrorMessage !== "") {
+      toast.error(AIErrorMessage);
       setAIContentOpen(false);
     }
-  }, [error]);
+  }, [AIErrorMessage]);
+
+  //Fetch AI response when AI content modal opened
+  useEffect(() => {
+    const fetchAIResponse = async () => {
+      if (AIContentOpen) {
+        const response = await dispatch(
+          bookActions.bookAIServices({
+            content: highlightedText,
+            language: AILanguage,
+            service: AIServiceOption,
+            title: title ? title : "",
+          })
+        );
+        setAIContentData(response.payload?.data ?? "");
+      }
+    };
+
+    fetchAIResponse();
+  }, [
+    AIContentOpen,
+    highlightedText,
+    AILanguage,
+    AIServiceOption,
+    title,
+    dispatch,
+  ]);
 
   //Highlight text for AI service
   const [popupVisible, setPopupVisible] = useState(false);
@@ -83,7 +100,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       setPopupVisible(true);
 
       // Positioning at mouse cursor
-      setPopupPosition({ x: e.pageX, y: e.pageY });
+      setPopupPosition({ x: e.pageX, y: e.pageY - 70 });
     } else {
       setPopupVisible(false);
       setHighlightedText("");
@@ -386,7 +403,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
         {/*popup menu when highlight a chunk of text for AI Services*/}
         {popupVisible && (
           <div
-            className="absolute z-50 bg-card border border-border rounded-lg shadow-lg p-2 space-y-1"
+            className="absolute z-50 bg-card border border-border rounded-lg shadow-lg p-2"
             style={{
               top: `${popupPosition.y}px`,
               left: `${popupPosition.x}px`,
@@ -427,15 +444,14 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           isOpen={AIContentOpen}
           onClose={() => {
             setAIContentOpen(false);
-            setAIContentData("");
           }}
           title={AIServiceOption.toLocaleUpperCase()}
-          className="w-[80vw] overflow-auto max-h-[80wh]"
+          className="flex flex-col w-[95vw] sm:w-[80vw]"
         >
-          {isLoading || AIContentData === "" ? (
-            <span className="text-lg text-foreground text-center">
-              Loading...
-            </span>
+          {isAILoading ? (
+            <div className="flex w-full items-center justify-center">
+              <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
+            </div>
           ) : (
             <div
               className="w-full text-foreground border-border border-2 rounded-lg py-4 px-8"
