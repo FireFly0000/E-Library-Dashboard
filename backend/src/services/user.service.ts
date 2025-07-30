@@ -82,8 +82,6 @@ const getUserProfile = async (
       }),
     ]);
 
-    console.log(userProfileRaw);
-
     if (!userProfileRaw) {
       return new ResponseError(
         400,
