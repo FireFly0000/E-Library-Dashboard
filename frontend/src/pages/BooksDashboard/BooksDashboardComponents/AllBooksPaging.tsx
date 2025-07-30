@@ -9,13 +9,13 @@ import {
   countryList,
 } from "@/utils/constants";
 import { Book, BooksPaginationParams } from "@/types/books";
-//import debounce from "lodash/debounce";
 import { useGetBooksPagingQuery } from "@/services/bookApis";
 import { useRtkQueryErrorToast } from "@/hooks/hooks";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 import { useNavigate } from "react-router-dom";
-import MobileAdvancedFilters from "./MobileAdvancedFilters";
+import MobileAdvancedFilters from "@/components/MobileAdvancedFilters";
+import { LoaderCircle } from "lucide-react";
 
 const AllBooksPaging: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -136,7 +136,9 @@ const AllBooksPaging: React.FC = () => {
             <div
               key={index}
               className="book-version-item"
-              onClick={() => navigate(`/book-versions/${book.id}`)}
+              onClick={() =>
+                navigate(`/book-versions/${book.id}/${book.authorId}`)
+              }
               title={book.title}
             >
               <img
@@ -159,7 +161,7 @@ const AllBooksPaging: React.FC = () => {
           ))}
         </div>
       ) : (
-        <span className="text-foreground text-2xl text-center">Loading...</span>
+        <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
       )}
 
       <Pagination

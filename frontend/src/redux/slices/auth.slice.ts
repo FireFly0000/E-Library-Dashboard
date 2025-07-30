@@ -113,7 +113,10 @@ const initialState: AuthSlice = {
   user: {
     email: "",
     username: "",
+    password: "",
+    url_avatar: "",
     id: undefined,
+    viewCount: -1,
   },
   isLogin: false,
   isLoading: false,
@@ -135,6 +138,7 @@ export const authSlice = createSlice({
 
       state.user.id = action.payload.id;
       state.user.url_avatar = action.payload.url_avatar;
+      state.user.viewCount = action.payload.viewCount;
       state.isLogin = true;
       state.isAuthChecked = true;
     },

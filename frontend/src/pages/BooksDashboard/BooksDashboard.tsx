@@ -13,7 +13,7 @@ const BooksDashboard: React.FC = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   return (
-    <div className="books-dashboard-root-container">
+    <main className="books-dashboard-root-container">
       {/* Upload book section starts here */}
       <div className="py-4 w-[90vw] max-w-[1400px]">
         <Button
@@ -44,7 +44,7 @@ const BooksDashboard: React.FC = () => {
       {/* Upload book section ends here */}
 
       <AllBooksPaging />
-    </div>
+    </main>
   );
 };
 

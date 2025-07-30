@@ -13,6 +13,8 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import NavBar from "./components/NavBar";
 import { Toaster } from "react-hot-toast";
 import BookVersionsDashboard from "./pages/BookVersionsDashboard/BookVersionsDashboard";
+import AuthorsDashboard from "./pages/AuthorsDashboard/AuthorsDashboard";
+import BooksByAuthorIdDashboard from "./pages/BooksByAuthorIdDashboard/BooksByAuthorIdDashboard";
 
 //axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
 
@@ -42,12 +44,18 @@ function App() {
           <Routes>
             <Route element={<NavBar />}>
               <Route element={<PrivateRoute />}>
-                <Route path="/profile" element={<ProfilePage />} />
+                {/*<Route path="/profile/:userId" element={<ProfilePage />} />*/}
               </Route>
+              <Route path="/profile/:userId" element={<ProfilePage />} />
               <Route path="/" element={<BooksDashboard />} />
               <Route
-                path="/book-versions/:bookId"
+                path="/book-versions/:bookId/:authorId"
                 element={<BookVersionsDashboard />}
+              />
+              <Route path="/authors" element={<AuthorsDashboard />} />
+              <Route
+                path="/books-by-author-id/:authorId/:authorName/:authorCountry/"
+                element={<BooksByAuthorIdDashboard />}
               />
             </Route>
 

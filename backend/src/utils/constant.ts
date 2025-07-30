@@ -78,6 +78,8 @@ export const errorMessages = {
   authorCountryIsRequired: "Author's country is required",
   invalidCountry: "Country name is invalid",
   createdAuthorFailed: "Created author failed, please try again",
+  authorIdIsRequired: "Author;s ID is required",
+  authorIdMustBeNumber: "Author's ID must be number",
 
   //redis
   blacklistFailed: "Blacklisting token failed",
@@ -126,6 +128,9 @@ export const errorMessages = {
   invalidAIServiceName: "Invalid AI service's name",
   AIServiceNameRequired: "AI service's name is required",
   AIServiceNameMustBeString: "AI service's name must be a string",
+
+  //User
+  UserProfileNotFound: "Can not find user's profile",
 };
 
 export const successMessages = {
@@ -182,9 +187,14 @@ export const successMessages = {
   getBookVersions: "Get book versions successfully",
   viewCountedForCurrentSession: "View counted for current session already",
   viewsIncrementSuccessfully: "Views Increment Successfully",
+  getAllBooks: "Get All books paging Successful",
+  getAllBooksByAuthorID: "Get books paging by author's ID successful",
 
   //Ai services
   AIContentGeneratedSuccessfully: "AI Content generated successfully",
+
+  //user
+  getUserProfile: "Get user profile successfully",
 };
 
 export const allowedCountries = [

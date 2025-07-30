@@ -389,10 +389,11 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
 
     if (userFound) {
       const userInformation = {
-        user_id: userFound.id,
+        id: userFound.id,
         email: userFound.email,
         username: userFound.username,
         url_avatar: userFound.url_avatar,
+        viewCount: userFound.total_views,
       };
       return new ResponseSuccess(
         200,

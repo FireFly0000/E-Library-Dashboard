@@ -41,8 +41,8 @@ const FilterList: React.FC<FilterListProps> = ({ list, search, setValue }) => {
 };
 
 type MobileAdvancedFiltersProps = {
-  setCategory: (category: string) => void;
-  setCountry: (country: string) => void;
+  setCategory?: (category: string) => void;
+  setCountry?: (country: string) => void;
 };
 
 const MobileAdvancedFilters: React.FC<MobileAdvancedFiltersProps> = ({
@@ -108,32 +108,36 @@ const MobileAdvancedFilters: React.FC<MobileAdvancedFiltersProps> = ({
           <div className="fixed left-1/2 -translate-x-1/2 z-50 mt-2 border-primary border-[2px] bg-card rounded-lg">
             {/*Current filter selection */}
             <div className="flex items-center justify-center w-[95vw] text-center">
-              <div
-                className={`text-lg hover:text-primary transition-colors duration-300 border-border border-[2px] p-2 select-none cursor-pointer w-full ${
-                  selectedListName === "category"
-                    ? "text-primary"
-                    : "text-foreground"
-                }`}
-                onClick={() => {
-                  setSelectedListName("category");
-                  setSearch("");
-                }}
-              >
-                Category
-              </div>
-              <div
-                className={`text-lg hover:text-primary transition-colors duration-300 border-border border-[2px] p-2 select-none cursor-pointer w-full ${
-                  selectedListName === "country"
-                    ? "text-primary"
-                    : "text-foreground"
-                }`}
-                onClick={() => {
-                  setSelectedListName("country");
-                  setSearch("");
-                }}
-              >
-                Country
-              </div>
+              {setCategory && (
+                <div
+                  className={`text-lg hover:text-primary transition-colors duration-300 border-border border-[2px] p-2 select-none cursor-pointer w-full ${
+                    selectedListName === "category"
+                      ? "text-primary"
+                      : "text-foreground"
+                  }`}
+                  onClick={() => {
+                    setSelectedListName("category");
+                    setSearch("");
+                  }}
+                >
+                  Category
+                </div>
+              )}
+              {setCountry && (
+                <div
+                  className={`text-lg hover:text-primary transition-colors duration-300 border-border border-[2px] p-2 select-none cursor-pointer w-full ${
+                    selectedListName === "country"
+                      ? "text-primary"
+                      : "text-foreground"
+                  }`}
+                  onClick={() => {
+                    setSelectedListName("country");
+                    setSearch("");
+                  }}
+                >
+                  Country
+                </div>
+              )}
             </div>
             <input
               type="text"
@@ -144,7 +148,7 @@ const MobileAdvancedFilters: React.FC<MobileAdvancedFiltersProps> = ({
             />
 
             {/*Category Filters list */}
-            {selectedListName === "category" && (
+            {selectedListName === "category" && setCategory && (
               <FilterList
                 list={BooksCategoryOptions}
                 search={search}
@@ -153,7 +157,7 @@ const MobileAdvancedFilters: React.FC<MobileAdvancedFiltersProps> = ({
             )}
 
             {/*Country Filters list */}
-            {selectedListName === "country" && (
+            {selectedListName === "country" && setCountry && (
               <FilterList
                 list={countryList}
                 search={search}

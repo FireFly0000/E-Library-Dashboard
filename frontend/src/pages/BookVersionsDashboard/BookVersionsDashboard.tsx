@@ -1,5 +1,5 @@
-import { useParams } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { BookInfo, BookVersionTableItem } from "@/types/books";
 import "./BookVersionsDashboard.css";
 import { useGetBookVersionsQuery } from "@/services/bookApis";
@@ -12,7 +12,7 @@ import { useAppDispatch } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 
 const BookVersionsDashboard = () => {
-  const { bookId } = useParams();
+  const { bookId, authorId } = useParams();
   const [bookInfo, setBookInfo] = useState<BookInfo | null>(null);
   const [bookVersions, setBookVersions] = useState<
     BookVersionTableItem[] | null
@@ -29,41 +29,48 @@ const BookVersionsDashboard = () => {
   });
   useRtkQueryErrorToast(error);
   const dispatch = useAppDispatch();
-  const initialBookVersions = useRef<BookVersionTableItem[]>([
-    {
-      id: -1,
-      createdAt: "Created At",
-      contributorName: "Contributor",
-      fileUrl: "File",
-      reader: "Reader",
-      viewCount: -1,
-    },
-  ]);
+  const navigate = useNavigate();
 
   //To load bookVersions into format for table layout using grid
   useEffect(() => {
+    const initialBookVersions: BookVersionTableItem[] = [
+      {
+        id: -1,
+        createdAt: "Created At",
+        contributorName: "Contributor",
+        contributorId: -1,
+        fileUrl: "File",
+        reader: "Reader",
+        viewCount: -1,
+      },
+    ];
     if (data?.data) {
       setBookInfo(data.data);
       setTotalPages(data.total_pages);
       data.data.versions.forEach((version) => {
-        initialBookVersions.current.push({
+        initialBookVersions.push({
           id: version.id,
           createdAt: new Date(version.createdAt).toLocaleDateString(),
           contributorName: version.contributorName,
+          contributorId: version.contributorId,
           fileUrl: version.fileUrl,
           reader: "Open",
           viewCount: version.viewCount,
         });
       });
-      setBookVersions(initialBookVersions.current);
+      setBookVersions(initialBookVersions);
     }
   }, [data]);
 
-  const handleViewsIncrement = async (bookVersionId: number) => {
+  const handleViewsIncrement = async (
+    bookVersionId: number,
+    contributorId: number
+  ) => {
     await dispatch(
       bookActions.updateViewCount({
         bookId: Number(bookId),
         bookVersionId: bookVersionId,
+        contributorId: contributorId,
       })
     );
   };
@@ -94,7 +101,17 @@ const BookVersionsDashboard = () => {
                   {bookInfo?.title}
                 </span>
                 <span className="text-lg italic text-center xl:text-start">
-                  By {bookInfo?.authorName}
+                  By{" "}
+                  <span
+                    className="hover:text-primary underline transition-colors duration-200 cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/books-by-author-id/${authorId}/${bookInfo?.authorName}/${bookInfo?.authorCountry}`
+                      )
+                    }
+                  >
+                    {bookInfo?.authorName}
+                  </span>
                 </span>
                 <span className="text-lg text-center xl:text-start">
                   Country: {bookInfo?.authorCountry}
@@ -118,8 +135,8 @@ const BookVersionsDashboard = () => {
               />
             </div>
 
-            {bookVersions?.map((book: BookVersionTableItem) => (
-              <div className="book-table-grid" key={book.id}>
+            {bookVersions?.map((book: BookVersionTableItem, index) => (
+              <div className="book-table-grid" key={index}>
                 <div>{book.id === -1 ? "ID" : book.id}</div>
                 <div>
                   {book.createdAt === "Created At"
@@ -127,12 +144,23 @@ const BookVersionsDashboard = () => {
                     : new Date(book.createdAt).toLocaleDateString()}
                 </div>
                 <div
-                  className="break-words whitespace-normal"
+                  className={`break-words whitespace-normal ${
+                    index > 0 ? "book-link" : ""
+                  }`}
                   title={book.contributorName}
+                  onClick={() => {
+                    console.log("Hello World");
+                    //if (index === 0) return;
+                    navigate(`/profile/${book.contributorId}`);
+                  }}
                 >
                   {book.contributorName}
                 </div>
-                <div onClick={() => handleViewsIncrement(book.id)}>
+                <div
+                  onClick={() =>
+                    handleViewsIncrement(book.id, book.contributorId)
+                  }
+                >
                   {book.reader === "Reader" ? (
                     <span>File</span>
                   ) : (

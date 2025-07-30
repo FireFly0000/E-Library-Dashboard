@@ -45,6 +45,7 @@ export type BookVersion = {
   id: number;
   fileUrl: string;
   contributorName: string;
+  contributorId: number;
   viewCount: number;
   createdAt: Date;
 };
@@ -64,6 +65,7 @@ export type BookVersionTableItem = {
   fileUrl: string;
   reader: string;
   contributorName: string;
+  contributorId: number;
   viewCount: number;
   createdAt: string;
 };
@@ -71,6 +73,7 @@ export type BookVersionTableItem = {
 export type UpdateViewsParams = {
   bookId: number;
   bookVersionId: number;
+  contributorId: number;
 };
 
 //AI services
@@ -79,4 +82,26 @@ export type BookAIServicesParams = {
   language: string;
   title: string;
   service: string;
+};
+
+//Books by author id dashboard
+export type BooksByAuthorIdParams = {
+  search: string;
+  authorId: number;
+  sortBy: string;
+  page_index: number;
+  category: string;
+};
+
+export type BookByAuthorId = {
+  id: number;
+  title: string;
+  authorId: number;
+  thumbnailUrl: string;
+  viewCount: number;
+};
+
+export type BookByAuthorDashboardResponse = {
+  totalViews: number;
+  books: BookByAuthorId[];
 };

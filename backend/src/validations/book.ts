@@ -217,6 +217,7 @@ export const getBookVersionsByIdSchema: ObjectSchema<GetBookVersionsById> =
 export type UpdateViewsParams = {
   bookId: number;
   bookVersionId: number;
+  contributorId: number;
 };
 
 export const updateBooksViewsSchema: ObjectSchema<UpdateViewsParams> =
@@ -234,6 +235,13 @@ export const updateBooksViewsSchema: ObjectSchema<UpdateViewsParams> =
       .messages({
         "any.required": i18n.t("errorMessages.bookVersionIdIsRequired"),
         "number.base": i18n.t("errorMessages.bookVersionIdMustBeNumber"),
+      }),
+    contributorId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.contributorIdIsRequired"),
+        "number.base": i18n.t("errorMessages.contributorIdMustBeNumber"),
       }),
   });
 
@@ -285,3 +293,46 @@ export const AIContentSchema: ObjectSchema<AITranslateParams> = Joi.object({
       "string.base": i18n.t("errorMessages.AIServiceNameMustBeString"),
     }),
 });
+
+//getBooksPagingByAuthorsID
+
+export type GetBooksPagingByAuthorID = {
+  search: string;
+  sortBy: string;
+  page_index: number;
+  category: string;
+  authorId: number;
+};
+
+export const getBooksPagingByAuthorIdSchema: ObjectSchema<GetBooksPagingByAuthorID> =
+  Joi.object({
+    search: Joi.string()
+      .allow("")
+      .optional()
+      .messages({
+        "string.base": i18n.t("errorMessages.bookSearchMustBeString"),
+      }),
+    sortBy: Joi.string()
+      .valid(...allowedSortFields)
+      .default("createdAt DESC")
+      .messages({
+        "any.only": i18n.t("errorMessages.invalidSortBy"),
+        "string.base": i18n.t("errorMessages.sortByMustBeString"),
+      }),
+    category: Joi.string()
+      .valid(...allowedCategoryCodes)
+      .allow("All")
+      .default("All")
+      .messages({
+        "any.only": i18n.t("errorMessages.invalidCategoryCode"),
+        "string.base": i18n.t("errorMessages.categoryMustBeString"),
+      }),
+    page_index: Joi.number().integer().min(1).default(1),
+    authorId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.authorIdIsRequired"),
+        "number.base": i18n.t("errorMessages.authorIdMustBeNumber"),
+      }),
+  });

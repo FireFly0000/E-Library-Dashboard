@@ -15,6 +15,7 @@ import {
   AuthorWithPopularity,
 } from "../validations/author";
 import { formatAuthorName } from "../utils/helper";
+import { AuthorDashboardResponse } from "types/author.type";
 
 //Get all authors paging (without books)
 const getAllAuthorsPaging = async (
@@ -28,11 +29,17 @@ const getAllAuthorsPaging = async (
     let sortOption = "a.created_at DESC";
     if (sortBy.includes("created_at")) {
       sortOption = `a.${sortBy}`;
+    } else {
+      sortOption = sortBy;
     }
 
     const authorsData: AuthorWithPopularity[] = await db.$queryRawUnsafe(
-      `
-      SELECT a.*, COALESCE(SUM(b."view_count"), 0) AS popularity
+      `SELECT 
+        a.id,
+        a.name,
+        a.country,
+        a.created_at AS "createdAt", 
+        COALESCE(SUM(b."view_count"), 0) AS popularity
       FROM "Author" a
       LEFT JOIN "Book" b ON b."author_id" = a."id"
       LEFT JOIN "Category" c ON c."id" = b."category_id"
@@ -50,10 +57,15 @@ const getAllAuthorsPaging = async (
     const totalRecords = authorsData.length;
     const totalPages = Math.ceil(totalRecords / pageSize);
 
-    const normalizedAuthorsData = authorsData.map((author) => ({
-      ...author,
-      popularity: Number(author.popularity),
-    }));
+    const normalizedAuthorsData: AuthorDashboardResponse[] = await Promise.all(
+      authorsData.map((author) => ({
+        id: author.id,
+        name: author.name,
+        country: author.country,
+        popularity: Number(author.popularity),
+        createdAt: author.createdAt,
+      }))
+    );
 
     return new ResponseSuccessPaginated(
       200,

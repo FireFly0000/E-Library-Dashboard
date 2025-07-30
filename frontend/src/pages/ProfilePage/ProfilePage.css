@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-.hello-div {
-  @apply px-10 py-3 text-lg bg-[var(--primary)] text-[var(--button-text)];
+.profile-page-root-container {
+  @apply flex justify-center items-center flex-col 
+  w-[90vw] max-w-[1400px] mt-5;
 }

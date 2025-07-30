@@ -36,6 +36,9 @@ bookRouter.post("/update-view-count", viewerIdentifier, (req, res) => {
 bookRouter.get("/ai-services", (req, res) => {
   controllers.bookController.AIContentServices(req, res);
 });
+bookRouter.get("/books-by-author-id", (req, res) => {
+  controllers.bookController.getBooksPagingByAuthorID(req, res);
+});
 //bookRouter.put("/:id", updateBook);
 //bookRouter.delete("/:id", deleteBook);
 
