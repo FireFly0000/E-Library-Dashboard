@@ -15,6 +15,7 @@ import {
   GetBookVersionsById,
   UpdateViewsParams,
   AITranslateParams,
+  GetBooksPagingByAuthorID,
 } from "../validations/book";
 import {
   uploadFileToS3,
@@ -28,6 +29,8 @@ import {
   BookInfo,
   BookResponse,
   SearchTitleAndAuthorResponse,
+  BookByAuthorId,
+  BookByAuthorDashboardResponse,
 } from "types/book.type";
 import { formatAuthorName, formatBookTitle } from "../utils/helper";
 import { Prisma } from "@prisma/client";
@@ -435,6 +438,7 @@ const getBookVersions = async (
               createdAt: true,
               user: {
                 select: {
+                  id: true,
                   username: true,
                 },
               },
@@ -480,6 +484,7 @@ const getBookVersions = async (
           viewCount: version.viewCount,
           createdAt: version.createdAt,
           contributorName: version.user.username,
+          contributorId: version.user.id,
         }))
       ),
     };
@@ -511,7 +516,7 @@ const updateBooksViews = async (
   params: UpdateViewsParams & { ip: string }
 ): Promise<ResponseBase> => {
   try {
-    const { bookVersionId, bookId, ip } = params;
+    const { bookVersionId, bookId, contributorId, ip } = params;
 
     const userId = req.user_id; // if logged in
 
@@ -542,13 +547,13 @@ const updateBooksViews = async (
 
     //Increment views with check
     const viewsUpdated = await db.$transaction(async (tx) => {
-      // Check if bookVersion belongs to the book
+      // Check if bookVersion belongs to the book and user
       const bookVersion = await tx.bookVersion.findUnique({
-        where: { id: bookVersionId },
+        where: { id: bookVersionId, userId: contributorId },
       });
 
       if (!bookVersion || bookVersion.bookId !== bookId) {
-        throw new Error("BookVersionDoesNotBelongToBook");
+        throw new Error("BookVersionDoesNotBelongToBookOrUser");
       }
 
       const bookUpdate = await tx.book.update({
@@ -561,7 +566,12 @@ const updateBooksViews = async (
         data: { viewCount: { increment: 1 } },
       });
 
-      return { bookUpdate, versionUpdate };
+      const userUpdate = await tx.user.update({
+        where: { id: contributorId },
+        data: { total_views: { increment: 1 } },
+      });
+
+      return { bookUpdate, versionUpdate, userUpdate };
     });
 
     if (!viewsUpdated) {
@@ -578,10 +588,10 @@ const updateBooksViews = async (
       true
     );
   } catch (error) {
-    if (error.message === "BookVersionDoesNotBelongToBook") {
+    if (error.message === "BookVersionDoesNotBelongToBookOrUser") {
       return new ResponseError(
         400,
-        i18n.t("successMessages.viewsIncrementFailed"),
+        i18n.t("errorMessages.viewsIncrementFailed"),
         false
       );
     }
@@ -662,6 +672,110 @@ const AIContentServices = async (
   }
 };
 
+const getBooksPagingByAuthorID = async (
+  params: GetBooksPagingByAuthorID
+): Promise<ResponseBase> => {
+  try {
+    const { search, page_index, category, authorId } = params;
+
+    // Parse sort field and direction
+    const sortBy = params.sortBy || "createdAt DESC";
+    const [sortField, sortDirection] = sortBy
+      .split(" ")
+      .map((item) => (item === "popularity" ? "viewCount" : item));
+
+    const pageSize = 16; // Fixed page size
+
+    const categoryFilter = category && category !== "All" ? category : null;
+    const whereClause = {
+      title: {
+        contains: search,
+        mode: "insensitive" as Prisma.QueryMode,
+      },
+      category: categoryFilter
+        ? {
+            categoryCode: categoryFilter as CategoryCode,
+          }
+        : undefined,
+      author: {
+        id: authorId,
+      },
+    };
+
+    const [booksDataRaw, totalRecords, totalViewsRes] = await db.$transaction([
+      db.book.findMany({
+        where: whereClause,
+        orderBy: {
+          [sortField]: sortDirection.toLowerCase() === "asc" ? "asc" : "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+          thumbnail: true,
+          authorId: true,
+          categoryId: true,
+          viewCount: true,
+        },
+        skip: (page_index - 1) * pageSize,
+        take: pageSize,
+      }),
+      db.book.count({
+        where: whereClause,
+      }),
+      db.$queryRawUnsafe<{ total_views: number }>(
+        `SELECT SUM("view_count") as total_views
+        FROM "Book"
+        WHERE "author_id" = $1
+        `,
+        authorId
+      ),
+    ]);
+
+    if (!booksDataRaw) {
+      return new ResponseError(400, i18n.t("errorMessages.NoBookFound"), false);
+    }
+
+    const booksData: BookByAuthorId[] = await Promise.all(
+      booksDataRaw.map(async (book) => ({
+        id: book.id,
+        title: book.title,
+        authorId: book.authorId,
+        thumbnailUrl: await getFileUrlFromS3(book.thumbnail),
+        viewCount: book.viewCount,
+      }))
+    );
+
+    const finalResponse: BookByAuthorDashboardResponse = {
+      totalViews: Number(totalViewsRes[0]?.total_views ?? 0),
+      books: booksData,
+    };
+
+    //const totalRecords = booksData.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    return new ResponseSuccessPaginated(
+      200,
+      i18n.t("successMessages.getAllBooksByAuthorID"),
+      true,
+      finalResponse, //BookByAuthorDashboardResponse
+      totalRecords, // Total number of books returned
+      totalPages, // Total number of pages
+      page_index, // Current page index
+      pageSize // Page size
+    );
+  } catch (error) {
+    console.log(error);
+    if (error instanceof PrismaClientKnownRequestError) {
+      return new ResponseError(405, error.toString(), false);
+    }
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
 const BookService = {
   createBook,
   getAllBooksPaging,
@@ -669,6 +783,7 @@ const BookService = {
   getBookVersions,
   updateBooksViews,
   AIContentServices,
+  getBooksPagingByAuthorID,
 };
 
 export default BookService;

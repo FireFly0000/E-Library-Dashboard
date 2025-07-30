@@ -5,6 +5,8 @@ import {
   BookSearchTitleAndAuthor,
   BookInfo,
   BookInfoParams,
+  BooksByAuthorIdParams,
+  BookByAuthorDashboardResponse,
 } from "@/types/books";
 import { BooksPaginationParams } from "@/types/books";
 import { ResponsePagination, Response } from "@/types/response";
@@ -54,6 +56,17 @@ export const bookApi = createApi({
       }),
       providesTags: ["AI-services"],
     }),*/
+
+    getBooksByAuthorId: builder.query<
+      ResponsePagination<BookByAuthorDashboardResponse>,
+      BooksByAuthorIdParams
+    >({
+      query: ({ search, authorId, page_index, category, sortBy }) => ({
+        url: `books/books-by-author-id?page_index=${page_index}&search=${search}&authorId=${authorId}&sortBy=${sortBy}&category=${category}`,
+        method: "GET",
+      }),
+      providesTags: ["books"],
+    }),
   }),
 });
 
@@ -61,5 +74,6 @@ export const {
   useGetBooksPagingQuery,
   useGetBooksSearchByTitleAndAuthorQuery,
   useGetBookVersionsQuery,
+  useGetBooksByAuthorIdQuery,
   //useAIContentServicesQuery,
 } = bookApi;

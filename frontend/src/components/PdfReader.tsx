@@ -20,6 +20,7 @@ import Modal from "./Modal";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 import toast from "react-hot-toast";
+//import { useWindowWidth } from "@/hooks/hooks";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -42,6 +43,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   const [scale, setScale] = useState(1.2); // zoom level
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]); // Ref for each page
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  //const width = useWindowWidth();
 
   //AI services
   const [highlightedText, setHighlightedText] = useState("");
@@ -89,9 +91,9 @@ const PDFReader: React.FC<PDFReaderProps> = ({
 
   //Highlight text for AI service
   const [popupVisible, setPopupVisible] = useState(false);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  //const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handleMouseUp = (/*e: React.MouseEvent*/) => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
@@ -100,7 +102,19 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       setPopupVisible(true);
 
       // Positioning at mouse cursor
-      setPopupPosition({ x: e.pageX, y: e.pageY - 70 });
+      /*let yOffset = 0;
+      if (width <= 393) {
+        yOffset = 610;
+      }
+      if (width <= 820) {
+        yOffset = 560;
+      }
+      if (width <= 1024) {
+        yOffset = 380;
+      }
+
+      console.log(yOffset);
+      setPopupPosition({ x: e.pageX, y: e.pageY - yOffset });*/
     } else {
       setPopupVisible(false);
       setHighlightedText("");
@@ -227,7 +241,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
             href={fileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-primary cursor-pointer hidden sm:flex"
+            className="hover:text-primary cursor-pointer hidden sm:flex text-foreground"
           >
             <Download />
           </a>
@@ -254,23 +268,23 @@ const PDFReader: React.FC<PDFReaderProps> = ({
                 setPageInput(val);
               }
             }}
-            className="w-20 px-2 py-1 border rounded text-center"
+            className="w-20 px-2 py-1 border-foreground border-1 rounded text-center text-foreground"
           />
           {/* Zoom Controls */}
           <Minus
             onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
-            className="hover:text-primary cursor-pointer"
+            className="hover:text-primary cursor-pointer text-foreground"
           />
           <span className="text-sm text-foreground">
             {scale.toFixed(1)} / 3
           </span>
           <Plus
             onClick={() => setScale((s) => Math.min(3, s + 0.2))}
-            className="hover:text-primary cursor-pointer"
+            className="hover:text-primary cursor-pointer text-foreground"
           />
 
-          {/* Pagination Controls for 640px or above*/}
-          <div className="hidden sm:flex items-center justify-center gap-2">
+          {/* Pagination Controls for 1024 or above*/}
+          <div className="hidden lg:flex items-center justify-center gap-2">
             <Button
               onClick={() => {
                 setCurrentPage((p) => {
@@ -353,8 +367,8 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           </Document>
         </div>
 
-        {/* Pagination Controls for below 640px*/}
-        <div className="sm:hidden flex items-center justify-center w-full mt-1 gap-2 relative">
+        {/* Pagination Controls for below 1024px*/}
+        <div className="lg:hidden flex items-center justify-center w-full my-2 gap-2 relative text-foreground">
           <a
             href={fileUrl}
             target="_blank"
@@ -403,11 +417,13 @@ const PDFReader: React.FC<PDFReaderProps> = ({
         {/*popup menu when highlight a chunk of text for AI Services*/}
         {popupVisible && (
           <div
-            className="absolute z-50 bg-card border border-border rounded-lg shadow-lg p-2"
-            style={{
-              top: `${popupPosition.y}px`,
-              left: `${popupPosition.x}px`,
-            }}
+            className="absolute z-50 bg-card border-2 border-primary rounded-lg shadow-lg p-2 bottom-16 right-[1%] text-foreground"
+            style={
+              {
+                //top: `${popupPosition.y}px`,
+                //left: `${popupPosition.x}px`,
+              }
+            }
           >
             <Select
               options={languageList}
@@ -416,7 +432,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
               }}
               styles={ReactSelectStyles}
               placeholder={AILanguage}
-              className="w-[200px]"
+              className="w-[200px] border-foreground"
             />
             <button
               className="block w-full text-left px-2 py-1 hover:bg-primary rounded"
@@ -443,6 +459,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
         <Modal
           isOpen={AIContentOpen}
           onClose={() => {
+            setAIContentData("");
             setAIContentOpen(false);
           }}
           title={AIServiceOption.toLocaleUpperCase()}

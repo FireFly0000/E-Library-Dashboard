@@ -8,6 +8,7 @@ import {
   getBookVersionsByIdSchema,
   AIContentSchema,
   updateBooksViewsSchema,
+  getBooksPagingByAuthorIdSchema,
 } from "../validations/book";
 import { RequestHasLogin } from "types/request.type";
 
@@ -142,6 +143,24 @@ class BookController {
     }
 
     const response = await services.BookService.AIContentServices(value);
+    return res.status(response.getStatusCode()).json(response);
+  };
+
+  getBooksPagingByAuthorID = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { error, value } = getBooksPagingByAuthorIdSchema.validate(req.query);
+
+    if (error) {
+      return res.status(400).json({
+        status_code: 400,
+        message: convertJoiErrorToString(error),
+        success: false,
+      });
+    }
+
+    const response = await services.BookService.getBooksPagingByAuthorID(value);
     return res.status(response.getStatusCode()).json(response);
   };
 }

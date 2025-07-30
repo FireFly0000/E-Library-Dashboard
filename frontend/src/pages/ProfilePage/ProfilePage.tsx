@@ -1,38 +1,244 @@
-import ThemeModeToggle from "@/components/ThemeToggle";
-import "./ProfilePage.css";
-import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/hooks/hooks";
+import BlankProfilePic from "@/assets/blank-profile-picture.png";
+import { useGetUserProfileQuery } from "@/services/userApis";
+import { useRtkQueryErrorToast } from "@/hooks/hooks";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  UserProfile,
+  BookVersionByUserId,
+  GetUserProfileParams,
+} from "@/types/user";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Pagination from "@/components/Pagination";
+import { BooksSortByOptions } from "@/utils/constants";
+import CustomSelect from "@/components/ui/CustomSelect";
+import "./ProfilePage.css";
+import { LoaderCircle } from "lucide-react";
+import PDFReader from "@/components/PdfReader";
+import { Button } from "@/components/ui/button";
+import { bookActions } from "@/redux/slices";
+import { useWindowWidth } from "@/hooks/hooks";
 
 const ProfilePage = () => {
+  //const user = useAppSelector((state) => state.authSlice.user);
+  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const [selectedFileTitle, setSelectedFileTitle] = useState<string | null>(
+    null
+  );
+  const [search, setSearch] = useState("");
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [sortBy, setSortBy] = useState("createdAt DESC");
+  const { userId } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const width = useWindowWidth();
+
+  const { data, isLoading, error } = useGetUserProfileQuery({
+    search: debouncedSearch,
+    sortBy: sortBy,
+    userId: Number(userId),
+    page_index: pageIndex,
+  } as GetUserProfileParams);
+  useRtkQueryErrorToast(error);
+
+  //Update book versions data
+  useEffect(() => {
+    if (data?.data) {
+      setUserProfile(data.data);
+      setTotalPages(data.total_pages);
+    }
+  }, [data]);
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [search]);
+
+  //Set page to 1 when filters applied
+  useEffect(() => {
+    setPageIndex(1);
+  }, [debouncedSearch, sortBy]);
+
+  const handleViewsIncrement = async (
+    bookVersionId: number,
+    bookId: number
+  ) => {
+    console.log(bookVersionId, bookId, userId);
+    await dispatch(
+      bookActions.updateViewCount({
+        bookId: bookId,
+        bookVersionId: bookVersionId,
+        contributorId: Number(userId),
+      })
+    );
+  };
+
+  const userInfos = [
+    { key: "Email", value: userProfile?.email },
+    { key: "Views", value: userProfile?.totalViews },
+  ];
+
   return (
-    <div className="flex flex-col gap-5 items-center">
-      <Button variant="outline" size="xl" className="w-full">
-        MY BUTTON
-      </Button>
-      <span className="text-foreground">RanDOM</span>
-      <div className="bg-[var(--popover)] text-[var(--popover-foreground)] px-10 py-3 text-lg">
-        HELLO WORLD
+    <main
+      className=" flex items-center flex-col
+      min-h-screen w-screen overflow-hidden"
+    >
+      <div className="profile-page-root-container">
+        {/*User info and user's contributed books section*/}
+        <section className="flex-col xl:flex-row flex w-full items-center xl:items-start justify-between text-foreground gap-8 xl:gap-0 mb-8">
+          {/*user info*/}
+          <div className="bg-card rounded-2xl border-border border-2 min-w-[350px] w-[50%] md:w-[55%] xl:w-[35%] flex flex-col items-center justify-center gap-4 py-8">
+            {/*Avatar and username */}
+            <div className="flex flex-col items-center justify-center gap-3 border-b-1 border-b-foreground/40 w-[80%] pb-4">
+              <img
+                src={
+                  userProfile?.url_avatar
+                    ? userProfile.url_avatar
+                    : BlankProfilePic
+                }
+                className="w-[70px] rounded-full"
+              />
+              <span className="text-xl md:text-2xl font-bold">
+                {userProfile?.username}
+              </span>
+            </div>
+
+            {/*user other infos*/}
+            <div className="w-full flex flex-col items-center justify-center">
+              {userInfos.map((item, index) => (
+                <span
+                  className="flex gap-4 text-base md:text-xl mb-4 border-b-1 border-b-foreground/40 w-[80%] pb-4"
+                  key={index}
+                >
+                  {item.key}: <span className="font-bold">{item.value}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/*User's contributed book versions*/}
+          <div className="bg-card rounded-2xl border-border border-2 w-full xl:w-[60%] flex flex-col items-center justify-center gap-4 py-8">
+            {/*filters*/}
+            <div className="flex flex-col lg:flex-row items-start justify-center gap-5">
+              <input
+                type="text"
+                placeholder="Search title..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="form-input"
+              />
+
+              <CustomSelect
+                options={BooksSortByOptions}
+                getValue={(item) => item.value}
+                getLabel={(item) => item.label}
+                getKey={(item) => item.key}
+                changeKey={(key) => setSortBy(BooksSortByOptions[key].value)}
+                className="w-[200px]"
+              />
+            </div>
+
+            {isLoading ? (
+              <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
+            ) : userProfile?.bookVersions.length === 0 ? (
+              <span className="text-foreground text-lg md:text-xl">
+                No Uploads Found
+              </span>
+            ) : (
+              <div className="flex items-start flex-col gap-6 px-4 md:px-8 w-full mt-6">
+                {userProfile?.bookVersions.map(
+                  (version: BookVersionByUserId, index) => (
+                    <div
+                      className="flex items-start justify-start gap-4 border-b-2 border-foreground/60 w-full pb-2"
+                      key={index}
+                    >
+                      <img
+                        className="w-[120px] md:w-[150px]"
+                        src={version.thumbnail}
+                      />
+
+                      {/*text info*/}
+                      <div className="flex flex-col w-fit gap-2 md:gap-3">
+                        <span
+                          className="text-lg md:text-xl font-bold leading-none underline hover:text-primary cursor-pointer"
+                          onClick={() =>
+                            navigate(
+                              `/book-versions/${version.bookId}/${version.authorId}`
+                            )
+                          }
+                        >
+                          {version.title}
+                        </span>
+
+                        <span className="text-base md:text-lg leading-none">
+                          By:{" "}
+                          <span
+                            className="italic underline hover:text-primary cursor-pointer font-bold"
+                            onClick={() =>
+                              navigate(
+                                `/books-by-author-id/${version.authorId}/${version.authorName}/${version.authorCountry}`
+                              )
+                            }
+                          >
+                            {version.authorName}
+                          </span>
+                        </span>
+
+                        <span className="text-base md:text-lg leading-none">
+                          ID: <span className="font-bold">{version.id}</span>
+                        </span>
+
+                        <span className="text-base md:text-lg leading-none">
+                          Views:{" "}
+                          <span className="font-bold">{version.viewCount}</span>
+                        </span>
+
+                        <Button
+                          variant="outline"
+                          size={width >= 820 ? "lg" : "sm"}
+                          onClick={() => {
+                            setSelectedFileUrl(version.fileUrl);
+                            setSelectedFileTitle(version.title);
+                            setIsReaderOpen(true);
+                            handleViewsIncrement(version.id, version.bookId);
+                          }}
+                          className="w-fit"
+                        >
+                          Read
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
+            <Pagination
+              currentPage={pageIndex}
+              totalPages={totalPages}
+              onPageChange={setPageIndex}
+            />
+          </div>
+        </section>
       </div>
-      <Select>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a fruit" />
-        </SelectTrigger>
-        <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-          <SelectItem value="blueberry">Blueberry</SelectItem>
-          <SelectItem value="grapes">Grapes</SelectItem>
-          <SelectItem value="pineapple">Pineapple</SelectItem>
-        </SelectContent>
-      </Select>
-      <ThemeModeToggle />
-    </div>
+      {selectedFileUrl && isReaderOpen && selectedFileTitle && (
+        <PDFReader
+          fileUrl={selectedFileUrl}
+          closeReader={() => setIsReaderOpen(false)}
+          title={selectedFileTitle}
+        />
+      )}
+    </main>
   );
 };
 

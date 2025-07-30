@@ -36,6 +36,7 @@ const ReactSelectStyles: StylesConfig<
   menuList: (base) => ({
     ...base,
     backgroundColor: "var(--background)",
+    height: 170,
   }),
   menu: (base) => ({
     ...base,

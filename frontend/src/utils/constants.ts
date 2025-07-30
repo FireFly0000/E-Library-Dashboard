@@ -78,6 +78,12 @@ export const BooksSortByOptions = [
   { key: 2, label: "Popular", value: "popularity DESC" },
 ];
 
+export const AuthorsSortByOptions = [
+  { key: 0, label: "Latest", value: "created_at DESC" },
+  { key: 1, label: "Oldest", value: "created_at ASC" },
+  { key: 2, label: "Popular", value: "popularity DESC" },
+];
+
 export const BooksCategoryOptions = [
   { key: 0, label: "All", value: "All" },
   { key: 1, label: "Fiction", value: "FIC" },

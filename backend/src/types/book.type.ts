@@ -43,3 +43,16 @@ export type BookInfo = {
   totalViews: number;
   versions: BookVersion[];
 };
+
+export type BookByAuthorId = {
+  id: number;
+  title: string;
+  authorId: number;
+  thumbnailUrl: string;
+  viewCount: number;
+};
+
+export type BookByAuthorDashboardResponse = {
+  totalViews: number;
+  books: BookByAuthorId[];
+};

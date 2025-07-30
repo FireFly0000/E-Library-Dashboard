@@ -21,6 +21,7 @@ app.use(
 app.use("/api/auth", routers.authRouter);
 app.use("/api/authors", routers.authorRouter);
 app.use("/api/books", routers.bookRouter);
+app.use("/api/users", routers.userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

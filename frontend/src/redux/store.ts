@@ -4,6 +4,7 @@ import authSlice from "./slices/auth.slice";
 import bookSlice from "./slices/books.slice";
 import { bookApi } from "@/services/bookApis";
 import { authorApi } from "@/services/authorApis";
+import { userApi } from "@/services/userApis";
 
 const store = configureStore({
   reducer: {
@@ -11,11 +12,12 @@ const store = configureStore({
     bookSlice: bookSlice,
     [bookApi.reducerPath]: bookApi.reducer,
     [authorApi.reducerPath]: authorApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(bookApi.middleware, authorApi.middleware),
+    }).concat(bookApi.middleware, authorApi.middleware, userApi.middleware),
 });
 
 setupListeners(store.dispatch);
