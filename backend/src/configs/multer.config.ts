@@ -32,3 +32,21 @@ export const uploadBookAssets = multer({
   { name: "bookFile", maxCount: 1 },
   { name: "thumbnail", maxCount: 1 },
 ]);
+
+//For user profile img update
+export const uploadProfileImg = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    const allowedImgTypes = ["image/png", "image/jpg", "image/jpeg"];
+
+    if (!allowedImgTypes.includes(file.mimetype)) {
+      return cb(new Error("Invalid img, must be PNG, JPG, or JPEG"));
+    }
+
+    if (file.fieldname !== "profileImg") {
+      return cb(new Error(`Unexpected field: ${file.fieldname}`));
+    }
+
+    cb(null, true);
+  },
+}).single("profileImg");

@@ -16,7 +16,7 @@ import bcrypt from "bcrypt";
 import configs from "../configs/index";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { MyJwtPayload } from "../types/decodeToken.type";
-import { sendVerificationEmail } from "../utils/helper";
+import { getFileUrlFromS3, sendVerificationEmail } from "../utils/helper";
 import { JwtPayload } from "jsonwebtoken";
 import { RequestHasLogin } from "../types/request.type";
 import redis from "../configs/redis.config";
@@ -392,7 +392,7 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
         id: userFound.id,
         email: userFound.email,
         username: userFound.username,
-        url_avatar: userFound.url_avatar,
+        url_avatar: await getFileUrlFromS3(userFound.url_avatar),
         viewCount: userFound.total_views,
       };
       return new ResponseSuccess(

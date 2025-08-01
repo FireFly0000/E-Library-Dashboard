@@ -19,6 +19,7 @@
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "croppie": "^2.6.5",
     "date-fns": "^4.1.0",
     "formik": "^2.4.6",
     "i18next": "^25.2.1",
@@ -33,6 +34,7 @@
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
+    "react-image-crop": "^11.0.10",
     "react-pdf": "^10.0.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.0",
@@ -45,6 +47,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/croppie": "^2.6.4",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.30",

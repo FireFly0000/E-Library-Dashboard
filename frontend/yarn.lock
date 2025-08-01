@@ -1165,6 +1165,11 @@
   dependencies:
     "@babel/types" "^7.20.7"
 
+"@types/croppie@^2.6.4":
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/@types/croppie/-/croppie-2.6.4.tgz#bff0a5f518469ed04a2de18c2d1f04af88c227cd"
+  integrity sha512-rxKLA5S+QarlaMVlsMqhn2fMMC5XlvogFzTYdMlkeupPgxT1mWaheucdZNzkUJACn61+JjN/eJYt5dS9GMoeXw==
+
 "@types/estree@1.0.8", "@types/estree@^1.0.6":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.8.tgz#958b91c991b1867ced318bedea0e215ee050726e"
@@ -1555,6 +1560,11 @@ cosmiconfig@^7.0.0:
     parse-json "^5.0.0"
     path-type "^4.0.0"
     yaml "^1.10.0"
+
+croppie@^2.6.5:
+  version "2.6.5"
+  resolved "https://registry.yarnpkg.com/croppie/-/croppie-2.6.5.tgz#67d76855b2983bdcd8aa348367398b2b8ef277cf"
+  integrity sha512-IlChnVUGG5T3w2gRZIaQgBtlvyuYnlUWs2YZIXXR3H9KrlO1PtBT3j+ykxvy9eZIWhk+V5SpBmhCQz5UXKrEKQ==
 
 cross-fetch@4.0.0:
   version "4.0.0"
@@ -2423,6 +2433,7 @@ ms@^2.1.3:
     axios "^1.8.4"
     class-variance-authority "^0.7.1"
     clsx "^2.1.1"
+    croppie "^2.6.5"
     date-fns "^4.1.0"
     formik "^2.4.6"
     i18next "^25.2.1"
@@ -2431,7 +2442,7 @@ ms@^2.1.3:
     js-cookie "^3.0.5"
     lodash "^4.17.21"
     lucide-react "^0.513.0"
-    my-app "file:C:/Users/wktfi/AppData/Local/Yarn/Cache/v6/npm-my-app-0.0.0-7bd69f17-38f8-49d9-a600-f0aaf9437043-1753501102285/node_modules/my-app"
+    my-app "file:C:/Users/wktfi/AppData/Local/Yarn/Cache/v6/npm-my-app-0.0.0-8f8aea08-b14c-47f1-b60b-2d5e1e0c7a87-1753988757319/node_modules/my-app"
     pdfjs-dist "^5.3.93"
     react "^19.0.0"
     react-datepicker "^8.4.0"
@@ -2637,6 +2648,11 @@ react-hot-toast@^2.5.2:
   dependencies:
     csstype "^3.1.3"
     goober "^2.1.16"
+
+react-image-crop@^11.0.10:
+  version "11.0.10"
+  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-11.0.10.tgz#20fe6e3ff6fe29745a37eac1b4c0e73e6b17f2e0"
+  integrity sha512-+5FfDXUgYLLqBh1Y/uQhIycpHCbXkI50a+nbfkB1C0xXXUTwkisHDo2QCB1SQJyHCqIuia4FeyReqXuMDKWQTQ==
 
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"

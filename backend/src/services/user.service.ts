@@ -1,13 +1,22 @@
 import {
   ResponseBase,
   ResponseError,
+  ResponseSuccess,
   ResponseSuccessPaginated,
 } from "../commons/response";
+import { RequestHasLogin } from "types/request.type";
 import { db } from "../configs/db.config";
 import i18n from "../utils/i18next";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { getFileUrlFromS3 } from "../utils/helper";
-import { GetUserProfileParams } from "validations/user";
+import {
+  deleteFileFromS3,
+  getFileUrlFromS3,
+  uploadFileToS3,
+} from "../utils/helper";
+import {
+  GetUserProfileParams,
+  UpdateUserProfileImgParams,
+} from "validations/user";
 import { Prisma } from "@prisma/client";
 import { BookVersionByUserId, UserProfile } from "types/user.type";
 
@@ -110,7 +119,7 @@ const getUserProfile = async (
     const finalResponse: UserProfile = {
       username: userProfileRaw.username,
       email: userProfileRaw.email,
-      url_avatar: userProfileRaw.url_avatar,
+      url_avatar: await getFileUrlFromS3(userProfileRaw.url_avatar),
       totalViews: userProfileRaw.total_views,
       bookVersions: bookVersionsData,
     };
@@ -126,7 +135,90 @@ const getUserProfile = async (
       pageSize // Page size
     );
   } catch (error) {
-    console.log(error);
+    if (error instanceof PrismaClientKnownRequestError) {
+      return new ResponseError(405, error.toString(), false);
+    }
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const updateUserProfileImg = async (
+  req: RequestHasLogin,
+  params: UpdateUserProfileImgParams
+): Promise<ResponseBase> => {
+  try {
+    const { profileId, profileImg } = params;
+    if (!req.user_id || req.user_id !== profileId) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        id: req.user_id,
+      },
+      select: {
+        url_avatar: true,
+      },
+    });
+
+    if (!user) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.userNotFound"),
+        false
+      );
+    }
+
+    //delete old profile img
+    if (user.url_avatar !== null) {
+      const deletedImg = await deleteFileFromS3(user.url_avatar);
+      if (!deletedImg) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.deleteOldProfileImgFailed"),
+          false
+        );
+      }
+    }
+
+    //upload new profile img
+    const newImgName = await uploadFileToS3(profileImg);
+    if (newImgName === "") {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.fileUploadFail"),
+        false
+      );
+    }
+
+    //save new img name to db
+    const saveNewFileToDb = await db.user.update({
+      where: {
+        id: req.user_id,
+      },
+      data: {
+        url_avatar: newImgName,
+      },
+    });
+
+    if (!saveNewFileToDb) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.fileUploadFail"),
+        false
+      );
+    }
+
+    return new ResponseSuccess(
+      200,
+      i18n.t("successMessages.changeProfileImg"),
+      true
+    );
+  } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(405, error.toString(), false);
     }
@@ -140,6 +232,7 @@ const getUserProfile = async (
 
 const UserService = {
   getUserProfile,
+  updateUserProfileImg,
 };
 
 export default UserService;

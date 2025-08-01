@@ -39,3 +39,24 @@ export const getUserProfileSchema: ObjectSchema<GetUserProfileParams> =
         "number.base": i18n.t("errorMessages.contributorIdMustBeNumber"),
       }),
   });
+
+//updateUserProfileImg
+
+export type UpdateUserProfileImgParams = {
+  profileImg: Express.Multer.File;
+  profileId: number;
+};
+
+export const updateUserProfileImgSchema: ObjectSchema<UpdateUserProfileImgParams> =
+  Joi.object({
+    profileImg: Joi.required().messages({
+      "any.required": i18n.t("errorMessages.profileImgFileRequired"),
+    }),
+    profileId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.profileIdIsRequired"),
+        "number.base": i18n.t("errorMessages.profileIdMustBeNumber"),
+      }),
+  });

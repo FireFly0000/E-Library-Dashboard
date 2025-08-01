@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { authActions } from "@/redux/slices/index";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Cookies from "js-cookie";
@@ -26,6 +26,9 @@ function App() {
   const dispatch = useAppDispatch();
 
   //const isLogin = useAppSelector((state) => state?.authSlice?.isLogin) ?? false;
+  const profileImgUploaded = useAppSelector(
+    (state) => state.userSlice.profileImgUploaded
+  );
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -34,7 +37,7 @@ function App() {
     } else {
       dispatch(authActions.setIsAuthChecked());
     }
-  }, [dispatch]);
+  }, [dispatch, profileImgUploaded]);
 
   return (
     <ThemeProvider>

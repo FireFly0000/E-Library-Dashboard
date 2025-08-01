@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center overflow-y-auto">
       <div
         className={clsx(
-          "bg-card rounded-2xl p-[35px] shadow-xl relative max-h-[90vh] overflow-y-auto",
+          "bg-card rounded-2xl py-[35px] px-[20px] shadow-xl relative max-h-[95vh] overflow-y-auto",
           className
         )}
       >

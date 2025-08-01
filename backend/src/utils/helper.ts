@@ -4,7 +4,11 @@ import configs from "../configs/index";
 import { setSignUpEmail } from "../configs/nodemailer.config";
 import { SendMail } from "../types/sendmail.type";
 import { sendMail } from "./sendMail";
-import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "../configs/aws.config";
 import slugify from "slugify";
@@ -111,7 +115,10 @@ export const uploadFileToS3 = async (file): Promise<string> => {
   const allowedImgTypes = ["image/png", "image/jpg", "image/jpeg"];
 
   let buffer = file.buffer;
-  if (allowedImgTypes.includes(file.mimetype)) {
+  if (
+    allowedImgTypes.includes(file.mimetype) &&
+    !file.originalname.includes("profile-img")
+  ) {
     buffer = await sharp(file.buffer)
       .resize({ height: 1000, width: 676, fit: "contain" })
       .toBuffer();
@@ -154,6 +161,23 @@ export const getFileUrlFromS3 = async (fileName): Promise<string> => {
   await redis.set(cacheKey, signedUrl, "EX", 3300);
 
   return signedUrl;
+};
+
+export const deleteFileFromS3 = async (fileName): Promise<Boolean> => {
+  const deleteObjectParams = {
+    Bucket: configs.general.AWS_S3_BUCKET_NAME,
+    Key: fileName,
+  };
+
+  const command = new DeleteObjectCommand(deleteObjectParams);
+
+  try {
+    await s3.send(command);
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
 };
 
 export const generateBookSlug = (title: string, authorName: string): string => {

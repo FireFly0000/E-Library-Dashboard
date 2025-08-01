@@ -1,4 +1,4 @@
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import BlankProfilePic from "@/assets/blank-profile-picture.png";
 import { useGetUserProfileQuery } from "@/services/userApis";
 import { useRtkQueryErrorToast } from "@/hooks/hooks";
@@ -13,14 +13,18 @@ import Pagination from "@/components/Pagination";
 import { BooksSortByOptions } from "@/utils/constants";
 import CustomSelect from "@/components/ui/CustomSelect";
 import "./ProfilePage.css";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Camera } from "lucide-react";
 import PDFReader from "@/components/PdfReader";
 import { Button } from "@/components/ui/button";
-import { bookActions } from "@/redux/slices";
+import { bookActions, userActions } from "@/redux/slices";
 import { useWindowWidth } from "@/hooks/hooks";
+//import ProfileImageCropper from "@/components/ProfileImgCropper";
+import ProfileImgUploader from "@/components/ProfileImgUploader";
+import Modal from "@/components/Modal";
 
 const ProfilePage = () => {
-  //const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state) => state.authSlice.user);
+  const isLogin = useAppSelector((state) => state.authSlice.isLogin);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [selectedFileTitle, setSelectedFileTitle] = useState<string | null>(
@@ -32,12 +36,16 @@ const ProfilePage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [sortBy, setSortBy] = useState("createdAt DESC");
+  const [openImgCropper, setOpenImgCropper] = useState(false);
   const { userId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const width = useWindowWidth();
+  const profileImgUploaded = useAppSelector(
+    (state) => state.userSlice.profileImgUploaded
+  );
 
-  const { data, isLoading, error } = useGetUserProfileQuery({
+  const { data, isLoading, error, refetch } = useGetUserProfileQuery({
     search: debouncedSearch,
     sortBy: sortBy,
     userId: Number(userId),
@@ -73,7 +81,6 @@ const ProfilePage = () => {
     bookVersionId: number,
     bookId: number
   ) => {
-    console.log(bookVersionId, bookId, userId);
     await dispatch(
       bookActions.updateViewCount({
         bookId: bookId,
@@ -82,6 +89,14 @@ const ProfilePage = () => {
       })
     );
   };
+
+  //Refetch when profile img is updated
+  useEffect(() => {
+    if (profileImgUploaded) {
+      refetch();
+      dispatch(userActions.setProfileImgUploaded(false));
+    }
+  }, [profileImgUploaded, refetch, dispatch]);
 
   const userInfos = [
     { key: "Email", value: userProfile?.email },
@@ -100,14 +115,23 @@ const ProfilePage = () => {
           <div className="bg-card rounded-2xl border-border border-2 min-w-[350px] w-[50%] md:w-[55%] xl:w-[35%] flex flex-col items-center justify-center gap-4 py-8">
             {/*Avatar and username */}
             <div className="flex flex-col items-center justify-center gap-3 border-b-1 border-b-foreground/40 w-[80%] pb-4">
-              <img
-                src={
-                  userProfile?.url_avatar
-                    ? userProfile.url_avatar
-                    : BlankProfilePic
-                }
-                className="w-[70px] rounded-full"
-              />
+              <div className="relative w-fit flex">
+                <img
+                  src={
+                    userProfile?.url_avatar
+                      ? userProfile.url_avatar
+                      : BlankProfilePic
+                  }
+                  className="w-[150px] rounded-full"
+                />
+                {isLogin && user.id === Number(userId) && (
+                  <Camera
+                    className="text-3xl bg-primary text-white rounded-full 
+                    absolute p-1 border-2 border-primary right-0 bottom-0 cursor-pointer w-[40px] h-[40px]"
+                    onClick={() => setOpenImgCropper((prev) => !prev)}
+                  />
+                )}
+              </div>
               <span className="text-xl md:text-2xl font-bold">
                 {userProfile?.username}
               </span>
@@ -230,6 +254,24 @@ const ProfilePage = () => {
             />
           </div>
         </section>
+
+        {/*Profile Picture upload*/}
+        <div className="flex w-full p-3">
+          <Modal
+            isOpen={openImgCropper}
+            onClose={() => setOpenImgCropper(false)}
+          >
+            {/*<ProfileImageCropper
+                circle={false}
+                profileId={user.id}
+                closeModal={() => setOpenImgCropper(false)}
+              />*/}
+            <ProfileImgUploader
+              profileId={user.id}
+              closeModal={() => setOpenImgCropper(false)}
+            />
+          </Modal>
+        </div>
       </div>
       {selectedFileUrl && isReaderOpen && selectedFileTitle && (
         <PDFReader
