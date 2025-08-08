@@ -14,7 +14,6 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: DOMAIN_NAME,
-    //origin: "http://localhost:5173",
     credentials: true,
   })
 ); // Allow requests from the React app

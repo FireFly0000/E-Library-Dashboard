@@ -14,6 +14,12 @@ async function main() {
     { name: "Horror", categoryCode: CategoryCode.HORR },
   ];
 
+  const count = await db.category.count();
+  if (count > 0) {
+    console.log("✅ Categories already seeded, skipping.");
+    return;
+  }
+
   for (const category of defaultCategories) {
     await db.category.upsert({
       where: { categoryCode: category.categoryCode as any },

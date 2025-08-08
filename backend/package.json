@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "migrate": "prisma migrate dev",
+    "migrate-dep": "prisma migrate deploy",
     "build": "yarn prisma generate && tsc",
     "start": "node dist/index.js",
     "seed": "prisma db seed"
