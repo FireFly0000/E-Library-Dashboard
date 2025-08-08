@@ -12,6 +12,7 @@ import {
   UserRoundPen,
   LogIn,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 import BlankProfilePic from "@/assets/blank-profile-picture.png";
@@ -137,6 +138,18 @@ const NavBar = () => {
                   <span className="absolute left-0 bottom-[-2px] h-[2px] w-0 bg-foreground/90 transition-all duration-200 group-hover:w-full" />
                 </div>
 
+                {isLogin && (
+                  <div
+                    className="relative group inline-flex items-center gap-2 text-foreground hover:cursor-pointer"
+                    onClick={() => navigate(`/settings`)}
+                  >
+                    <Settings className="w-[24px] h-[24px]" />
+                    <span className="text-2xl">Settings</span>
+
+                    <span className="absolute left-0 bottom-[-2px] h-[2px] w-0 bg-foreground/90 transition-all duration-200 group-hover:w-full" />
+                  </div>
+                )}
+
                 {/*Login or Logout*/}
                 {isLogin ? (
                   <div
@@ -164,7 +177,7 @@ const NavBar = () => {
           )}
         </div>
       </nav>
-      <div className="mt-22 w-full">
+      <div className="mt-18 w-full">
         <Outlet />
       </div>
     </section>

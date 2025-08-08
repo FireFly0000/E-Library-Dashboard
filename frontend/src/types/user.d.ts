@@ -28,6 +28,7 @@ export type BookVersionByUserId = {
   authorCountry: string;
   viewCount: number;
   fileUrl: string;
+  date: Date;
 };
 
 export type UserProfile = {
@@ -36,4 +37,49 @@ export type UserProfile = {
   url_avatar: string;
   totalViews: number;
   bookVersions: BookVersionByUserId[];
+};
+
+export type MoveBookVersionToTrashParams = {
+  bookVersionId: number;
+  profileId: number;
+};
+
+//For user's info update (basic settings)
+export type ChangeUserBasicInfo = {
+  username: string;
+  //Add other infos here in future (gender, birth year, etc)
+};
+
+//For user's info update (secured settings)
+export type EmailUpdateParams = {
+  email: string;
+  password: string;
+};
+
+export type ChangePasswordParams = {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
+//For trashed book versions
+export type TrashedBookVersion = {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  viewCount: number;
+  fileUrl: string;
+  trashedAt: Date;
+  authorId: number;
+  authorName: string;
+};
+
+//recoverTrashedBookVersion
+export type RecoverTrashedBookVersionParams = {
+  bookVersionId: number;
+};
+
+//deleteBookVersion
+export type DeleteBookVersionParams = {
+  bookVersionId: number;
 };

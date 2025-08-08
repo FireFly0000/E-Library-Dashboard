@@ -180,7 +180,7 @@ const createBook = async (
     }
     //Added bookVersion to existing book
     else if (!hasBookInfo && hasBookId) {
-      const bookFileName = await uploadFileToS3(params.bookVersion.bookFile);
+      const bookFileName = await uploadFileToS3(params.bookVersion.bookFile[0]);
 
       if (bookFileName === "") {
         return new ResponseError(
@@ -190,14 +190,21 @@ const createBook = async (
         );
       }
 
-      const bookVersionAdded = await db.bookVersion.create({
-        data: {
-          user: { connect: { id: params.bookVersion.userId } },
-          fileName: bookFileName,
-          book: {
-            connect: { id: params.bookVersion.bookId },
+      const bookVersionAdded = await db.$transaction(async (tx) => {
+        const created = await tx.bookVersion.create({
+          data: {
+            user: { connect: { id: params.bookVersion.userId } },
+            fileName: bookFileName,
+            book: { connect: { id: params.bookVersion.bookId } },
           },
-        },
+        });
+
+        await tx.book.update({
+          where: { id: params.bookVersion.bookId },
+          data: { isEmpty: false },
+        });
+
+        return created;
       });
 
       if (!bookVersionAdded) {
@@ -260,6 +267,7 @@ const getAllBooksPaging = async (
               country: country,
             }
           : undefined,
+      isEmpty: false,
     };
 
     const [booksDataRaw, totalRecords] = await db.$transaction([
@@ -431,6 +439,9 @@ const getBookVersions = async (
             },
           },
           versions: {
+            where: {
+              isTrashed: false,
+            },
             select: {
               id: true,
               fileName: true,
@@ -700,6 +711,7 @@ const getBooksPagingByAuthorID = async (
       author: {
         id: authorId,
       },
+      isEmpty: false,
     };
 
     const [booksDataRaw, totalRecords, totalViewsRes] = await db.$transaction([

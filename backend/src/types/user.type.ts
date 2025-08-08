@@ -8,6 +8,7 @@ export type BookVersionByUserId = {
   authorCountry: string;
   viewCount: number;
   fileUrl: string;
+  date: Date;
 };
 
 export type UserProfile = {
@@ -16,4 +17,15 @@ export type UserProfile = {
   totalViews: number;
   url_avatar: string;
   bookVersions: BookVersionByUserId[];
+};
+
+export type TrashedBookVersion = {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  viewCount: number;
+  fileUrl: string;
+  trashedAt: Date;
+  authorId: number;
+  authorName: string;
 };

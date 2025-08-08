@@ -50,11 +50,6 @@ export const errorMessages = {
   signUpFailed: "Sign Up Failed",
   serverFailed: "Server Failed, please try again",
 
-  // User
-  userNotFound: " User is not found ",
-  loginUnverified:
-    "Unverified account, We have sent you a verification link, please check your email soon before it expires!",
-
   // username
   UsernameMustBeString: "Username must be a string",
   UsernameIsRequired: "Username is required",
@@ -130,7 +125,20 @@ export const errorMessages = {
   AIServiceNameMustBeString: "AI service's name must be a string",
 
   //User
+  userNotFound: " User is not found ",
+  loginUnverified:
+    "Unverified account, We have sent you a verification link, please check your email soon before it expires!",
   UserProfileNotFound: "Can not find user's profile",
+  profileImgFileRequired: "Please select an image file",
+  profileIdIsRequired: "User's ID of the profile being updated is required",
+  profileIdMustBeNumber: "User's ID of the profile must be a number",
+  deleteOldProfileImgFailed:
+    "Failed to delete old profile image, Please try again",
+  trashBookVersionFailed: "Trashed Book Version Failed",
+  updateUserBasicInfoFailed: "Update user's info failed, please try again",
+  getTrashedVersionsFailed: "Fail to get book versions in trash",
+  recoverVersionFailed: "Fail to recover version, try again",
+  deleteBookVersionFailed: "Delete book version failed, try again",
 };
 
 export const successMessages = {
@@ -195,6 +203,12 @@ export const successMessages = {
 
   //user
   getUserProfile: "Get user profile successfully",
+  changeProfileImg: "Change profile image successfully",
+  trashBookVersion: "Trashed Book Version Successfully",
+  updateUserBasicInfo: "Updated user's info successfully",
+  getTrashedVersions: "Get trashed book versions successfully",
+  recoverVersionSuccess: "Recover version successfully",
+  deleteBookVersionSuccess: "Delete book version successfully",
 };
 
 export const allowedCountries = [

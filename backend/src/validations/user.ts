@@ -39,3 +39,98 @@ export const getUserProfileSchema: ObjectSchema<GetUserProfileParams> =
         "number.base": i18n.t("errorMessages.contributorIdMustBeNumber"),
       }),
   });
+
+//updateUserProfileImg
+
+export type UpdateUserProfileImgParams = {
+  profileImg: Express.Multer.File;
+  profileId: number;
+};
+
+export const updateUserProfileImgSchema: ObjectSchema<UpdateUserProfileImgParams> =
+  Joi.object({
+    profileImg: Joi.required().messages({
+      "any.required": i18n.t("errorMessages.profileImgFileRequired"),
+    }),
+    profileId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.profileIdIsRequired"),
+        "number.base": i18n.t("errorMessages.profileIdMustBeNumber"),
+      }),
+  });
+
+//deleteBookVersion
+export type MoveBookVersionToTrashParams = {
+  bookVersionId: number;
+  profileId: number;
+};
+
+export const moveBookVersionToTrashSchema: ObjectSchema<MoveBookVersionToTrashParams> =
+  Joi.object({
+    bookVersionId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.bookVersionIdIsRequired"),
+        "number.base": i18n.t("errorMessages.bookVersionIdMustBeNumber"),
+      }),
+    profileId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.profileIdIsRequired"),
+        "number.base": i18n.t("errorMessages.profileIdMustBeNumber"),
+      }),
+  });
+
+//updateUserBasicInfo (username, gender, birth year etc)
+export type UpdateUserBasicInfoParams = {
+  username: string;
+};
+
+export const updateUserBasicInfoSchema: ObjectSchema<UpdateUserBasicInfoParams> =
+  Joi.object({
+    username: Joi.string()
+      .trim()
+      .max(51)
+      .required()
+      .messages({
+        "string.base": i18n.t("errorMessages.UsernameMustBeString"),
+        "string.max": i18n.t("errorMessages.tooLongUsername"),
+        "any.required": i18n.t("errorMessages.UsernameIsRequired"),
+      }),
+  });
+
+//recoverTrashedBookVersion
+export type RecoverTrashedBookVersionParams = {
+  bookVersionId: number;
+};
+
+export const recoverTrashedBookVersionSchema: ObjectSchema<RecoverTrashedBookVersionParams> =
+  Joi.object({
+    bookVersionId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.bookVersionIdIsRequired"),
+        "number.base": i18n.t("errorMessages.bookVersionIdMustBeNumber"),
+      }),
+  });
+
+//deleteBookVersion
+export type DeleteBookVersionParams = {
+  bookVersionId: number;
+};
+
+export const deleteBookVersionSchema: ObjectSchema<DeleteBookVersionParams> =
+  Joi.object({
+    bookVersionId: Joi.number()
+      .integer()
+      .required()
+      .messages({
+        "any.required": i18n.t("errorMessages.bookVersionIdIsRequired"),
+        "number.base": i18n.t("errorMessages.bookVersionIdMustBeNumber"),
+      }),
+  });

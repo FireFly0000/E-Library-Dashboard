@@ -90,7 +90,7 @@ const AuthorsDashboard = () => {
         All Authors
       </header>
 
-      <main className="default-card-container w-[98vw] md:w-[90vw] max-w-[1400px] py-[30px] px-[10px] md:p-[30px] items-center justify-center">
+      <main className="default-card-container w-[98vw] md:w-[90vw] max-w-[1400px] py-[30px] px-[10px] md:p-[30px] items-center justify-center mt-[30px]">
         {/*Filters section*/}
         <section className="flex justify-between items-start w-full">
           {/*basic filters*/}

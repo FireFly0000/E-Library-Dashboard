@@ -1,3 +1,5 @@
+import { Trash2, ArchiveRestore } from "lucide-react";
+
 export const HTTP_CALL = {
   HTTP_POST: "POST",
   HTTP_GET: "GET",
@@ -112,6 +114,29 @@ export const BooksCategoryOptionsWithoutAll = [
   { key: 6, label: "Historical", value: "HIST" },
   { key: 7, label: "Mystery", value: "MYST" },
   { key: 8, label: "Horror", value: "HORR" },
+];
+
+//for profile page
+export const BookVersionActionsMenu = [
+  {
+    icon: Trash2,
+    label: "Move to trash",
+    subLabel: "Items in your trash are deleted after 15 days",
+  },
+];
+
+//for trash bin
+export const trashedItemsActionsMenu = [
+  {
+    icon: ArchiveRestore,
+    label: "Recover",
+    subLabel: "",
+  },
+  {
+    icon: Trash2,
+    label: "Delete",
+    subLabel: "Permanently Delete",
+  },
 ];
 
 export const languageList = [

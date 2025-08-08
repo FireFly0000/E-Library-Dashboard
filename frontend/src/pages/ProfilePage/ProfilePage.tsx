@@ -1,6 +1,6 @@
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import BlankProfilePic from "@/assets/blank-profile-picture.png";
-import { useGetUserProfileQuery } from "@/services/userApis";
+import { useGetUserProfileQuery, userApi } from "@/services/userApis";
 import { useRtkQueryErrorToast } from "@/hooks/hooks";
 import {
   UserProfile,
@@ -13,14 +13,21 @@ import Pagination from "@/components/Pagination";
 import { BooksSortByOptions } from "@/utils/constants";
 import CustomSelect from "@/components/ui/CustomSelect";
 import "./ProfilePage.css";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Camera, Trash2 } from "lucide-react";
 import PDFReader from "@/components/PdfReader";
 import { Button } from "@/components/ui/button";
-import { bookActions } from "@/redux/slices";
+import { bookActions, userActions } from "@/redux/slices";
 import { useWindowWidth } from "@/hooks/hooks";
+//import ProfileImageCropper from "@/components/ProfileImgCropper";
+import ProfileImgUploader from "@/components/ProfileImgUploader";
+import Modal from "@/components/Modal";
+import toast from "react-hot-toast";
+import { ItemAction, ItemActionsMenu } from "@/components/ItemActionsMenu";
+import { bookApi } from "@/services/bookApis";
 
 const ProfilePage = () => {
-  //const user = useAppSelector((state) => state.authSlice.user);
+  const user = useAppSelector((state) => state.authSlice.user);
+  const isLogin = useAppSelector((state) => state.authSlice.isLogin);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [selectedFileTitle, setSelectedFileTitle] = useState<string | null>(
@@ -32,12 +39,22 @@ const ProfilePage = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [sortBy, setSortBy] = useState("createdAt DESC");
+  const [openImgCropper, setOpenImgCropper] = useState(false);
   const { userId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const width = useWindowWidth();
 
-  const { data, isLoading, error } = useGetUserProfileQuery({
+  //Redux states to watch and trigger RTK refetch when profile is updated
+  const profileImgUploaded = useAppSelector(
+    (state) => state.userSlice.profileImgUploaded
+  );
+  const bookVersionTrashed = useAppSelector(
+    (state) => state.userSlice.bookVersionTrashed
+  );
+
+  //API to get user profile
+  const { data, isLoading, error, refetch } = useGetUserProfileQuery({
     search: debouncedSearch,
     sortBy: sortBy,
     userId: Number(userId),
@@ -73,7 +90,6 @@ const ProfilePage = () => {
     bookVersionId: number,
     bookId: number
   ) => {
-    console.log(bookVersionId, bookId, userId);
     await dispatch(
       bookActions.updateViewCount({
         bookId: bookId,
@@ -82,6 +98,45 @@ const ProfilePage = () => {
       })
     );
   };
+
+  //Refetch when profile changes (avatar, version to trash etc)
+  useEffect(() => {
+    if (profileImgUploaded || bookVersionTrashed) {
+      refetch();
+      dispatch(userActions.setProfileImgUploaded(false));
+      dispatch(userActions.setBookVersionTrashed(false));
+    }
+  }, [profileImgUploaded, bookVersionTrashed, refetch, dispatch]);
+
+  //call versionToTrash API
+  const handleVersionToTrash = async (bookVersionId: number) => {
+    if (user.id && bookVersionId) {
+      await dispatch(
+        userActions.moveBookVersionToTrash({
+          bookVersionId: bookVersionId,
+          profileId: user.id,
+        })
+      );
+    } else {
+      toast.error("Unexpected error");
+    }
+    dispatch(userApi.util.invalidateTags(["trashed"]));
+    dispatch(bookApi.util.invalidateTags(["books"]));
+  };
+
+  //Trashed items actions menu list======================================
+  const bookVersionActionsMenu: ItemAction<BookVersionByUserId>[] = [
+    {
+      icon: Trash2,
+      label: "Move to trash",
+      subLabel: "Permanently delete in 15 days",
+      needsConfirm: true,
+      modalTitle: () => "Move this version to trash?",
+      onConfirm: async (version: BookVersionByUserId) => {
+        await handleVersionToTrash(version.id);
+      },
+    },
+  ];
 
   const userInfos = [
     { key: "Email", value: userProfile?.email },
@@ -99,15 +154,24 @@ const ProfilePage = () => {
           {/*user info*/}
           <div className="bg-card rounded-2xl border-border border-2 min-w-[350px] w-[50%] md:w-[55%] xl:w-[35%] flex flex-col items-center justify-center gap-4 py-8">
             {/*Avatar and username */}
-            <div className="flex flex-col items-center justify-center gap-3 border-b-1 border-b-foreground/40 w-[80%] pb-4">
-              <img
-                src={
-                  userProfile?.url_avatar
-                    ? userProfile.url_avatar
-                    : BlankProfilePic
-                }
-                className="w-[70px] rounded-full"
-              />
+            <div className="flex flex-col items-center justify-center gap-3 border-b-1 border-b-foreground/40 w-[80%] pb-4 last:border-b-0">
+              <div className="relative w-fit flex">
+                <img
+                  src={
+                    userProfile?.url_avatar
+                      ? userProfile.url_avatar
+                      : BlankProfilePic
+                  }
+                  className="w-[150px] rounded-full"
+                />
+                {isLogin && user.id === Number(userId) && (
+                  <Camera
+                    className="text-3xl bg-primary text-white rounded-full 
+                    absolute p-1 border-2 border-primary right-0 bottom-0 cursor-pointer w-[40px] h-[40px]"
+                    onClick={() => setOpenImgCropper((prev) => !prev)}
+                  />
+                )}
+              </div>
               <span className="text-xl md:text-2xl font-bold">
                 {userProfile?.username}
               </span>
@@ -155,7 +219,7 @@ const ProfilePage = () => {
                 No Uploads Found
               </span>
             ) : (
-              <div className="flex items-start flex-col gap-6 px-4 md:px-8 w-full mt-6">
+              <div className="flex items-start flex-col gap-6 px-2 md:px-8 w-full mt-6">
                 {userProfile?.bookVersions.map(
                   (version: BookVersionByUserId, index) => (
                     <div
@@ -163,14 +227,14 @@ const ProfilePage = () => {
                       key={index}
                     >
                       <img
-                        className="w-[120px] md:w-[150px]"
+                        className="w-[130px] md:w-[150px]"
                         src={version.thumbnail}
                       />
 
                       {/*text info*/}
-                      <div className="flex flex-col w-fit gap-2 md:gap-3">
+                      <div className="flex flex-col w-full gap-2 md:gap-3">
                         <span
-                          className="text-lg md:text-xl font-bold leading-none underline hover:text-primary cursor-pointer"
+                          className="w-fit text-base md:text-xl font-bold leading-none underline hover:text-primary cursor-pointer"
                           onClick={() =>
                             navigate(
                               `/book-versions/${version.bookId}/${version.authorId}`
@@ -180,7 +244,7 @@ const ProfilePage = () => {
                           {version.title}
                         </span>
 
-                        <span className="text-base md:text-lg leading-none">
+                        <span className="text-sm md:text-lg leading-none">
                           By:{" "}
                           <span
                             className="italic underline hover:text-primary cursor-pointer font-bold"
@@ -194,15 +258,23 @@ const ProfilePage = () => {
                           </span>
                         </span>
 
-                        <span className="text-base md:text-lg leading-none">
+                        <span className="text-sm md:text-lg leading-none">
                           ID: <span className="font-bold">{version.id}</span>
                         </span>
 
-                        <span className="text-base md:text-lg leading-none">
+                        <span className="text-sm md:text-lg leading-none">
                           Views:{" "}
                           <span className="font-bold">{version.viewCount}</span>
                         </span>
 
+                        <span className="text-sm md:text-lg leading-none">
+                          Date:{" "}
+                          <span className="font-bold">
+                            {new Date(version.date).toLocaleDateString()}
+                          </span>
+                        </span>
+
+                        {/*Read button*/}
                         <Button
                           variant="outline"
                           size={width >= 820 ? "lg" : "sm"}
@@ -217,6 +289,12 @@ const ProfilePage = () => {
                           Read
                         </Button>
                       </div>
+
+                      {/*Actions menu dropdown (delete version, etc..) */}
+                      <ItemActionsMenu
+                        item={version}
+                        actions={bookVersionActionsMenu}
+                      />
                     </div>
                   )
                 )}
@@ -230,6 +308,24 @@ const ProfilePage = () => {
             />
           </div>
         </section>
+
+        {/*Profile Picture upload*/}
+        <div className="flex w-full p-3">
+          <Modal
+            isOpen={openImgCropper}
+            onClose={() => setOpenImgCropper(false)}
+          >
+            {/*<ProfileImageCropper
+                circle={false}
+                profileId={user.id}
+                closeModal={() => setOpenImgCropper(false)}
+              />*/}
+            <ProfileImgUploader
+              profileId={user.id}
+              closeModal={() => setOpenImgCropper(false)}
+            />
+          </Modal>
+        </div>
       </div>
       {selectedFileUrl && isReaderOpen && selectedFileTitle && (
         <PDFReader

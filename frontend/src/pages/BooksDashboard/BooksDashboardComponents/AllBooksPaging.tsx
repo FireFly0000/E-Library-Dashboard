@@ -28,6 +28,12 @@ const AllBooksPaging: React.FC = () => {
   const [category, setCategory] = useState("All");
   const dispatch = useAppDispatch();
   const bookUploaded = useAppSelector((state) => state.bookSlice.bookUploaded);
+  const bookVersionTrashed = useAppSelector(
+    (state) => state.userSlice.bookVersionTrashed
+  );
+  const trashedBookVersionRecovered = useAppSelector(
+    (state) => state.userSlice.trashedBookVersionRecovered
+  );
   const navigate = useNavigate();
 
   const { data, error, isLoading, refetch } = useGetBooksPagingQuery({
@@ -65,11 +71,17 @@ const AllBooksPaging: React.FC = () => {
 
   //Refetch when a new book is added
   useEffect(() => {
-    if (bookUploaded) {
+    if (bookUploaded || bookVersionTrashed || trashedBookVersionRecovered) {
       refetch();
       dispatch(bookActions.setBookUploaded(false));
     }
-  }, [bookUploaded, refetch, dispatch]);
+  }, [
+    bookUploaded,
+    bookVersionTrashed,
+    trashedBookVersionRecovered,
+    refetch,
+    dispatch,
+  ]);
 
   return (
     <section className="all-books-paging-container">

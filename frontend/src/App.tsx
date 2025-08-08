@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { authActions } from "@/redux/slices/index";
 import { ThemeProvider } from "./components/ThemeProvider";
 import Cookies from "js-cookie";
@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import BookVersionsDashboard from "./pages/BookVersionsDashboard/BookVersionsDashboard";
 import AuthorsDashboard from "./pages/AuthorsDashboard/AuthorsDashboard";
 import BooksByAuthorIdDashboard from "./pages/BooksByAuthorIdDashboard/BooksByAuthorIdDashboard";
+import SettingsDashboard from "./pages/SettingsDashboard/SettingsDashboard";
 
 //axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
 
@@ -26,6 +27,9 @@ function App() {
   const dispatch = useAppDispatch();
 
   //const isLogin = useAppSelector((state) => state?.authSlice?.isLogin) ?? false;
+  const profileImgUploaded = useAppSelector(
+    (state) => state.userSlice.profileImgUploaded
+  );
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -34,7 +38,7 @@ function App() {
     } else {
       dispatch(authActions.setIsAuthChecked());
     }
-  }, [dispatch]);
+  }, [dispatch, profileImgUploaded]);
 
   return (
     <ThemeProvider>
@@ -44,7 +48,7 @@ function App() {
           <Routes>
             <Route element={<NavBar />}>
               <Route element={<PrivateRoute />}>
-                {/*<Route path="/profile/:userId" element={<ProfilePage />} />*/}
+                <Route path="/settings" element={<SettingsDashboard />} />
               </Route>
               <Route path="/profile/:userId" element={<ProfilePage />} />
               <Route path="/" element={<BooksDashboard />} />
