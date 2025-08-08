@@ -47,7 +47,7 @@ const RegisterPage = () => {
         }
       >
         {({ isSubmitting }) => (
-          <Form className="default-card-container w-[80vw] max-w-[400px] gap-5 px-4 md:px-12 py-10">
+          <Form className="default-card-container w-[80vw] max-w-[400px] gap-5 px-4 md:px-12 py-10 mt-[15px]">
             <span className="text-2xl">Register New Account</span>
             {keys.map((key) => (
               <>

@@ -5,7 +5,7 @@ import "./BookVersionsDashboard.css";
 import { useGetBookVersionsQuery } from "@/services/bookApis";
 import { BooksSortByOptions } from "@/utils/constants";
 import CustomSelect from "@/components/ui/CustomSelect";
-import { useRtkQueryErrorToast } from "@/hooks/hooks";
+import { useAppSelector, useRtkQueryErrorToast } from "@/hooks/hooks";
 import Pagination from "@/components/Pagination";
 import PDFReader from "@/components/PdfReader";
 import { useAppDispatch } from "@/hooks/hooks";
@@ -22,12 +22,15 @@ const BookVersionsDashboard = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
-  const { data, error, isLoading } = useGetBookVersionsQuery({
+  const { data, error, isLoading, refetch } = useGetBookVersionsQuery({
     bookId: Number(bookId),
     page_index: pageIndex,
     sortBy,
   });
   useRtkQueryErrorToast(error);
+  const versionIsTrashed = useAppSelector(
+    (state) => state.userSlice.bookVersionTrashed
+  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -75,9 +78,16 @@ const BookVersionsDashboard = () => {
     );
   };
 
+  //refetch when a version is move to trash
+  useEffect(() => {
+    if (versionIsTrashed) {
+      refetch();
+    }
+  }, [versionIsTrashed, refetch]);
+
   return (
     <div className="flex items-center flex-col min-h-screen w-screen overflow-hidden">
-      <div className="default-card-container w-[98vw] md:w-[90vw] max-w-[1400px] py-[30px] px-[5px] md:p-[30px] items-center justify-center">
+      <div className="default-card-container w-[98vw] md:w-[90vw] max-w-[1400px] py-[30px] px-[5px] md:p-[30px] items-center justify-center mt-[30px]">
         {!isLoading ? (
           <>
             {/*Book general info*/}

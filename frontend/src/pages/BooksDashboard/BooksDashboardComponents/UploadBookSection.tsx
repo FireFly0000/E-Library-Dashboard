@@ -97,7 +97,7 @@ const UploadBookSection: React.FC<UploadBookSectionProps> = ({
 
       formData.append("bookFile", bookFile);
       formData.append("thumbnail", thumbnail ? thumbnail : String(null));
-      formData.append("category", category === "Fiction" ? "FICda" : category);
+      formData.append("category", category === "Fiction" ? "FIC" : category);
       formData.append("title", title === "" ? String(null) : String(title));
       formData.append(
         "description",
@@ -113,6 +113,10 @@ const UploadBookSection: React.FC<UploadBookSectionProps> = ({
         authorCountry === "" ? String(null) : String(authorCountry)
       );
       formData.append("bookId", String(bookId));
+
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
 
       await dispatch(
         bookActions.createBook({

@@ -392,7 +392,9 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
         id: userFound.id,
         email: userFound.email,
         username: userFound.username,
-        url_avatar: await getFileUrlFromS3(userFound.url_avatar),
+        url_avatar: userFound.url_avatar
+          ? await getFileUrlFromS3(userFound.url_avatar)
+          : null,
         viewCount: userFound.total_views,
       };
       return new ResponseSuccess(
@@ -405,6 +407,7 @@ const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
 
     return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
   } catch (error: any) {
+    console.log(error);
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),

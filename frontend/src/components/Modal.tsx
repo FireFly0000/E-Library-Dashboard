@@ -56,7 +56,7 @@ const Modal: React.FC<ModalProps> = ({
 
         {/* Modal Title */}
         {title && (
-          <h2 className="text-2xl font-semibold text-center text-foreground leading-snug mb-6 break-words whitespace-normal">
+          <h2 className="text-2xl font-semibold text-center text-foreground mb-6 break-words whitespace-normal px-2 my-2">
             {title}
           </h2>
         )}

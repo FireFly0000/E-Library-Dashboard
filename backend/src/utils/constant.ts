@@ -134,6 +134,11 @@ export const errorMessages = {
   profileIdMustBeNumber: "User's ID of the profile must be a number",
   deleteOldProfileImgFailed:
     "Failed to delete old profile image, Please try again",
+  trashBookVersionFailed: "Trashed Book Version Failed",
+  updateUserBasicInfoFailed: "Update user's info failed, please try again",
+  getTrashedVersionsFailed: "Fail to get book versions in trash",
+  recoverVersionFailed: "Fail to recover version, try again",
+  deleteBookVersionFailed: "Delete book version failed, try again",
 };
 
 export const successMessages = {
@@ -199,6 +204,11 @@ export const successMessages = {
   //user
   getUserProfile: "Get user profile successfully",
   changeProfileImg: "Change profile image successfully",
+  trashBookVersion: "Trashed Book Version Successfully",
+  updateUserBasicInfo: "Updated user's info successfully",
+  getTrashedVersions: "Get trashed book versions successfully",
+  recoverVersionSuccess: "Recover version successfully",
+  deleteBookVersionSuccess: "Delete book version successfully",
 };
 
 export const allowedCountries = [

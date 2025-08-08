@@ -35,7 +35,7 @@ export const updateUserProfileImgFileMdw = async (
 export const enforceUploadLimits = (req, res, next) => {
   const bookFile = req.files?.bookFile?.[0];
   const thumbnailFile = req.files?.thumbnail?.[0];
-  //const profileImg = req.file;
+  const profileImg = req.file;
 
   if (bookFile && bookFile.size > 20 * 1024 * 1024) {
     return res.status(400).json({ message: "Book file exceeds 20MB limit" });
@@ -45,9 +45,9 @@ export const enforceUploadLimits = (req, res, next) => {
     return res.status(400).json({ message: "Thumbnail exceeds 4MB limit" });
   }
 
-  //if (profileImg && profileImg.size > 4 * 1024 * 1024) {
-  //  return res.status(400).json({ message: "Profile image exceeds 4MB limit" });
-  //}
+  if (profileImg && profileImg.size > 4 * 1024 * 1024) {
+    return res.status(400).json({ message: "Profile image exceeds 4MB limit" });
+  }
 
   next();
 };

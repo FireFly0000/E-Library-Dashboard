@@ -6,12 +6,12 @@ const storage = multer.memoryStorage();
 export const uploadBookAssets = multer({
   storage,
   fileFilter(req, file, cb) {
-    const allowedBookTypes = ["application/pdf", "application/epub+zip"];
+    const allowedBookTypes = ["application/pdf"];
     const allowedImgTypes = ["image/png", "image/jpg", "image/jpeg"];
 
     if (file.fieldname === "bookFile") {
       if (!allowedBookTypes.includes(file.mimetype)) {
-        return cb(new Error("Invalid book file, must be PDF or EPUB"));
+        return cb(new Error("Invalid book file, must be PDF"));
       }
     }
 

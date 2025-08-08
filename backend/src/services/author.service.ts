@@ -26,14 +26,25 @@ const getAllAuthorsPaging = async (
 
     const pageSize = 10; // Fixed page size
 
-    let sortOption = "a.created_at DESC";
+    /*let sortOption = "a.created_at DESC";
     if (sortBy.includes("created_at")) {
       sortOption = `a.${sortBy}`;
     } else {
       sortOption = sortBy;
-    }
+    }*/
 
-    const authorsData: AuthorWithPopularity[] = await db.$queryRawUnsafe(
+    const allowedFields = ["created_at", "popularity"];
+    const field =
+      allowedFields.find((f) => sortBy.startsWith(f)) ?? "created_at";
+    const direction = sortBy.toLowerCase().endsWith("desc") ? "DESC" : "ASC";
+    const sortOption =
+      field === "created_at"
+        ? `a.${field} ${direction}`
+        : `${field} ${direction}`;
+
+    const authorsData: AuthorWithPopularity[] = await db.$queryRawUnsafe<
+      AuthorWithPopularity[]
+    >(
       `SELECT 
         a.id,
         a.name,
@@ -41,17 +52,19 @@ const getAllAuthorsPaging = async (
         a.created_at AS "createdAt", 
         COALESCE(SUM(b."view_count"), 0) AS popularity
       FROM "Author" a
-      LEFT JOIN "Book" b ON b."author_id" = a."id"
+      LEFT JOIN "Book" b ON b."author_id" = a."id" AND b."is_empty" = false
       LEFT JOIN "Category" c ON c."id" = b."category_id"
       WHERE (a."name" ILIKE $1 AND a."country" ILIKE $2)
       AND (c."category_code" = $3::"CategoryCode" OR $3 IS NULL) 
       GROUP BY a.id
       ORDER BY ${sortOption}
-      LIMIT ${pageSize} OFFSET ${(page_index - 1) * pageSize}
+      LIMIT $4 OFFSET $5
     `,
       `%${search || ""}%`,
       `%${country === "All" ? "" : country}%`,
-      category === "All" ? null : category
+      category === "All" ? null : category,
+      pageSize,
+      (page_index - 1) * pageSize
     );
 
     const totalRecords = authorsData.length;

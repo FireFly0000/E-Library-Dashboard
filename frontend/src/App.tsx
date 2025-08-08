@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import BookVersionsDashboard from "./pages/BookVersionsDashboard/BookVersionsDashboard";
 import AuthorsDashboard from "./pages/AuthorsDashboard/AuthorsDashboard";
 import BooksByAuthorIdDashboard from "./pages/BooksByAuthorIdDashboard/BooksByAuthorIdDashboard";
+import SettingsDashboard from "./pages/SettingsDashboard/SettingsDashboard";
 
 //axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
 
@@ -47,7 +48,7 @@ function App() {
           <Routes>
             <Route element={<NavBar />}>
               <Route element={<PrivateRoute />}>
-                {/*<Route path="/profile/:userId" element={<ProfilePage />} />*/}
+                <Route path="/settings" element={<SettingsDashboard />} />
               </Route>
               <Route path="/profile/:userId" element={<ProfilePage />} />
               <Route path="/" element={<BooksDashboard />} />

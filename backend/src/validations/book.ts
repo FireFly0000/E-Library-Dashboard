@@ -101,12 +101,12 @@ export const createBookSchema = Joi.object({
     }
 
     if (hasBookId && hasBookInfo) {
-      return helpers.error("authorInfo.required", {
+      return helpers.error("bookInfo.required", {
         message: i18n.t("errorMessages.eitherBookIdOrBook"),
       });
     }
 
-    if (!value.authorId && !value.author) {
+    if (!value.authorId && !value.author && !hasBookId) {
       return helpers.error("authorInfo.required", {
         message: i18n.t("errorMessages.authorIsRequired"),
       });

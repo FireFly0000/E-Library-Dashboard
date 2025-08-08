@@ -84,6 +84,8 @@ model Book {
   commentCount Int   @default(0) @map("comment_count")
   viewCount   Int          @default(0) @map("view_count")
   likeCount   Int          @default(0) @map("like_count")
+  isEmpty     Boolean      @default(false) @map("is_empty")
+  isDeleted   Boolean      @default(false) @map("is_deleted") 
   
   author      Author       @relation(fields: [authorId], references: [id])
   category    Category     @relation(fields: [categoryId], references: [id])
@@ -96,6 +98,9 @@ model Book {
   @@index([authorId], name: "idx_book_author_id")
   @@index([createdAt], name: "idx_book_created_at")
   @@index([viewCount], name: "idx_book_view_count")
+  @@index([isEmpty], name: "idx_book_is_empty")
+  @@index([categoryId], name: "idx_book_category_id")
+  @@index([categoryId, createdAt], name: "idx_book_category_id_created")
 }
 
 model BookVersion {
@@ -107,6 +112,8 @@ model BookVersion {
   likeCount    Int      @default(0) @map("like_count")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  isTrashed Boolean  @default(false) @map("is_trashed")
+  trashedAt DateTime? @map("trashed_at")
   
   user      User   @relation(fields: [userId], references: [id])
   book      Book   @relation(fields: [bookId], references: [id])
@@ -114,6 +121,10 @@ model BookVersion {
   @@index([userId], name: "idx_book_versions_user_id")
   @@index([createdAt], name: "idx_book_versions_created_at")
   @@index([viewCount], name: "idx_book_versions_view_count")
+  @@index([isTrashed], name: "idx_book_versions_is_trashed")
+  @@index([id, userId], name: "idx_book_versions_id_user_id")
+  @@index([bookId], name: "idx_book_versions_book_id")
+  @@index([bookId, isTrashed], name : "idx_book_versions_book_id_is_trashed")
 }
 
 model Comment {

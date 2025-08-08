@@ -3,6 +3,7 @@ import cors from "cors";
 import configs from "./configs/index";
 import routers from "./routes/index";
 import cookieParser from "cookie-parser";
+import { workers } from "../src/utils/worker";
 
 const app: Application = express();
 const PORT = configs.general.PORT;
@@ -26,3 +27,6 @@ app.use("/api/users", routers.userRouter);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+//worker tasks (scheduled tasks)
+workers.dailyCleanupTrash();
