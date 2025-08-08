@@ -28,9 +28,9 @@ export const sendVerificationEmail = async (
   const link = `${configs.general.DOMAIN_NAME}/verify-email/${token}`;
   const html = setSignUpEmail(link);
   const mailOptions: SendMail = {
-    from: "E-Lib Share",
+    from: "E-Shelf",
     to: `${payload.email}`,
-    subject: "E-Lib Share - Verification email",
+    subject: "E-Shelf - Verification email",
     text: "You received message from " + payload.email,
     html: html,
   };

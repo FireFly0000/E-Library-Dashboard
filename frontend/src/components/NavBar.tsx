@@ -57,9 +57,7 @@ const NavBar = () => {
               className="w-[55px]"
               onClick={() => (window.location.href = "/")}
             />
-            <span className="text-foreground text-xl font-sora">
-              E-Lib Share
-            </span>
+            <span className="text-foreground text-xl font-sora">E-Shelf</span>
           </div>
 
           {/*Navigation bar buttons for sm (640px) or below*/}
