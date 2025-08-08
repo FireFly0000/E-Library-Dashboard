@@ -3,7 +3,7 @@ import cors from "cors";
 import configs from "./configs/index";
 import routers from "./routes/index";
 import cookieParser from "cookie-parser";
-import { workers } from "../src/utils/worker";
+import { workers } from "./utils/worker";
 
 const app: Application = express();
 const PORT = configs.general.PORT;
