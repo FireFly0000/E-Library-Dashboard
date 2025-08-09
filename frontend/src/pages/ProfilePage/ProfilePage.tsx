@@ -52,6 +52,9 @@ const ProfilePage = () => {
   const bookVersionTrashed = useAppSelector(
     (state) => state.userSlice.bookVersionTrashed
   );
+  const trashedBookVersionRecovered = useAppSelector(
+    (state) => state.userSlice.trashedBookVersionRecovered
+  );
 
   //API to get user profile
   const { data, isLoading, error, refetch } = useGetUserProfileQuery({
@@ -101,12 +104,22 @@ const ProfilePage = () => {
 
   //Refetch when profile changes (avatar, version to trash etc)
   useEffect(() => {
-    if (profileImgUploaded || bookVersionTrashed) {
+    if (
+      profileImgUploaded ||
+      bookVersionTrashed ||
+      trashedBookVersionRecovered
+    ) {
       refetch();
       dispatch(userActions.setProfileImgUploaded(false));
       dispatch(userActions.setBookVersionTrashed(false));
     }
-  }, [profileImgUploaded, bookVersionTrashed, refetch, dispatch]);
+  }, [
+    profileImgUploaded,
+    bookVersionTrashed,
+    trashedBookVersionRecovered,
+    refetch,
+    dispatch,
+  ]);
 
   //call versionToTrash API
   const handleVersionToTrash = async (bookVersionId: number) => {
