@@ -51,12 +51,7 @@ const NavBar = () => {
             className="flex gap-2 w-fit items-center hover:cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <img
-              src={ELibLogo}
-              alt="App's logo"
-              className="w-[55px]"
-              onClick={() => (window.location.href = "/")}
-            />
+            <img src={ELibLogo} alt="App's logo" className="w-[55px]" />
             <span className="text-foreground text-xl font-sora">E-Shelf</span>
           </div>
 

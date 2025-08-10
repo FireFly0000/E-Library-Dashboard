@@ -30,6 +30,9 @@ function App() {
   const profileImgUploaded = useAppSelector(
     (state) => state.userSlice.profileImgUploaded
   );
+  const basicInfoUpdated = useAppSelector(
+    (state) => state.userSlice.basicInfoUpdated
+  );
 
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
@@ -38,7 +41,7 @@ function App() {
     } else {
       dispatch(authActions.setIsAuthChecked());
     }
-  }, [dispatch, profileImgUploaded]);
+  }, [dispatch, profileImgUploaded, basicInfoUpdated]);
 
   return (
     <ThemeProvider>

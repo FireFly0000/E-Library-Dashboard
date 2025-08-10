@@ -201,7 +201,7 @@ export const userSlice = createSlice({
       toast.error(state.error);
     });
 
-    //recoverTrashedBookVersion
+    //deleteBookVersion
     builder.addCase(deleteBookVersion.pending, (state) => {
       state.error = "";
       state.success = "";

@@ -35,6 +35,9 @@ const BooksByAuthorIdDashboard = () => {
   } as BooksByAuthorIdParams);
   useRtkQueryErrorToast(error);
 
+  //const bookUploaded = useAppSelector((state) => state.bookSlice.bookUploaded)
+  //const bookVersionTrashed = useAppSelector((state) => state.userSlice.)
+
   //update books
   useEffect(() => {
     if (data?.data) {
@@ -116,7 +119,13 @@ const BooksByAuthorIdDashboard = () => {
         </div>
 
         {/*content section */}
-        {!isLoading ? (
+        {isLoading ? (
+          <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
+        ) : books.length === 0 ? (
+          <span className="text-foreground text-lg md:text-xl mt-4">
+            No Book Found
+          </span>
+        ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 items-center gap-8 place-items-center my-8 w-full">
             {books.map((book: BookByAuthorId, index) => (
               <div
@@ -146,8 +155,6 @@ const BooksByAuthorIdDashboard = () => {
               </div>
             ))}
           </div>
-        ) : (
-          <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
         )}
 
         <Pagination

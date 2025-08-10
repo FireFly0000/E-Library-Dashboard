@@ -4,11 +4,13 @@ import { authActions } from "@/redux/slices";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const EmailVerification = () => {
   const { token } = useParams();
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(authActions.verifyEmail(token ?? ""));
@@ -25,7 +27,12 @@ const EmailVerification = () => {
 
   return (
     <div className="flex flex-col items-center gap-5 text-center w-full text-4xl text-[var(--foreground)] px-5">
-      <img src={ELibLogo} alt="App's logo" className="w-[10%] min-w-[200px]" />
+      <img
+        src={ELibLogo}
+        alt="App's logo"
+        className="w-[10%] min-w-[200px] cursor-pointer"
+        onClick={() => navigate("/")}
+      />
 
       {errorMessage !== "" ? (
         <>

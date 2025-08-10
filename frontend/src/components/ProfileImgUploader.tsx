@@ -143,7 +143,8 @@ const ProfileImgUploader: React.FC<ProfileImgUploaderProps> = ({
   //Close modal and invalidate tag for refetch if upload succeeds
   useEffect(() => {
     if (uploadSuccess) {
-      dispatch(userApi.util.invalidateTags(["users"]));
+      dispatch(userApi.util.invalidateTags(["profile"]));
+      dispatch(userActions.setProfileImgUploaded(false));
       closeModal();
     }
   }, [uploadSuccess, dispatch, closeModal]);

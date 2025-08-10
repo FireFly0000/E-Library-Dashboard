@@ -129,7 +129,7 @@ const ProfileImageCropper: React.FC<Props> = ({
 
   useEffect(() => {
     if (uploadSuccess) {
-      dispatch(userApi.util.invalidateTags(["users"]));
+      dispatch(userApi.util.invalidateTags(["profile"]));
       closeModal();
     }
   }, [uploadSuccess, dispatch, closeModal]);

@@ -27,10 +27,7 @@ const TrashBin: React.FC = () => {
   const [versionsInTrash, setVersionsInTrash] = useState<
     TrashedBookVersion[] | null
   >(null);
-  const { data, isLoading, refetch } = useGetBookVersionsInTrashQuery();
-  const bookVersionTrashed = useAppSelector(
-    (state) => state.userSlice.bookVersionTrashed
-  );
+  const { data, isLoading } = useGetBookVersionsInTrashQuery();
   const trashedBookVersionRecovered = useAppSelector(
     (state) => state.userSlice.trashedBookVersionRecovered
   );
@@ -52,25 +49,22 @@ const TrashBin: React.FC = () => {
     }
   }, [data]);
 
-  //refetch when a version is move to trash
-  //Refetch when profile img is updated
+  //invalidate tags and reset success state for recover trashed book version
   useEffect(() => {
-    if (
-      bookVersionTrashed ||
-      trashedBookVersionRecovered ||
-      bookVersionDeleted
-    ) {
-      refetch();
-      dispatch(userActions.setBookVersionTrashed(false));
+    if (trashedBookVersionRecovered) {
+      dispatch(userApi.util.invalidateTags(["trashed", "profile"]));
+      dispatch(bookApi.util.invalidateTags(["books"]));
       dispatch(userActions.setTrashedBookVersionRecovered(false));
     }
-  }, [
-    bookVersionTrashed,
-    refetch,
-    dispatch,
-    trashedBookVersionRecovered,
-    bookVersionDeleted,
-  ]);
+  });
+
+  //invalidate tags and reset success state for permanently delete book version
+  useEffect(() => {
+    if (bookVersionDeleted) {
+      dispatch(userApi.util.invalidateTags(["trashed"]));
+      dispatch(userActions.setBookVersionDeleted(false));
+    }
+  });
 
   //Trashed items actions menu list======================================
   const trashedItemsActionsMenu: ItemAction<TrashedBookVersion>[] = [
@@ -86,8 +80,6 @@ const TrashBin: React.FC = () => {
             bookVersionId: version.id,
           })
         );
-        dispatch(userApi.util.invalidateTags(["trashed"]));
-        dispatch(bookApi.util.invalidateTags(["books"]));
       },
     },
     {
@@ -102,7 +94,6 @@ const TrashBin: React.FC = () => {
             bookVersionId: version.id,
           })
         );
-        dispatch(userApi.util.invalidateTags(["trashed"]));
       },
     },
   ];
@@ -179,7 +170,6 @@ const TrashBin: React.FC = () => {
                 <ItemActionsMenu
                   item={version}
                   actions={trashedItemsActionsMenu}
-                  onActionComplete={() => refetch()}
                 />
               </div>
             ))}

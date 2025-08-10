@@ -13,6 +13,7 @@ import ReactSelectStyles from "@/styles/ReactSelectStyles";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 import { bookApi } from "@/services/bookApis";
+import { userApi } from "@/services/userApis";
 
 type UploadBookSectionProps = {
   closeModal: () => void;
@@ -153,9 +154,12 @@ const UploadBookSection: React.FC<UploadBookSectionProps> = ({
     existingAuthorRef.current?.clearInput();
   };
 
+  //invalidate tags so other pages could refetch due to changes
   useEffect(() => {
     if (uploadSuccess) {
       dispatch(bookApi.util.invalidateTags(["books"]));
+      dispatch(userApi.util.invalidateTags(["profile"]));
+      dispatch(bookActions.setBookUploaded(false));
       closeModal();
     }
   }, [uploadSuccess, dispatch, closeModal]);

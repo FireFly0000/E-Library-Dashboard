@@ -151,7 +151,13 @@ const AuthorsDashboard = () => {
 
         {/*content section*/}
         <section className="my-4 w-full">
-          {!isLoading ? (
+          {isLoading ? (
+            <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
+          ) : authors.length === 0 ? (
+            <span className="text-foreground text-lg md:text-xl mt-4">
+              No Author Found
+            </span>
+          ) : (
             authors?.map((author: AuthorDashboardTableItem, index) => (
               <div className="author-table-grid" key={author.id}>
                 <p>{author.id === -1 ? "ID" : author.id}</p>
@@ -183,8 +189,6 @@ const AuthorsDashboard = () => {
                 <p>{author.popularity === -1 ? "Views" : author.popularity}</p>
               </div>
             ))
-          ) : (
-            <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
           )}
         </section>
 

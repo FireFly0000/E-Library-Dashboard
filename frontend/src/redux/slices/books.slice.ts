@@ -8,6 +8,7 @@ import { BookAIServicesParams } from "@/types/books";
 
 type BookSlice = {
   bookUploaded: boolean;
+  viewCountUpdated: boolean;
   isLoading: boolean;
   success: string;
   error: string;
@@ -60,6 +61,7 @@ export const bookAIServices = createAsyncThunk<
 
 const initialState: BookSlice = {
   bookUploaded: false,
+  viewCountUpdated: false,
   isLoading: false,
   error: "",
   success: "",
@@ -71,6 +73,9 @@ export const bookSlice = createSlice({
   reducers: {
     setBookUploaded: (state, action: PayloadAction<boolean>) => {
       state.bookUploaded = action.payload;
+    },
+    setViewCountUpdated: (state, action: PayloadAction<boolean>) => {
+      state.viewCountUpdated = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -101,6 +106,7 @@ export const bookSlice = createSlice({
 
     builder.addCase(updateViewCount.fulfilled, (state) => {
       state.isLoading = false;
+      state.viewCountUpdated = true;
     });
 
     builder.addCase(updateViewCount.rejected, (state, action) => {
@@ -124,6 +130,6 @@ export const bookSlice = createSlice({
   },
 });
 
-export const { setBookUploaded } = bookSlice.actions;
+export const { setBookUploaded, setViewCountUpdated } = bookSlice.actions;
 
 export default bookSlice.reducer;

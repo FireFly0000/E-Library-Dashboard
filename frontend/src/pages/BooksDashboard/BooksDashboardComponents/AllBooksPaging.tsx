@@ -11,8 +11,6 @@ import {
 import { Book, BooksPaginationParams } from "@/types/books";
 import { useGetBooksPagingQuery } from "@/services/bookApis";
 import { useRtkQueryErrorToast } from "@/hooks/hooks";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { bookActions } from "@/redux/slices";
 import { useNavigate } from "react-router-dom";
 import MobileAdvancedFilters from "@/components/MobileAdvancedFilters";
 import { LoaderCircle } from "lucide-react";
@@ -26,17 +24,9 @@ const AllBooksPaging: React.FC = () => {
   const [sortBy, setSortBy] = useState("createdAt DESC");
   const [country, setCountry] = useState("All");
   const [category, setCategory] = useState("All");
-  const dispatch = useAppDispatch();
-  const bookUploaded = useAppSelector((state) => state.bookSlice.bookUploaded);
-  const bookVersionTrashed = useAppSelector(
-    (state) => state.userSlice.bookVersionTrashed
-  );
-  const trashedBookVersionRecovered = useAppSelector(
-    (state) => state.userSlice.trashedBookVersionRecovered
-  );
   const navigate = useNavigate();
 
-  const { data, error, isLoading, refetch } = useGetBooksPagingQuery({
+  const { data, error, isLoading } = useGetBooksPagingQuery({
     search: debouncedSearch,
     page_index: pageIndex,
     country,
@@ -68,20 +58,6 @@ const AllBooksPaging: React.FC = () => {
   useEffect(() => {
     setPageIndex(1);
   }, [debouncedSearch, country, category, sortBy]);
-
-  //Refetch when a new book is added
-  useEffect(() => {
-    if (bookUploaded || bookVersionTrashed || trashedBookVersionRecovered) {
-      refetch();
-      dispatch(bookActions.setBookUploaded(false));
-    }
-  }, [
-    bookUploaded,
-    bookVersionTrashed,
-    trashedBookVersionRecovered,
-    refetch,
-    dispatch,
-  ]);
 
   return (
     <section className="all-books-paging-container">
@@ -142,7 +118,13 @@ const AllBooksPaging: React.FC = () => {
         />
       </div>
 
-      {!isLoading ? (
+      {isLoading ? (
+        <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
+      ) : books.length === 0 ? (
+        <span className="text-foreground text-lg md:text-xl mt-4">
+          No Book Found
+        </span>
+      ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 items-center gap-8 place-items-center my-8 w-full">
           {books.map((book: Book, index) => (
             <div
@@ -172,8 +154,6 @@ const AllBooksPaging: React.FC = () => {
             </div>
           ))}
         </div>
-      ) : (
-        <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin" />
       )}
 
       <Pagination

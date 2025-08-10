@@ -10,7 +10,7 @@ import {
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: RtkBaseQuery({ baseUrl: "" }),
-  tagTypes: ["books", "users", "trashed"],
+  tagTypes: ["profile", "trashed"],
   endpoints: (builder) => ({
     getUserProfile: builder.query<
       ResponsePagination<UserProfile>,
@@ -20,7 +20,7 @@ export const userApi = createApi({
         url: `users/profile?page_index=${page_index}&search=${search}&userId=${userId}&sortBy=${sortBy}`,
         method: "GET",
       }),
-      providesTags: ["books", "users"],
+      providesTags: ["profile"],
     }),
 
     getBookVersionsInTrash: builder.query<Response<TrashedBookVersion[]>, void>(

@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { BookInfo, BookVersionTableItem } from "@/types/books";
 import "./BookVersionsDashboard.css";
-import { useGetBookVersionsQuery } from "@/services/bookApis";
+import { bookApi, useGetBookVersionsQuery } from "@/services/bookApis";
 import { BooksSortByOptions } from "@/utils/constants";
 import CustomSelect from "@/components/ui/CustomSelect";
 import { useAppSelector, useRtkQueryErrorToast } from "@/hooks/hooks";
@@ -10,6 +10,8 @@ import Pagination from "@/components/Pagination";
 import PDFReader from "@/components/PdfReader";
 import { useAppDispatch } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
+import { LoaderCircle } from "lucide-react";
+import { userApi } from "@/services/userApis";
 
 const BookVersionsDashboard = () => {
   const { bookId, authorId } = useParams();
@@ -22,17 +24,17 @@ const BookVersionsDashboard = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
-  const { data, error, isLoading, refetch } = useGetBookVersionsQuery({
+  const { data, error, isLoading } = useGetBookVersionsQuery({
     bookId: Number(bookId),
     page_index: pageIndex,
     sortBy,
   });
   useRtkQueryErrorToast(error);
-  const versionIsTrashed = useAppSelector(
-    (state) => state.userSlice.bookVersionTrashed
-  );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const viewCountUpdated = useAppSelector(
+    (state) => state.bookSlice.viewCountUpdated
+  );
 
   //To load bookVersions into format for table layout using grid
   useEffect(() => {
@@ -65,6 +67,15 @@ const BookVersionsDashboard = () => {
     }
   }, [data]);
 
+  //invalidate tags and reset success state for view count update
+  useEffect(() => {
+    if (viewCountUpdated) {
+      dispatch(bookApi.util.invalidateTags(["books"]));
+      dispatch(userApi.util.invalidateTags(["profile"]));
+      dispatch(bookActions.setViewCountUpdated(false));
+    }
+  });
+
   const handleViewsIncrement = async (
     bookVersionId: number,
     contributorId: number
@@ -77,13 +88,6 @@ const BookVersionsDashboard = () => {
       })
     );
   };
-
-  //refetch when a version is move to trash
-  useEffect(() => {
-    if (versionIsTrashed) {
-      refetch();
-    }
-  }, [versionIsTrashed, refetch]);
 
   return (
     <div className="flex items-center flex-col min-h-screen w-screen overflow-hidden">
@@ -204,9 +208,7 @@ const BookVersionsDashboard = () => {
             />
           </>
         ) : (
-          <span className="text-foreground text-2xl text-center">
-            Loading...
-          </span>
+          <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
         )}
       </div>
     </div>

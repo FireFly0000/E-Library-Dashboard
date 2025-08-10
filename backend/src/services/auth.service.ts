@@ -381,6 +381,9 @@ const refreshToken = async (req: Request): Promise<ResponseBase> => {
 const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
   try {
     const userId = req.user_id;
+    if (!userId) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
     const userFound = await configs.db.user.findUnique({
       where: {
         id: userId,

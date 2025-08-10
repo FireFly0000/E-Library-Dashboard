@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Set working directory
-WORKDIR /usr/src/app
+WORKDIR /home/node
 
 # Copy package files first for better caching
 COPY package.json yarn.lock ./

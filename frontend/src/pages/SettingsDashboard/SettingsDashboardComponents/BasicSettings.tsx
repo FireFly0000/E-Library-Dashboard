@@ -6,12 +6,16 @@ import { ChangeUserBasicInfo } from "@/types/user";
 import { formatKeyToLabel } from "@/utils/helper";
 import { changeUserBasicInfoValidationSchema } from "@/validations/user";
 import { userActions } from "@/redux/slices";
+import { userApi } from "@/services/userApis";
+import { useEffect } from "react";
 
 const BasicSettings: React.FC = () => {
   const user = useAppSelector((state) => state.authSlice.user);
   const dispatch = useAppDispatch();
+  const basicUserInfoUpdated = useAppSelector(
+    (state) => state.userSlice.basicInfoUpdated
+  );
 
-  //for changing email
   const changeUserBasicInfoInitialValues: ChangeUserBasicInfo = {
     username: user.username,
   };
@@ -21,9 +25,17 @@ const BasicSettings: React.FC = () => {
     values: ChangeUserBasicInfo,
     setSubmitting: (isSubmitting: boolean) => void
   ) => {
-    dispatch(userActions.updateUserBasicInfo(values));
+    await dispatch(userActions.updateUserBasicInfo(values));
     setSubmitting(false);
   };
+
+  //Invalidate tag and reset update success state for refetch
+  useEffect(() => {
+    if (basicUserInfoUpdated) {
+      dispatch(userApi.util.invalidateTags(["profile"]));
+      dispatch(userActions.setBasicInfoUpdated(false));
+    }
+  }, [basicUserInfoUpdated, dispatch]);
 
   return (
     <main className="flex flex-col w-full items-center justify-center">

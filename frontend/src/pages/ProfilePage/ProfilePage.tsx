@@ -44,20 +44,15 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const width = useWindowWidth();
-
-  //Redux states to watch and trigger RTK refetch when profile is updated
-  const profileImgUploaded = useAppSelector(
-    (state) => state.userSlice.profileImgUploaded
-  );
   const bookVersionTrashed = useAppSelector(
     (state) => state.userSlice.bookVersionTrashed
   );
-  const trashedBookVersionRecovered = useAppSelector(
-    (state) => state.userSlice.trashedBookVersionRecovered
+  const viewCountUpdated = useAppSelector(
+    (state) => state.bookSlice.viewCountUpdated
   );
 
   //API to get user profile
-  const { data, isLoading, error, refetch } = useGetUserProfileQuery({
+  const { data, isLoading, error } = useGetUserProfileQuery({
     search: debouncedSearch,
     sortBy: sortBy,
     userId: Number(userId),
@@ -102,24 +97,23 @@ const ProfilePage = () => {
     );
   };
 
-  //Refetch when profile changes (avatar, version to trash etc)
+  //invalidate tags and reset success state for view count update
   useEffect(() => {
-    if (
-      profileImgUploaded ||
-      bookVersionTrashed ||
-      trashedBookVersionRecovered
-    ) {
-      refetch();
-      dispatch(userActions.setProfileImgUploaded(false));
+    if (viewCountUpdated) {
+      dispatch(bookApi.util.invalidateTags(["books"]));
+      dispatch(userApi.util.invalidateTags(["profile"]));
+      dispatch(bookActions.setViewCountUpdated(false));
+    }
+  });
+
+  //invalidate tags and reset success state for move book version to trash
+  useEffect(() => {
+    if (bookVersionTrashed) {
+      dispatch(userApi.util.invalidateTags(["trashed", "profile"]));
+      dispatch(bookApi.util.invalidateTags(["books"]));
       dispatch(userActions.setBookVersionTrashed(false));
     }
-  }, [
-    profileImgUploaded,
-    bookVersionTrashed,
-    trashedBookVersionRecovered,
-    refetch,
-    dispatch,
-  ]);
+  }, [bookVersionTrashed, dispatch]);
 
   //call versionToTrash API
   const handleVersionToTrash = async (bookVersionId: number) => {
@@ -133,8 +127,6 @@ const ProfilePage = () => {
     } else {
       toast.error("Unexpected error");
     }
-    dispatch(userApi.util.invalidateTags(["trashed"]));
-    dispatch(bookApi.util.invalidateTags(["books"]));
   };
 
   //Trashed items actions menu list======================================
