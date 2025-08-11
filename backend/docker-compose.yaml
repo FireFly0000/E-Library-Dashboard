@@ -1,0 +1,15 @@
+services:
+  node-app:
+    build: .
+    image: e_shelf_backend:v1
+    container_name: e_shelf_backend
+    ports:
+      - "${PORT}:${PORT}"
+    expose:
+      - "${PORT}"
+    networks:
+      - data
+
+networks:
+  data:
+    driver: bridge
