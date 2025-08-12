@@ -25,7 +25,7 @@ const dailyCleanupTrash = async () => {
 
       if (trashedVersions.length === 0) {
         console.log("🚫 No trashed book version found");
-        return;
+        return { count: 0 };
       }
 
       const successfullyDeletedIds: number[] = [];
