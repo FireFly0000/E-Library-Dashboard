@@ -27,7 +27,6 @@ import {
   TrashedBookVersion,
   UserProfile,
 } from "types/user.type";
-import { number } from "joi";
 
 const getUserProfile = async (
   params: GetUserProfileParams
@@ -149,7 +148,6 @@ const getUserProfile = async (
       pageSize // Page size
     );
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(405, error.toString(), false);
     }
@@ -327,7 +325,6 @@ const moveBookVersionToTrash = async (
       );
     }
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(405, error.toString(), false);
     }
@@ -593,7 +590,6 @@ const deleteBookVersion = async (
       true
     );
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(405, error.toString(), false);
     }

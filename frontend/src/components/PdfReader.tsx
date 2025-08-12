@@ -17,7 +17,7 @@ import Select from "react-select";
 import { languageList } from "@/utils/constants";
 import ReactSelectStyles from "@/styles/ReactSelectStyles";
 import Modal from "./Modal";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector, useWindowWidth } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 import toast from "react-hot-toast";
 //import { useWindowWidth } from "@/hooks/hooks";
@@ -35,7 +35,8 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   title,
   closeReader,
 }) => {
-  const [isScrollMode, setIsScrollMode] = useState(true);
+  const width = useWindowWidth();
+  const [isScrollMode, setIsScrollMode] = useState(width >= 820 ? false : true);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState(String(currentPage));
@@ -236,7 +237,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
       <div className="flex flex-col items-center w-full bg-card rounded-2xl sm:px-[35px] shadow-xl relative max-h-screen">
         {/* Controls */}
-        <div className="flex gap-4 items-center justify-start w-full px-2 sm:w-fit sm:px-0 my-2">
+        <div className="flex gap-4 items-center justify-start w-full px-2 sm:w-fit sm:px-0 my-2 select-none">
           <a
             href={fileUrl}
             target="_blank"
@@ -247,15 +248,17 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           </a>
 
           {/* Read Mode Selector */}
-          <CustomSelect
-            options={readModes}
-            getValue={(item) => item.value}
-            getLabel={(item) => item.label}
-            getKey={(item) => item.key}
-            changeKey={(key) => setIsScrollMode(readModes[key].value)}
-            className="w-[90px]"
-            variant="highlight"
-          />
+          {width >= 820 && (
+            <CustomSelect
+              options={readModes}
+              getValue={(item) => item.value}
+              getLabel={(item) => item.label}
+              getKey={(item) => item.key}
+              changeKey={(key) => setIsScrollMode(readModes[key].value)}
+              className="w-[90px]"
+              variant="highlight"
+            />
+          )}
 
           {/* Page Input */}
           <input
@@ -336,6 +339,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           className="w-full overflow-auto"
           ref={scrollContainerRef}
           onMouseUp={handleMouseUp}
+          onTouchEnd={handleMouseUp}
         >
           <Document
             file={fileUrl}
@@ -368,7 +372,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
         </div>
 
         {/* Pagination Controls for below 1024px*/}
-        <div className="lg:hidden flex items-center justify-center w-full my-2 gap-2 relative text-foreground">
+        <div className="lg:hidden flex items-center justify-center w-full my-2 gap-2 relative text-foreground select-none">
           <a
             href={fileUrl}
             target="_blank"

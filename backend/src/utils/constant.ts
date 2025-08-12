@@ -209,6 +209,9 @@ export const successMessages = {
   getTrashedVersions: "Get trashed book versions successfully",
   recoverVersionSuccess: "Recover version successfully",
   deleteBookVersionSuccess: "Delete book version successfully",
+
+  //system
+  dailyCleanUpSuccess: "Daily clean up succeeds",
 };
 
 export const allowedCountries = [

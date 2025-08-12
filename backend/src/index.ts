@@ -3,10 +3,9 @@ import cors from "cors";
 import configs from "./configs/index";
 import routers from "./routes/index";
 import cookieParser from "cookie-parser";
-import { workers } from "./utils/worker";
 
 const app: Application = express();
-const PORT = configs.general.PORT;
+//const PORT = configs.general.PORT;
 const DOMAIN_NAME = configs.general.DOMAIN_NAME;
 
 app.use(express.json());
@@ -22,10 +21,8 @@ app.use("/api/auth", routers.authRouter);
 app.use("/api/authors", routers.authorRouter);
 app.use("/api/books", routers.bookRouter);
 app.use("/api/users", routers.userRouter);
+app.use("/api/system", routers.systemRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(8080, () => {
+  console.log(`Server is running on port ${8080}`);
 });
-
-//worker tasks (scheduled tasks)
-workers.dailyCleanupTrash();
