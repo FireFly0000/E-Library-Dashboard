@@ -1,7 +1,8 @@
 # E-Library App with AI Reading Assitant.
-# Techonologies Used: React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Docker, and AWS S3.
-
 A fully functional, and secured E-Library that allows users to share and find books. As well as reading e-books (PDF files) with an AI assistant that can help translate, give context summarization, and analyze pieces of content. 
+
+# Techonologies Used: 
+React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Docker, and AWS S3.
 
 ## 🚀 Prerequisites
 
