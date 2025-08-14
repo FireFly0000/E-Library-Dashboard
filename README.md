@@ -5,7 +5,6 @@ A fully functional, and secured E-Library that allows users to share and find bo
 React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Docker, and AWS S3.
 
 ## 🚀 Prerequisites
-
 - Node.js and npm installed on your system
 - Git installed
 
