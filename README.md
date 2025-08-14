@@ -1,48 +1,17 @@
-# E-Library App with AI Reading Assitant.
-A fully functional, and secured E-Library that allows users to share and find books. As well as reading e-books (PDF files) with an AI assistant that can help translate, give context summarization, and analyze pieces of content. 
+### 📖 E-Library App with AI Reading Assistant
+An AI-powered e-library where readers can search, share, and enjoy e-books with built-in translation, summarization, and content analysis. Supports multiple book versions and in-app PDF reading for a seamless reading experience.
 
-# Techonologies Used: 
-React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Docker, and AWS S3.
+### 🛠 Technologies Used
+React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, Redis, Docker, CI/CD, and AWS S3.
 
-## 🚀 Prerequisites
-- Node.js and  installed on your system
-- Git installed
+### 🌐 Deployed Demo
+Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
-## Deployed Demo
-Check out the working deployment here: [My Deployed Full-stack App](https://e-library-dashboard-fe-deployed.vercel.app/)
+### 📦 Features
 
-## 📦 Current Features
-
-### 1. Searching and Sharing Books/BookVersions
-
-```bash
-asdasd
-```
-
-### 2. Navigate to the project directory
-
-```bash
-cd E-commerce-FE-test
-```
-
-### 3. Install Dependencies
-
-```bash
-npm install
-```
-OR
-```bash
-yarn
-```
-
-### 4. Run the app in development locally
-
-```bash
-npm run dev
-```
-OR
-```
-yarn dev
-```
-
-
+| Feature | Description |
+|---------|-------------|
+| 📚 **Search & Share** | Upload books with multiple versions (illustrated, plain text, etc.) |
+| 👁 **View Tracking** | Tracks views per version and total per book, with anti-spam measures via IP/user ID blacklisting in Redis with set time frame |
+| 🤖 **AI Assistant** | Translate, summarize, and analyze selected text in real-time |
+| 📄 **In-App PDF Reading** | Read e-books directly in the browser without leaving the app |
