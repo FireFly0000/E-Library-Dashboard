@@ -5,11 +5,11 @@ A fully functional, and secured E-Library that allows users to share and find bo
 React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Docker, and AWS S3.
 
 ## 🚀 Prerequisites
-- Node.js and npm installed on your system
+- Node.js and  installed on your system
 - Git installed
 
 ## Deployed Demo
-Check out the working demo here: [My Deployed Work](https://celebrated-melomakarona-cb6a65.netlify.app/)
+Check out the working deployment here: [My Deployed Full-stack App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
 ## 📦 Getting Started
 Follow these steps to set up and run the project locally:
