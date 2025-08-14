@@ -2,10 +2,10 @@
 An AI-powered e-library where readers can search, share, and enjoy e-books with built-in translation, summarization, and content analysis. Supports multiple book versions and in-app PDF reading for a seamless reading experience.
 
 ### 🛠 Technologies Used
-React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, Redis, Docker, CI/CD, and AWS S3.
+React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, Redis, Docker, CI/CD, Google Cloud, and AWS S3.
 
 ### 🌐 Deployed Demo
-Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/)
+Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/) (server is cold start so initial load could take a moment)
 
 ### 📦 Current Features
 
