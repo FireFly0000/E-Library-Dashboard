@@ -14,4 +14,4 @@ Check out the live app here: [E-Library App](https://e-library-dashboard-fe-depl
 | 📚 **Search & Share** | Upload books with multiple versions (illustrated, plain text, etc.) |
 | 👁 **View Tracking** | Tracks views per version and total per book, with anti-spam measures via IP/user ID blacklisting in Redis with set time frame |
 | 🤖 **AI Assistant** | Translate, summarize, and analyze selected text in real-time |
-| 📄 **In-App PDF Reading** | Read e-books directly in the browser without leaving the app |
+| 📄 **In-App PDF Reading** | Read e-books (PDF files) directly in the browser without leaving the app |
