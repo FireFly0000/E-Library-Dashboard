@@ -537,7 +537,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       {/*popup menu for mobile when highlight a chunk of text for AI Services*/}
       {mobileAIMenuOpen && (
         <div
-          className="absolute flex w-[95%] z-50 bg-card border-2 border-primary rounded-lg shadow-lg bottom-15 left-1/2 -translate-x-1/2 text-foreground"
+          className="absolute flex w-[95%] max-w-[395px] z-50 bg-card border-2 border-primary rounded-lg shadow-lg bottom-15 left-1/2 -translate-x-1/2 text-foreground"
           style={
             {
               //top: `${popupPosition.y}px`,
