@@ -1,20 +1,16 @@
 import { Router } from "express";
-import {
-  getAllAuthors,
-  getAuthorById,
-  createAuthor,
-  updateAuthor,
-  deleteAuthor,
-  filterAuthorsByName,
-} from "../controllers/author.controller";
+import controllers from "../controllers/index";
+import { isLogin } from "../middlewares/isLogin";
 
 const authorRouter: Router = Router();
 
-authorRouter.get("/", getAllAuthors);
-authorRouter.get("/filter", filterAuthorsByName); // Filter authors by name
-authorRouter.get("/:id", getAuthorById);
-authorRouter.post("/", createAuthor);
-authorRouter.put("/:id", updateAuthor);
-authorRouter.delete("/:id", deleteAuthor);
-
+authorRouter.get("/paging", (req, res) => {
+  controllers.authorController.getAllAuthorsPaging(req, res);
+});
+authorRouter.get("/search-by-name", isLogin, (req, res) => {
+  controllers.authorController.searchAuthorsByName(req, res);
+});
+authorRouter.post("/create", isLogin, (req, res) => {
+  controllers.authorController.createAuthor(req, res);
+});
 export default authorRouter;

@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+.menu-buttons-container {
+  @apply flex w-full 
+  md:w-[90vw] max-w-[1400px]
+  mb-5 bg-[var(--muted-foreground)];
+}
+
+.menu-buttons-container button {
+  @apply text-[15.5px] md:text-lg px-2 md:px-4 py-3 md:py-2 cursor-pointer w-full md:w-fit
+  border-r-[1px] border-r-[color:rgba(0,0,0,0.1)];
+}

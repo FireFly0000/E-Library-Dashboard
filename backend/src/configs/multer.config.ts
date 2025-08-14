@@ -1,0 +1,52 @@
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+
+//Files size limits are validated in controller layer
+export const uploadBookAssets = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    const allowedBookTypes = ["application/pdf"];
+    const allowedImgTypes = ["image/png", "image/jpg", "image/jpeg"];
+
+    if (file.fieldname === "bookFile") {
+      if (!allowedBookTypes.includes(file.mimetype)) {
+        return cb(new Error("Invalid book file, must be PDF"));
+      }
+    }
+
+    if (file.fieldname === "thumbnail") {
+      if (!allowedImgTypes.includes(file.mimetype)) {
+        return cb(new Error("Invalid thumbnail, must be PNG, JPG, or JPEG"));
+      }
+    }
+
+    // If other fields come in, you can reject them too
+    if (!["bookFile", "thumbnail"].includes(file.fieldname)) {
+      return cb(new Error(`Unexpected field: ${file.fieldname}`));
+    }
+
+    cb(null, true);
+  },
+}).fields([
+  { name: "bookFile", maxCount: 1 },
+  { name: "thumbnail", maxCount: 1 },
+]);
+
+//For user profile img update
+export const uploadProfileImg = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    const allowedImgTypes = ["image/png", "image/jpg", "image/jpeg"];
+
+    if (!allowedImgTypes.includes(file.mimetype)) {
+      return cb(new Error("Invalid img, must be PNG, JPG, or JPEG"));
+    }
+
+    if (file.fieldname !== "profileImg") {
+      return cb(new Error(`Unexpected field: ${file.fieldname}`));
+    }
+
+    cb(null, true);
+  },
+}).single("profileImg");

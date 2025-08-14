@@ -10,6 +10,7 @@ export const errorMessages = {
   emailTokenExpired: "The verification link has expired",
   tokenVerifiedCode: "The verification link is not correct",
   tokenGenerateCode: "This verification link was never generated",
+  cantFindToken: "Can't find token",
 
   // Password
   wrongPassword: "Wrong password",
@@ -24,7 +25,7 @@ export const errorMessages = {
   wrongConfirmPasswordIsRequired: "Wrong Confirm Password is required",
   passwordMustBeString: "Password must be a string",
   passWordAndConfirmPasswordMustBeSameRequired:
-    "Password and comfirm password must be same required !",
+    "Password and confirm password must be same required !",
 
   // Email
   emailNotExist: "Email does not exist",
@@ -34,8 +35,11 @@ export const errorMessages = {
   emailMustBeString: "Email must be a string",
   inCorrectEmail: "Incorrect email",
   errorSendEmail:
-    "Email sending failed, please login to the account you just registered to be sent confirmation email again",
-  resendVerificationEmail: "Resend verification email successfully",
+    "Email sending failed, please login again to receive a new confirmation email",
+  emailNotFound: "Email not found",
+  errorSendEmail2: "Error sending email, please try again",
+  errorSendEmail3:
+    "Unverified account.\nError sending email, please login again to receive a new confirmation email",
 
   // Verified Email
   verifiedEmail: "This account has been verified before",
@@ -44,106 +48,97 @@ export const errorMessages = {
   // Login
   loginFailed: "Email or password is invalid",
   signUpFailed: "Sign Up Failed",
-
-  // User
-  userNotFound: " User is not found ",
-  loginUnverified:
-    "Unverified account, We have sent you a verification link, please check your email soon before it expires!",
+  serverFailed: "Server Failed, please try again",
 
   // username
   UsernameMustBeString: "Username must be a string",
   UsernameIsRequired: "Username is required",
   tooLongUsername: "Username is too long",
-
-  // Lastname
-  //lastNameMustBeString: "Last Name must be a string",
-  //lastNameIsRequired: "Last Name is required",
-  //tooLongLastName: "Last name is too long",
-
-  // Course
-  courseIdIsRequired: "Course id is required",
-  courseIdMustBeAnInt: "Course id must be an integer",
-  courseIdMustBeNumber: "Course id must be a number",
-  createCourseFailed: "Create a new failed course",
-  courseNotFound: "Course Not Found",
-
-  // Section
-  sectionIdIsRequired: "Section id is required",
-  sectionIdMustBeAnInt: "Section id must be an integer",
-  sectionIdMustBeNumber: "Section id must be a number",
-  sectionNotFound: "Section Not Found",
-
-  // Lesson
-  lessonNotFound: "Lesson Not Found",
+  usernameAlreadyExists: "Username already exists",
 
   // Reset password
   expiredToken: "This link is expired",
   errorToken: "This link is error",
-  errorMatchingPasssword: "Password ",
-
-  // Slug
-  slugIsUsed: "This slug is already in use",
-  courseSlugIsRequired: "Course Slug is required",
-  courseSlugMalformed: "Course Slug malformed",
-  courseSlugMustBeString: "Course Slug must be a string",
-
-  // Title
-  courseTitleIsRequired: "Title is required",
-  courseTitleMustBeString: "Title must be a string",
-  courseTitleIsTooLong: "Title is too long, maximum 100 characters only",
-
-  // Status
-  statusIsRequired: "Status is required",
-  statusMustBeBoolean: "Status must be a boolean",
-
-  // Description
-  descriptionIsRequired: "Description is required",
-  descriptionMustBeString: "Description must be a string",
-  tooLongDescription: "Description is too long",
-  tooshortDescription: "Description is too short",
-
-  // Summary
-  summaryIsRequired: "Summary is required",
-  summaryMustBeString: "Summary must be a string",
-
-  // Category
-  categoryArrayNumber: "Categories must be a array int",
-  // export const MESSAGE_ERROR_CATEGORIES_ARRAY_NUMBER = "Categories must be a array int";
-  categoryIsRequired: "Categories is required",
-  categoryNotFound: "Category Not Found",
-
-  // Thumbnail
-  thumbnailIsRequired: "Thumbnail is required",
-
-  // Upload Image
-  imageUploadError: "Upload Image Error",
-
-  //Rating
-  ratingError: "You have already rated",
-  contentRatingTooLong:
-    "Content rating is too long, maxium 100 characters only",
-  contentRatingType: "Content rating must be string",
-  ratingScoreRequired: "Rating score is required",
-  ratingScoreType: "Rating score must be a number",
-  ratingScoreMustBeAnInt: "Rating score must be an integer",
-  ratingScoreMinError: "Rating score must be in 1-5",
-  ratingScoareMaxError: "Rating score must be in 1-5",
-
-  //Subscribe course
-  authorSubscribeError: "You can't subscribe your own course",
-  authorUnsubscribeError: "You can't unsubscribe your own course",
-  unsubscribeUser: "You haven't subscribed course yet",
-  subscribeUser: "You have already subscribed",
+  errorMatchingPassword: "Password ",
 
   //Auth
   loginAgain: "Please login again",
+  unauthorized: "Unauthorized",
 
-  //reOrder
-  reOrderRequired: "Your reOrder is missing",
-  orderExisted: "Order was Existed",
-  orderDuplicate: "Order item must be unique",
+  //Author
+  authorNameMustBeString: "Author name must be a string",
+  authorNameIsRequired: "Author name is required",
+  authorNameTooShort: "Author name is too short",
+  authorCountryMustBeString: "Author's country must be a string",
+  authorCountryIsRequired: "Author's country is required",
+  invalidCountry: "Country name is invalid",
+  createdAuthorFailed: "Created author failed, please try again",
+  authorIdIsRequired: "Author;s ID is required",
+  authorIdMustBeNumber: "Author's ID must be number",
 
-  orderNotValid: "Order List is not valid",
+  //redis
+  blacklistFailed: "Blacklisting token failed",
+
+  //Book
+  contributorIdIsRequired: "Contributor's ID (User's ID) is required",
+  contributorIdMustBeNumber: "Contributor's ID must be a number",
+  bookIdMustBeNumber: "Book's ID must be a number",
+  bookTitleMustBeString: "Book's title must be a string",
+  bookTitleIsTooLong: "Book's title is at most 100 characters",
+  bookFileIsRequired: "Book file is required",
+  noBookFound: "No Book Found, Please try again",
+  bookDescriptionMustBeString: "Description must be a string.",
+  bookDescriptionTooShort: "Description must be at least 30 characters.",
+  bookDescriptionTooLong: "Description must be at most 1000 characters.",
+  bookSearchMustBeString: "Book search keyword must be string",
+  authorIsRequired: "Author is required",
+  bookInfoRequired: "Book Information is required",
+  eitherAuthorIdOrAuthor:
+    "Please include only either Author ID or New Author Info",
+  eitherBookIdOrBook: "Please include only either Book ID or New Book Info",
+  bookAlreadyExist: "Book already exists, please search up title",
+  createBookFail: "Creating new book failed, please try again",
+  createBookVersionFail: "Added new book version failed",
+  fileUploadFail: "Uploaded file(s) failed, please try again",
+  invalidCategoryCode: "Invalid Category Code",
+  invalidSortBy: "Invalid sort field",
+  sortByMustBeString: "Sort field must be string",
+  noSearchInput: "No search Input",
+  bookIdIsRequired: "Book ID is required",
+  bookDoesNotExist: "Book does not exist",
+  missingBookIdAndBookVersionID: "Both bookVersionId and bookId are required",
+  userIdOrIpIsRequired: "User's ID or Device IP is required",
+  viewsIncrementFailed: "Views increment failed",
+  bookVersionIdIsRequired: "Book Version's ID is required",
+  bookVersionIdMustBeNumber: "Book Version's ID must be a number",
+
+  //AI services
+  contentRequiredForAI: "Content is required for AI service",
+  contentForAIMustBeString: "Content for AI service must be string",
+  contentForAIIsTooLong:
+    "Content for AI service is too long (480 characters max)",
+  languageRequiredForAI: "A language is required for AI service",
+  languageForAIMustBeString: "Language name for AI service must be string",
+  bookTitleRequiredForTranslate: "Book's Title is required for AI service",
+  invalidAIServiceName: "Invalid AI service's name",
+  AIServiceNameRequired: "AI service's name is required",
+  AIServiceNameMustBeString: "AI service's name must be a string",
+
+  //User
+  userNotFound: " User is not found ",
+  loginUnverified:
+    "Unverified account, We have sent you a verification link, please check your email soon before it expires!",
+  UserProfileNotFound: "Can not find user's profile",
+  profileImgFileRequired: "Please select an image file",
+  profileIdIsRequired: "User's ID of the profile being updated is required",
+  profileIdMustBeNumber: "User's ID of the profile must be a number",
+  deleteOldProfileImgFailed:
+    "Failed to delete old profile image, Please try again",
+  trashBookVersionFailed: "Trashed Book Version Failed",
+  updateUserBasicInfoFailed: "Update user's info failed, please try again",
+  getTrashedVersionsFailed: "Fail to get book versions in trash",
+  recoverVersionFailed: "Fail to recover version, try again",
+  deleteBookVersionFailed: "Delete book version failed, try again",
 };
 
 export const successMessages = {
@@ -161,43 +156,312 @@ export const successMessages = {
 
   // Email
   verificationForgotPassword: "Sent a verification code to your email",
+  resendVerificationEmail: "Resend verification email successfully",
 
   // Verified Email
   verifiedEmail: "Account verification successful",
   verifiedEmailBefore: "This account has been verified before",
 
   // Password
-  changePasswordSuccessfully: "Change password succesfully",
+  changePasswordSuccessfully: "Change password successfully",
 
   // Login
   successLogin: "Logged in successfully",
 
+  //logout
+  logoutSuccess: "Logout Successfully",
+
   // Sign-up
   signUpSuccess: "Signup successful, please check your email",
 
-  // Register Course
-  registerCourseSuccess: "Subcribe successfully",
-  unRegisterCourseSuccess: "Unsubcribe successfully",
-
   // Reset password
   resetPasswordSuccess: "Reset successfully, please login your account",
-
-  // Course
-  createCourseSuccess: "Create a new successful course",
-  searchMyCourseSuccess: "Search My Course Successfully",
-  deleteCourseSuccess: "Course Deleted Successfully",
-
-  // Category
-  getAllCategoriesSuccess: "Get All Categories Successfully",
-  getCategoryByIdSuccess: "Get Category By Id Successfully",
-  createCategorySuccess: "Category Created Successfully",
-  retrievedCategorySuccess: "Categories Retrieved Successfully",
-  updatedCategorySuccess: "Category Updated Successfully",
-  deletedCategorySuccess: "Category Deleted Successfully",
 
   // Upload Image
   imageUploadSuccess: "Upload Image Successfully",
 
   // reOrder
   sectionReorderSuccess: "Reorder lessons successfully",
+
+  // Author
+  getAllAuthors: "Get all authors successfully",
+  filterAuthorsByName: "Filter authors by name successfully",
+  newAuthorCreated: "New author created successfully",
+
+  //Book
+  createBookSuccessfully: "Created new book successfully",
+  createBookVersionSuccessfully: "Added new book version successfully",
+  searchBookByTitleAndAuthor: "Book(s) found",
+  getBookVersions: "Get book versions successfully",
+  viewCountedForCurrentSession: "View counted for current session already",
+  viewsIncrementSuccessfully: "Views Increment Successfully",
+  getAllBooks: "Get All books paging Successful",
+  getAllBooksByAuthorID: "Get books paging by author's ID successful",
+
+  //Ai services
+  AIContentGeneratedSuccessfully: "AI Content generated successfully",
+
+  //user
+  getUserProfile: "Get user profile successfully",
+  changeProfileImg: "Change profile image successfully",
+  trashBookVersion: "Trashed Book Version Successfully",
+  updateUserBasicInfo: "Updated user's info successfully",
+  getTrashedVersions: "Get trashed book versions successfully",
+  recoverVersionSuccess: "Recover version successfully",
+  deleteBookVersionSuccess: "Delete book version successfully",
+
+  //system
+  dailyCleanUpSuccess: "Daily clean up succeeds",
 };
+
+export const allowedCountries = [
+  "Afghanistan",
+  "Åland Islands",
+  "Albania",
+  "Algeria",
+  "American Samoa",
+  "Andorra",
+  "Angola",
+  "Anguilla",
+  "Antarctica",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Aruba",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bermuda",
+  "Bhutan",
+  "Bolivia, Plurinational State of",
+  "Bonaire, Sint Eustatius and Saba",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Bouvet Island",
+  "Brazil",
+  "British Indian Ocean Territory",
+  "Brunei Darussalam",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cayman Islands",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Christmas Island",
+  "Cocos (Keeling) Islands",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Congo, Democratic Republic of the",
+  "Cook Islands",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Curaçao",
+  "Cyprus",
+  "Czechia",
+  "Côte d'Ivoire",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Falkland Islands (Malvinas)",
+  "Faroe Islands",
+  "Fiji",
+  "Finland",
+  "France",
+  "French Guiana",
+  "French Polynesia",
+  "French Southern Territories",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Gibraltar",
+  "Greece",
+  "Greenland",
+  "Grenada",
+  "Guadeloupe",
+  "Guam",
+  "Guatemala",
+  "Guernsey",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Heard Island and McDonald Islands",
+  "Holy See",
+  "Honduras",
+  "Hong Kong",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran, Islamic Republic of",
+  "Iraq",
+  "Ireland",
+  "Isle of Man",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jersey",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Korea, Democratic People's Republic of",
+  "Korea, Republic of",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Lao People's Democratic Republic",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Macao",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Martinique",
+  "Mauritania",
+  "Mauritius",
+  "Mayotte",
+  "Mexico",
+  "Micronesia, Federated States of",
+  "Moldova, Republic of",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Montserrat",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Caledonia",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "Niue",
+  "Norfolk Island",
+  "North Macedonia",
+  "Northern Mariana Islands",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine, State of",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Pitcairn",
+  "Poland",
+  "Portugal",
+  "Puerto Rico",
+  "Qatar",
+  "Romania",
+  "Russian Federation",
+  "Rwanda",
+  "Réunion",
+  "Saint Barthélemy",
+  "Saint Helena, Ascension and Tristan da Cunha",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Martin (French part)",
+  "Saint Pierre and Miquelon",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Sint Maarten (Dutch part)",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Georgia and the South Sandwich Islands",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Svalbard and Jan Mayen",
+  "Sweden",
+  "Switzerland",
+  "Syrian Arab Republic",
+  "Taiwan, Province of China",
+  "Tajikistan",
+  "Tanzania, United Republic of",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tokelau",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Turks and Caicos Islands",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States Minor Outlying Islands",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Venezuela, Bolivarian Republic of",
+  "Viet Nam",
+  "Virgin Islands, British",
+  "Virgin Islands, U.S.",
+  "Wallis and Futuna",
+  "Western Sahara",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
+];

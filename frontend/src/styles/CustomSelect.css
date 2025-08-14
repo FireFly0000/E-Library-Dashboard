@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+.custom-select-root-default {
+  @apply border-[var(--border)] border-solid border-[1px] shadow-[0_0_0_2px_transparent] 
+  cursor-pointer py-3 rounded-lg bg-[var(--input)] text-[var(--foreground)]
+  relative flex select-none 
+  
+  focus:border-[var(--primary)] 
+  focus:ring-[var(--ring)]
+  transition-[color,box-shadow] 
+  focus:ring-[1px];
+}
+
+.custom-select-root-highlight {
+  @apply border-[var(--foreground)] border-solid border-[1px] shadow-[0_0_0_2px_transparent] 
+  cursor-pointer py-1 rounded-lg bg-[var(--input)] text-[var(--foreground)]
+  relative flex select-none;
+}
+
+.custom-select-current {
+  @apply flex w-full cursor-pointer items-center justify-between px-2;
+}
+
+.custom-select-icon {
+  @apply w-[20px] h-[20px];
+}
+
+.custom-select-options-container {
+  @apply bg-[var(--card)] text-[var(--foreground)] 
+  flex flex-col absolute w-full 
+  shadow-[0px_4px_10px_rgba(0,0,0,0.1)] 
+  top-[112%] gap-2 rounded-[5px] 
+  border-[var(--foreground)] border-solid border
+  overflow-y-auto max-h-[200px] z-100;
+}
+
+.custom-select-options-container div {
+  @apply w-full p-[5px];
+}
+
+.custom-select-options-container div:hover {
+  cursor: pointer;
+  background-color: var(--primary);
+
+  @apply text-[var(--button-text)];
+}

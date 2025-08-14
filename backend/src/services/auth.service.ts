@@ -3,6 +3,7 @@ import {
   ResponseBase,
   ResponseError,
   ResponseSuccess,
+  ResponseWithToken,
 } from "../commons/response";
 import { db } from "../configs/db.config";
 import i18n from "../utils/i18next";
@@ -15,7 +16,10 @@ import bcrypt from "bcrypt";
 import configs from "../configs/index";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { MyJwtPayload } from "../types/decodeToken.type";
-import { sendVerificationEmail } from "../utils/helper";
+import { getFileUrlFromS3, sendVerificationEmail } from "../utils/helper";
+import { JwtPayload } from "jsonwebtoken";
+import { RequestHasLogin } from "../types/request.type";
+import redis from "../configs/redis.config";
 
 const register = async (req: Request): Promise<ResponseBase> => {
   try {
@@ -31,6 +35,20 @@ const register = async (req: Request): Promise<ResponseBase> => {
       return new ResponseError(
         400,
         i18n.t("errorMessages.emailAlreadyExists"),
+        false
+      );
+    }
+
+    const userFoundByUsername = await db.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    if (userFoundByUsername) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.usernameAlreadyExists"),
         false
       );
     }
@@ -78,7 +96,101 @@ const register = async (req: Request): Promise<ResponseBase> => {
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);
     }
-    console.error("Error in register service:", error);
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const login = async (req: Request): Promise<ResponseBase> => {
+  try {
+    const { email, password } = req.body;
+
+    const userFound = await db.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!userFound) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.emailNotFound"),
+        false
+      );
+    }
+
+    const correctPassword = await bcrypt.compare(password, userFound.password);
+
+    if (correctPassword) {
+      if (!userFound.is_verify) {
+        //if not verified, send verification email
+        const payload = {
+          email: userFound.email,
+          id: userFound.id,
+        };
+        const isSendEmailSuccess = sendVerificationEmail(payload);
+        if (!isSendEmailSuccess) {
+          return new ResponseError(
+            400,
+            i18n.t("errorMessages.errorSendEmail3"),
+            false
+          );
+        }
+
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.loginUnverified"),
+          false
+        );
+      }
+
+      // If the user is verified, generate JWT tokens
+      const accessToken = jwt.sign(
+        { user_id: userFound.id },
+        configs.general.JWT_SECRET_KEY,
+        {
+          expiresIn: configs.general.TOKEN_ACCESS_EXPIRED_TIME,
+        }
+      );
+
+      const refreshToken = jwt.sign(
+        { user_id: userFound.id },
+        configs.general.JWT_SECRET_KEY,
+        {
+          expiresIn: configs.general.TOKEN_REFRESH_EXPIRED_TIME,
+        }
+      );
+
+      if (!accessToken || !refreshToken) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.serverFailed"),
+          false
+        );
+      }
+
+      //Return the access token and refresh token.
+      //Store the refresh token in Redis
+      return new ResponseWithToken(
+        200,
+        i18n.t("successMessages.successLogin"),
+        true,
+        { accessToken, refreshToken }
+      );
+    } else {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.wrongPassword"),
+        false
+      );
+    }
+  } catch (error: any) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      return new ResponseError(400, error.toString(), false);
+    }
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),
@@ -171,8 +283,9 @@ const verifyEmail = async (req: Request): Promise<ResponseBase> => {
 const resendVerificationEmail = async (req: Request): Promise<ResponseBase> => {
   try {
     const { token } = req.params;
-    const payload = jwt.decode(token) as MyJwtPayload | null;
-    const isSendEmailSuccess = sendVerificationEmail(payload);
+    const payload = jwt.decode(token) as JwtPayload | null;
+    const { iat, exp, ...rest } = payload;
+    const isSendEmailSuccess = sendVerificationEmail(rest);
 
     if (isSendEmailSuccess) {
       return new ResponseSuccess(
@@ -183,10 +296,186 @@ const resendVerificationEmail = async (req: Request): Promise<ResponseBase> => {
     }
     return new ResponseError(
       400,
-      i18n.t("errorMessages.errorSendEmail"),
+      i18n.t("errorMessages.errorSendEmail2"),
       false
     );
   } catch (error: any) {
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const refreshToken = async (req: Request): Promise<ResponseBase> => {
+  try {
+    let oldToken = req.cookies.refreshToken;
+    if (!oldToken) {
+      const rfrHeader = req.headers.rfrTk;
+
+      if (typeof rfrHeader === "string") {
+        oldToken = rfrHeader.split(":")[1];
+      } else if (Array.isArray(rfrHeader)) {
+        oldToken = rfrHeader[0].split(":")[1];
+      }
+    }
+
+    if (!oldToken) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+
+    //Check if refresh token is blacklisted
+    const isBlacklisted = await redis.get(`bl_${oldToken}`);
+    if (isBlacklisted) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+
+    const decoded = jwt.verify(
+      oldToken,
+      configs.general.JWT_SECRET_KEY
+    ) as MyJwtPayload;
+    if (!decoded) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+
+    // Blacklist old token with same expiry time
+    const { exp } = jwt.decode(oldToken);
+    const ttl = exp - Math.floor(Date.now() / 1000);
+    await redis.set(`bl_${oldToken}`, "true", "EX", ttl);
+
+    //if current refreshToken is valid, generate new tokens
+    const newAccessToken = jwt.sign(
+      { user_id: decoded.user_id },
+      configs.general.JWT_SECRET_KEY,
+      {
+        expiresIn: configs.general.TOKEN_ACCESS_EXPIRED_TIME,
+      }
+    );
+
+    const newRefreshToken = jwt.sign(
+      { user_id: decoded.user_id },
+      configs.general.JWT_SECRET_KEY,
+      {
+        expiresIn: configs.general.TOKEN_REFRESH_EXPIRED_TIME,
+      }
+    );
+
+    return new ResponseWithToken(
+      200,
+      i18n.t("successMessages.requestSuccess"),
+      true,
+      {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      }
+    );
+  } catch (error: any) {
+    if (error instanceof TokenExpiredError) {
+      return new ResponseError(400, i18n.t("errorMessages.loginAgain"), false);
+    } else if (error instanceof JsonWebTokenError) {
+      return new ResponseError(400, i18n.t("errorMessages.loginAgain"), false);
+    } else if (error instanceof NotBeforeError) {
+      return new ResponseError(400, i18n.t("errorMessages.loginAgain"), false);
+    }
+
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const getMe = async (req: RequestHasLogin): Promise<ResponseBase> => {
+  try {
+    const userId = req.user_id;
+    if (!userId) {
+      return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+    }
+    const userFound = await configs.db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (userFound) {
+      const userInformation = {
+        id: userFound.id,
+        email: userFound.email,
+        username: userFound.username,
+        url_avatar: userFound.url_avatar
+          ? await getFileUrlFromS3(userFound.url_avatar)
+          : null,
+        viewCount: userFound.total_views,
+      };
+      return new ResponseSuccess(
+        200,
+        i18n.t("successMessages.requestSuccess"),
+        true,
+        userInformation
+      );
+    }
+
+    return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
+  } catch (error: any) {
+    console.log(error);
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const logout = async (req: RequestHasLogin): Promise<ResponseBase> => {
+  try {
+    if (!req.user_id) {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.unauthorized"),
+        false
+      );
+    }
+
+    let token = req.cookies.refreshToken;
+    if (!token) {
+      const rfrHeader = req.headers.rfrtk;
+
+      if (typeof rfrHeader === "string") {
+        token = rfrHeader.split(":")[1];
+      } else if (Array.isArray(rfrHeader)) {
+        token = rfrHeader[0].split(":")[1];
+      }
+    }
+
+    //Blacklisting current refreshToken
+    if (token) {
+      try {
+        const { exp } = jwt.decode(token);
+        const ttl = exp - Math.floor(Date.now() / 1000);
+        await redis.set(`bl_${token}`, "true", "EX", ttl);
+      } catch (error) {
+        return new ResponseError(
+          400,
+          i18n.t("errorMessages.blacklistFailed"),
+          false
+        );
+      }
+    } else {
+      return new ResponseError(
+        400,
+        i18n.t("errorMessages.cantFindToken"),
+        false
+      );
+    }
+
+    return new ResponseSuccess(
+      200,
+      i18n.t("successMessages.logoutSuccess"),
+      true
+    );
+  } catch (error) {
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),
@@ -199,6 +488,10 @@ const AuthService = {
   register,
   verifyEmail,
   resendVerificationEmail,
+  login,
+  refreshToken,
+  getMe,
+  logout,
 };
 
 export default AuthService;

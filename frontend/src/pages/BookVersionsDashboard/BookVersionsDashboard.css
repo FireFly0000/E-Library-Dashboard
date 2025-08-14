@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Book table styling */
+
+/*.book-table {
+  @apply w-full border-collapse mb-4 sm:min-w-[350px] 
+  shadow-[0_4px_12px_rgba(0,0,0,0.1)];
+  font-family: Arial, sans-serif;
+}
+
+.book-table th,
+.book-table td {
+  @apply text-center sm:text-left 
+  px-2.5 py-3
+  sm:px-4 sm:py-3 
+  border border-solid border-[var(--foreground)]
+  bg-[var(--card)] text-[var(--foreground)] w-fit;
+}*/
+
+.book-link {
+  @apply text-[var(--primary/70)] underline hover:text-[var(--primary)] transition-colors duration-200 cursor-pointer;
+}
+
+.book-table-grid {
+  @apply grid grid-cols-5 items-center place-items-center w-full border-t-2;
+}
+
+.book-table-grid:last-child {
+  @apply border-b-2;
+}
+
+.book-table-grid div {
+  @apply text-[var(--foreground)] text-center sm:text-left text-sm sm:text-base break-words whitespace-normal
+  border-[var(--foreground)] border-b-0 border-r-2 w-full h-full p-2;
+}
+
+.book-table-grid div:first-child {
+  @apply border-l-2;
+}

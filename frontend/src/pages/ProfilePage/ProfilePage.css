@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.profile-page-root-container {
+  @apply flex justify-center items-center flex-col 
+  w-[90vw] max-w-[1400px] mt-5;
+}

@@ -1,0 +1,43 @@
+/* Input styling */
+.custom-date-input {
+  background-color: var(--input);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+/* Calendar popup styling */
+.custom-datepicker {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+/* Highlight selected day */
+.custom-datepicker .react-datepicker__day--selected,
+.custom-datepicker .react-datepicker__day--keyboard-selected {
+  background-color: var(--primary);
+  color: var(--foreground);
+}
+
+/* Hover on days */
+.custom-datepicker .react-datepicker__day:hover {
+  background-color: var(--primary);
+  color: var(--foreground);
+}
+
+/* Navigation arrows and header */
+.custom-datepicker .react-datepicker__header {
+  background-color: var(--input);
+  border-bottom: 1px solid var(--border);
+}
+
+.custom-datepicker .react-datepicker__current-month,
+.custom-datepicker .react-datepicker__day-name,
+.custom-datepicker .react-datepicker__day {
+  color: var(--foreground);
+}

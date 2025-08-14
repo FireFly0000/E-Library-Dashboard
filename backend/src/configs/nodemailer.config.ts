@@ -193,7 +193,7 @@ export function setSignUpEmail(link: string) {
                                                         <table class="image_block block-1" width="100%" border="0" cellpadding="15" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
                                                             <tr>
                                                                 <td class="pad">
-                                                                    <div class="alignment" align="center" style="line-height:10px"><img class="fullWidth" src="https://asset.cloudinary.com/dkv4gihl5/11a22645242da551c2dd0b9e1d6481c4" style="height: auto; display: block; border: 0; max-width: 374px; width: 100%;" width="374" alt="Resetting Password" title="Email Verification"></div>
+                                                                    <div class="alignment" align="center" style="line-height:10px"><img class="fullWidth" src="https://img.freepik.com/free-vector/library-interior-empty-room-reading-with-books-wooden-shelves_33099-1722.jpg?semt=ais_hybrid&w=740" style="height: auto; display: block; border: 0; max-width: 374px; width: 100%;" width="374" alt="Resetting Password" title="Email Verification"></div>
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -201,7 +201,7 @@ export function setSignUpEmail(link: string) {
                                                         <table class="heading_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
                                                             <tr>
                                                                 <td class="pad" style="text-align:center;width:100%;">
-                                                                    <h1 style="margin: 0; color: #101010; direction: ltr; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 27px; font-weight: normal; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0;"><strong>WELCOME TO E-Lib Share</strong></h1>
+                                                                    <h1 style="margin: 0; color: #101010; direction: ltr; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 27px; font-weight: normal; letter-spacing: normal; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0;"><strong>WELCOME TO E-Shelf</strong></h1>
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -229,7 +229,7 @@ export function setSignUpEmail(link: string) {
                                                                 <td class="pad" style="padding-bottom:10px;padding-left:20px;padding-right:10px;padding-top:10px;">
                                                                     <div style="font-family: sans-serif">
                                                                         <div class style="font-size: 12px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21.6px; color: #848484; line-height: 1.8;">
-                                                                            <p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 25.2px;"><span style="font-size:14px;">Congratulations!. You successfully signup account for E-Lib Share. Click the button below to verify your account. Expires in 15 minutes.
+                                                                            <p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 25.2px;"><span style="font-size:14px;">Congratulations!. You successfully signup account for E-Shelf. Click the button below to verify your account. Expires in 15 minutes.
                                                                             </span></p>
                                                                         </div>
                                                                     </div>
