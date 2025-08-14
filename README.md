@@ -7,7 +7,7 @@ React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, 
 ### 🌐 Deployed Demo
 Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
-### 📦 Features
+### 📦 Current Features
 
 | Feature | Description |
 |---------|-------------|
@@ -15,3 +15,12 @@ Check out the live app here: [E-Library App](https://e-library-dashboard-fe-depl
 | 👁 **View Tracking** | Tracks views per version and total per book, with anti-spam measures via IP/user ID blacklisting in Redis with set time frame |
 | 🤖 **AI Assistant** | Translate, summarize, and analyze selected text in real-time |
 | 📄 **In-App PDF Reading** | Read e-books (PDF files) directly in the browser without leaving the app |
+
+### 🚀 Future Features
+
+| Feature | Description |
+|---------|-------------|
+| 📚 **Reading Progress Tracking** | Track users’ reading progress (page numbers) and allow statuses such as "reading," "saved," or "completed" |
+| 💡 **Books Recommendations** | Use progress data and AI agents to recommend books available on the app |
+| 🤖 **Enhanced AI Assistant** | Let users interact with the AI agent through chat or questionnaires to recommend trending books — even those not yet on the app |
+| 📖 **Users As Authors** | Allow users to publish their own books by implementing a stricter Role-Based Access Control (RBAC) |
