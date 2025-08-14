@@ -537,7 +537,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       {/*popup menu for mobile when highlight a chunk of text for AI Services*/}
       {mobileAIMenuOpen && (
         <div
-          className="absolute flex w-[95%] z-50 bg-card border-2 border-primary rounded-lg shadow-lg p-1 bottom-5 left-1 text-foreground"
+          className="absolute flex w-[95%] z-50 bg-card border-2 border-primary rounded-lg shadow-lg bottom-15 left-1/2 -translate-x-1/2 text-foreground"
           style={
             {
               //top: `${popupPosition.y}px`,
@@ -546,19 +546,19 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           }
         >
           <button
-            className="text-sm block w-full text-center p-1 hover:bg-primary border-1 border-border"
+            className="text-sm block w-full text-center p-2 hover:bg-primary border-r-1 border-border"
             onClick={() => handleOptionClick("translate")}
           >
             Translate
           </button>
           <button
-            className="text-sm block w-full text-center p-1 hover:bg-primary border-1 border-border"
+            className="text-sm block w-full text-center p-2 hover:bg-primary border-r-1 border-border"
             onClick={() => handleOptionClick("summarize")}
           >
             Summarize
           </button>
           <button
-            className="text-sm block w-full text-center p-1 hover:bg-primary border-1 border-border"
+            className="text-sm block w-full text-center p-2 hover:bg-primary border-none"
             onClick={() => handleOptionClick("discuss")}
           >
             Discuss
