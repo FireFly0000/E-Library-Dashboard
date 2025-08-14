@@ -11,7 +11,7 @@ React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Do
 ## Deployed Demo
 Check out the working deployment here: [My Deployed Full-stack App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
-## 📦 Getting Started
+## 📦 Frontend Getting Started
 Follow these steps to set up and run the project locally:
 
 ### 1. Clone the repository
