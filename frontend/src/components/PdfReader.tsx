@@ -555,7 +555,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
             className="text-sm block w-full text-center p-1 hover:bg-primary border-1 border-border"
             onClick={() => handleOptionClick("summarize")}
           >
-            Context Summarize
+            Summarize
           </button>
           <button
             className="text-sm block w-full text-center p-1 hover:bg-primary border-1 border-border"
