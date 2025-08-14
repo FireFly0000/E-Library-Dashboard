@@ -7,7 +7,7 @@ React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, 
 ### 🌐 Deployed Demo
 Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
-*(Note: The server deployed on Google Cloud run uses cold starts, so initial load may take a moment)*
+**Note:** The server deployed on Google Cloud run uses cold starts, so initial load may take a moment
 
 ### 📦 Current Features
 
