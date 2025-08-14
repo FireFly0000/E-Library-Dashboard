@@ -95,11 +95,23 @@ export class ResponseWithToken extends ResponseBase {
       status_code: this.getStatusCode(),
       message: this.getMessage(),
       success: this.getSuccess(),
-      data: this.data
-        ? {
-            accessToken: this.data.accessToken,
-          }
-        : undefined,
+      data:
+        this.data && this.data.refreshToken !== ""
+          ? {
+              accessToken: this.data.accessToken,
+              refreshToken: this.data.refreshToken,
+            }
+          : this.data && this.data.refreshToken === ""
+          ? {
+              accessToken: this.data.accessToken,
+            }
+          : undefined,
     };
+  }
+
+  public clearRefreshToken() {
+    if (this.data) {
+      this.data.refreshToken = "";
+    }
   }
 }

@@ -20,7 +20,7 @@ import Modal from "./Modal";
 import { useAppDispatch, useAppSelector, useWindowWidth } from "@/hooks/hooks";
 import { bookActions } from "@/redux/slices";
 import toast from "react-hot-toast";
-//import { useWindowWidth } from "@/hooks/hooks";
+//import "@/styles/ReactPdf.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -28,6 +28,7 @@ type PDFReaderProps = {
   fileUrl: string;
   title: string | undefined;
   closeReader: () => void;
+  isOpen?: boolean;
 };
 
 const PDFReader: React.FC<PDFReaderProps> = ({
@@ -36,12 +37,12 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   closeReader,
 }) => {
   const width = useWindowWidth();
-  const [isScrollMode, setIsScrollMode] = useState(width >= 820 ? false : true);
+  const [isScrollMode, setIsScrollMode] = useState(width >= 820 ? true : false);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState(String(currentPage));
   const [manuallySetPage, setManuallySetPage] = useState(false);
-  const [scale, setScale] = useState(1.2); // zoom level
+  const [scale, setScale] = useState(width >= 820 ? 1.2 : 0.8); // zoom level
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]); // Ref for each page
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   //const width = useWindowWidth();
@@ -91,7 +92,8 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   ]);
 
   //Highlight text for AI service
-  const [popupVisible, setPopupVisible] = useState(false);
+  const [desktopAIMenuOpen, setDesktopAIMenuOpen] = useState(false);
+  const [mobileAIMenuOpen, setMobileAIMenuOpen] = useState(false);
   //const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseUp = (/*e: React.MouseEvent*/) => {
@@ -100,7 +102,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
 
     if (selectedText) {
       setHighlightedText(selectedText);
-      setPopupVisible(true);
+      setDesktopAIMenuOpen(true);
 
       // Positioning at mouse cursor
       /*let yOffset = 0;
@@ -117,14 +119,43 @@ const PDFReader: React.FC<PDFReaderProps> = ({
       console.log(yOffset);
       setPopupPosition({ x: e.pageX, y: e.pageY - yOffset });*/
     } else {
-      setPopupVisible(false);
+      setDesktopAIMenuOpen(false);
+      setHighlightedText("");
+    }
+  };
+
+  const handleTouchEnd = (/*e: React.MouseEvent*/) => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
+
+    if (selectedText) {
+      setHighlightedText(selectedText);
+      setMobileAIMenuOpen(true);
+
+      // Positioning at mouse cursor
+      /*let yOffset = 0;
+      if (width <= 393) {
+        yOffset = 610;
+      }
+      if (width <= 820) {
+        yOffset = 560;
+      }
+      if (width <= 1024) {
+        yOffset = 380;
+      }
+
+      console.log(yOffset);
+      setPopupPosition({ x: e.pageX, y: e.pageY - yOffset });*/
+    } else {
+      setMobileAIMenuOpen(false);
       setHighlightedText("");
     }
   };
 
   const handleOptionClick = (option: string) => {
     setAIServiceOption(option);
-    setPopupVisible(false);
+    setDesktopAIMenuOpen(false);
+    setMobileAIMenuOpen(false);
     setAIContentOpen(true);
   };
 
@@ -234,112 +265,128 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-      <div className="flex flex-col items-center w-full bg-card rounded-2xl sm:px-[35px] shadow-xl relative max-h-screen">
+    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center overflow-y-auto w-full max-h-screen">
+      <div className="flex flex-col items-center w-full bg-card rounded-2xl sm:px-[35px] shadow-xl relative max-h-screen overflow-y-auto">
         {/* Controls */}
-        <div className="flex gap-4 items-center justify-start w-full px-2 sm:w-fit sm:px-0 my-2 select-none">
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-primary cursor-pointer hidden sm:flex text-foreground"
-          >
-            <Download />
-          </a>
+        <div className="max-w-[600px] w-full px-2 flex flex-col gap-1">
+          <div className="flex gap-4 items-center justify-start w-full px-2 sm:w-fit sm:px-0 my-2 select-none">
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary cursor-pointer hidden sm:flex text-foreground"
+            >
+              <Download />
+            </a>
 
-          {/* Read Mode Selector */}
-          {width >= 820 && (
-            <CustomSelect
-              options={readModes}
-              getValue={(item) => item.value}
-              getLabel={(item) => item.label}
-              getKey={(item) => item.key}
-              changeKey={(key) => setIsScrollMode(readModes[key].value)}
-              className="w-[90px]"
-              variant="highlight"
+            {/* Read Mode Selector */}
+            {width >= 820 && (
+              <CustomSelect
+                options={readModes}
+                getValue={(item) => item.value}
+                getLabel={(item) => item.label}
+                getKey={(item) => item.key}
+                changeKey={(key) => setIsScrollMode(readModes[key].value)}
+                className="w-[90px]"
+                variant="highlight"
+              />
+            )}
+
+            {/* Page Input */}
+            <input
+              type="text"
+              value={pageInput}
+              onKeyDown={(e) => inputSubmit(e)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (/^\d*$/.test(val)) {
+                  setPageInput(val);
+                }
+              }}
+              className="w-20 px-2 py-1 border-foreground border-1 rounded text-center text-foreground"
             />
-          )}
-
-          {/* Page Input */}
-          <input
-            type="text"
-            value={pageInput}
-            onKeyDown={(e) => inputSubmit(e)}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (/^\d*$/.test(val)) {
-                setPageInput(val);
-              }
-            }}
-            className="w-20 px-2 py-1 border-foreground border-1 rounded text-center text-foreground"
-          />
-          {/* Zoom Controls */}
-          <Minus
-            onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
-            className="hover:text-primary cursor-pointer text-foreground"
-          />
-          <span className="text-sm text-foreground">
-            {scale.toFixed(1)} / 3
-          </span>
-          <Plus
-            onClick={() => setScale((s) => Math.min(3, s + 0.2))}
-            className="hover:text-primary cursor-pointer text-foreground"
-          />
-
-          {/* Pagination Controls for 1024 or above*/}
-          <div className="hidden lg:flex items-center justify-center gap-2">
-            <Button
-              onClick={() => {
-                setCurrentPage((p) => {
-                  if (p - 1 >= 1) {
-                    return p - 1;
-                  } else {
-                    return numPages!;
-                  }
-                });
-                setManuallySetPage(true);
-              }}
-              size="sm"
-              variant="outline"
-            >
-              <ArrowLeft />
-            </Button>
+            {/* Zoom Controls */}
+            <Minus
+              onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
+              className="hover:text-primary cursor-pointer text-foreground"
+            />
             <span className="text-sm text-foreground">
-              Page {currentPage} / {numPages}
+              {scale.toFixed(1)} / 3
             </span>
-            <Button
-              onClick={() => {
-                setCurrentPage((p) => {
-                  if (p + 1 <= numPages!) {
-                    return p + 1;
-                  } else {
-                    return 1;
-                  }
-                });
-                setManuallySetPage(true);
-              }}
-              size="sm"
-              variant="outline"
+            <Plus
+              onClick={() => setScale((s) => Math.min(3, s + 0.2))}
+              className="hover:text-primary cursor-pointer text-foreground"
+            />
+
+            {/* Pagination Controls for 1024 or above*/}
+            <div className="hidden lg:flex items-center justify-center gap-2">
+              <Button
+                onClick={() => {
+                  setCurrentPage((p) => {
+                    if (p - 1 >= 1) {
+                      return p - 1;
+                    } else {
+                      return numPages!;
+                    }
+                  });
+                  setManuallySetPage(true);
+                }}
+                size="sm"
+                variant="outline"
+              >
+                <ArrowLeft />
+              </Button>
+              <span className="text-sm text-foreground">
+                Page {currentPage} / {numPages}
+              </span>
+              <Button
+                onClick={() => {
+                  setCurrentPage((p) => {
+                    if (p + 1 <= numPages!) {
+                      return p + 1;
+                    } else {
+                      return 1;
+                    }
+                  });
+                  setManuallySetPage(true);
+                }}
+                size="sm"
+                variant="outline"
+              >
+                <ArrowRight />
+              </Button>
+            </div>
+
+            <button
+              className="absolute top-0 right-5 text-foreground hover:text-destructive cursor-pointer"
+              onClick={closeReader}
+              aria-label="Close modal"
             >
-              <ArrowRight />
-            </Button>
+              ✕
+            </button>
           </div>
 
-          <button
-            className="absolute top-0 right-5 text-foreground hover:text-destructive cursor-pointer"
-            onClick={closeReader}
-            aria-label="Close modal"
-          >
-            ✕
-          </button>
+          {/*AI language selector*/}
+          <div className="flex w-fit flex-col gap-1 z-80 px-2 select-none">
+            <label className="text-foreground">AI Language</label>
+            <Select
+              options={languageList}
+              onChange={(e) => {
+                if (e) setAILanguage(e.label);
+              }}
+              styles={ReactSelectStyles}
+              placeholder={AILanguage}
+              className="w-[150px] sm:w-[200px] border-foreground text-base"
+            />
+          </div>
         </div>
 
         {/* PDF Display */}
         <div
           className="w-full overflow-auto"
           ref={scrollContainerRef}
+          onTouchEnd={handleTouchEnd}
           onMouseUp={handleMouseUp}
-          onTouchEnd={handleMouseUp}
         >
           <Document
             file={fileUrl}
@@ -353,7 +400,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
                   ref={(el) => {
                     pageRefs.current[index] = el;
                   }}
-                  className="flex justify-center w-fit min-w-[100%] py-4"
+                  className={`flex justify-center w-fit min-w-[100%] py-4`}
                 >
                   <Page
                     key={index}
@@ -365,7 +412,12 @@ const PDFReader: React.FC<PDFReaderProps> = ({
               ))
             ) : (
               <div className="flex justify-center w-fit min-w-[100%] py-4">
-                <Page pageNumber={currentPage} scale={scale} />
+                <Page
+                  pageNumber={currentPage}
+                  scale={scale}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={false}
+                />
               </div>
             )}
           </Document>
@@ -418,8 +470,8 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           </Button>
         </div>
 
-        {/*popup menu when highlight a chunk of text for AI Services*/}
-        {popupVisible && (
+        {/*popup menu for desktop when highlight a chunk of text for AI Services*/}
+        {desktopAIMenuOpen && (
           <div
             className="absolute z-50 bg-card border-2 border-primary rounded-lg shadow-lg p-2 bottom-16 right-[1%] text-foreground"
             style={
@@ -481,6 +533,38 @@ const PDFReader: React.FC<PDFReaderProps> = ({
           )}
         </Modal>
       </div>
+
+      {/*popup menu for mobile when highlight a chunk of text for AI Services*/}
+      {mobileAIMenuOpen && (
+        <div
+          className="absolute w-fit z-50 bg-card border-2 border-primary rounded-lg shadow-lg p-1 bottom-5 left-1 text-foreground"
+          style={
+            {
+              //top: `${popupPosition.y}px`,
+              //left: `${popupPosition.x}px`,
+            }
+          }
+        >
+          <button
+            className="text-sm block w-full text-left p-1 hover:bg-primary border-1 border-border"
+            onClick={() => handleOptionClick("translate")}
+          >
+            Translate
+          </button>
+          <button
+            className="text-sm block w-full text-left p-1 hover:bg-primary border-1 border-border"
+            onClick={() => handleOptionClick("summarize")}
+          >
+            Context Summarize
+          </button>
+          <button
+            className="text-sm block w-full text-left p-1 hover:bg-primary border-1 border-border"
+            onClick={() => handleOptionClick("discuss")}
+          >
+            Discuss
+          </button>
+        </div>
+      )}
     </div>
   );
 };

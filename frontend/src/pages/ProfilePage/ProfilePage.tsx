@@ -296,10 +296,12 @@ const ProfilePage = () => {
                       </div>
 
                       {/*Actions menu dropdown (delete version, etc..) */}
-                      <ItemActionsMenu
-                        item={version}
-                        actions={bookVersionActionsMenu}
-                      />
+                      {isLogin && (
+                        <ItemActionsMenu
+                          item={version}
+                          actions={bookVersionActionsMenu}
+                        />
+                      )}
                     </div>
                   )
                 )}
@@ -337,6 +339,7 @@ const ProfilePage = () => {
           fileUrl={selectedFileUrl}
           closeReader={() => setIsReaderOpen(false)}
           title={selectedFileTitle}
+          isOpen={isReaderOpen}
         />
       )}
     </main>

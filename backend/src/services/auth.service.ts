@@ -310,7 +310,16 @@ const resendVerificationEmail = async (req: Request): Promise<ResponseBase> => {
 
 const refreshToken = async (req: Request): Promise<ResponseBase> => {
   try {
-    const oldToken = req.cookies.refreshToken;
+    let oldToken = req.cookies.refreshToken;
+    if (!oldToken) {
+      const rfrHeader = req.headers.rfrTk;
+
+      if (typeof rfrHeader === "string") {
+        oldToken = rfrHeader.split(":")[1];
+      } else if (Array.isArray(rfrHeader)) {
+        oldToken = rfrHeader[0].split(":")[1];
+      }
+    }
 
     if (!oldToken) {
       return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);
@@ -429,7 +438,16 @@ const logout = async (req: RequestHasLogin): Promise<ResponseBase> => {
       );
     }
 
-    const token = req.cookies.refreshToken;
+    let token = req.cookies.refreshToken;
+    if (!token) {
+      const rfrHeader = req.headers.rfrtk;
+
+      if (typeof rfrHeader === "string") {
+        token = rfrHeader.split(":")[1];
+      } else if (Array.isArray(rfrHeader)) {
+        token = rfrHeader[0].split(":")[1];
+      }
+    }
 
     //Blacklisting current refreshToken
     if (token) {

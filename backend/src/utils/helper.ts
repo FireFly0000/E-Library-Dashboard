@@ -215,3 +215,22 @@ export function hashAIRedisKey(
   const raw = `${content}_${bookTitle}_${service}_${language}`;
   return crypto.createHash("sha256").update(raw).digest("hex");
 }
+
+//for mobile device detection for setting refreshToken differently
+// because of sameSite=none disabled browsers on mobile
+export function isMobileDevice(req) {
+  const ua = req.headers["user-agent"] || "";
+  const secChUaMobile = req.headers["sec-ch-ua-mobile"];
+
+  // 1. Check sec-ch-ua-mobile if available
+  // "1" means mobile, "?0" means not mobile
+  if (secChUaMobile) {
+    if (secChUaMobile.includes("1")) return true;
+    if (secChUaMobile.includes("0")) return false;
+  }
+
+  // 2. Fallback: Check User-Agent regex
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    ua
+  );
+}

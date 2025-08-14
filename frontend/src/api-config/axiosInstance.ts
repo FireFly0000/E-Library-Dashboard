@@ -80,9 +80,19 @@ axiosInstance.interceptors.response.use(
           withCredentials: true,
         });
         const accessToken = response.data.data.accessToken;
+        const refreshToken = response.data.data.refreshToken;
 
         if (accessToken) {
           Cookies.set("accessToken", accessToken);
+          //set refreshToken in frontend only if device is mobile (BE sent back none empty)
+          if (refreshToken !== "") {
+            Cookies.set("refreshToken", refreshToken, {
+              secure: true,
+              sameSite: "None",
+              expires: 15, // days
+              path: "/",
+            });
+          }
           if (originalRequest.headers) {
             originalRequest.headers = {
               ...originalRequest.headers,
@@ -103,6 +113,7 @@ axiosInstance.interceptors.response.use(
           }
         }); // need to use store outside of component
         Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
         window.location.href = "/";
         return Promise.reject(refreshError);
       } finally {
@@ -124,6 +135,7 @@ export const apiCaller = (
     headers: {
       "Access-Control-Allow-Credentials": true,
       "Access-Control-Allow-Origin": "*",
+      rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
     },
     url: `${path}`,
     data,
@@ -153,6 +165,7 @@ export const RtkBaseQuery =
         headers: {
           "Access-Control-Allow-Credentials": true,
           "Access-Control-Allow-Origin": "*",
+          rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
         },
         url: baseUrl + `${url}`,
         data,

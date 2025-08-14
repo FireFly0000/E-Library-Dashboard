@@ -38,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 z-90 flex justify-center items-center overflow-y-auto">
       <div
         className={clsx(
           "bg-card rounded-2xl py-[35px] px-[20px] shadow-xl relative max-h-[95vh] overflow-y-auto",

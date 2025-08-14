@@ -1,0 +1,7 @@
+.pdf-page {
+  user-select: text;
+}
+
+.pdf-page.disabled {
+  user-select: none;
+}

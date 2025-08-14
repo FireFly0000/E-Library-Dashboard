@@ -17,10 +17,7 @@ import AuthorsDashboard from "./pages/AuthorsDashboard/AuthorsDashboard";
 import BooksByAuthorIdDashboard from "./pages/BooksByAuthorIdDashboard/BooksByAuthorIdDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard/SettingsDashboard";
 
-//axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.onrender.com";
-
-//axios.defaults.baseURL = "https://e-library-dashboard-be-deployed.vercel.app";
-
+//testing new backend
 //axios.defaults.baseURL = "https://bkdelibserver.duckdns.org";
 
 function App() {

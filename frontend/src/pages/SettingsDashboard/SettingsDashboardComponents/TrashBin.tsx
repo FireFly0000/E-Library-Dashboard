@@ -181,6 +181,7 @@ const TrashBin: React.FC = () => {
             fileUrl={selectedFileUrl}
             closeReader={() => setIsReaderOpen(false)}
             title={selectedFileTitle}
+            isOpen={isReaderOpen}
           />
         )}
       </section>

@@ -198,6 +198,7 @@ const BookVersionsDashboard = () => {
                 fileUrl={selectedFileUrl}
                 closeReader={() => setIsReaderOpen(false)}
                 title={bookInfo?.title}
+                isOpen={isReaderOpen}
               />
             )}
 

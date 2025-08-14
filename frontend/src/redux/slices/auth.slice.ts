@@ -86,6 +86,7 @@ export const getMe = () => async (dispatch: AppDispatch) => {
         dispatch(setUser(response.data.data));
       } else {
         Cookies.remove("accessToken");
+        Cookies.remove("refreshToken", { path: "/" });
       }
     }
   } catch (error) {
@@ -170,6 +171,16 @@ export const authSlice = createSlice({
     });
     builder.addCase(login.fulfilled, (state, action) => {
       Cookies.set("accessToken", action.payload.data?.accessToken as string);
+      //set refreshToken in frontend only if device is mobile (BE sent back none empty)
+      const refreshToken = action.payload.data?.refreshToken || "";
+      if (refreshToken && refreshToken !== "") {
+        Cookies.set("refreshToken", refreshToken, {
+          secure: true,
+          sameSite: "None",
+          expires: 15, // days
+          path: "/",
+        });
+      }
       state.isLogin = true;
 
       state.isLoading = false;
@@ -186,6 +197,9 @@ export const authSlice = createSlice({
     });
     builder.addCase(logout.fulfilled, (state) => {
       Cookies.remove("accessToken");
+      Cookies.remove("refreshToken", {
+        path: "/",
+      });
       state.user.email = "";
       state.user.id = undefined;
       state.user.username = "";

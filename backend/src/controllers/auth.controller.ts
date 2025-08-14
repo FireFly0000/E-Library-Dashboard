@@ -6,6 +6,7 @@ import service from "../services/index";
 import { ResponseWithToken } from "../commons/response";
 import ms from "ms";
 import configs from "../configs/index";
+import { isMobileDevice } from "../utils/helper";
 
 class AuthController {
   //register or signup controller
@@ -59,18 +60,25 @@ class AuthController {
 
     const response = await service.AuthService.login(req);
     if (response instanceof ResponseWithToken) {
-      const refreshExpiration = ms(
-        configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
-      );
+      //if mobile set refreshToken in frontend
+      if (isMobileDevice(req)) {
+        return res.status(response.getStatusCode()).json(response.toJSON());
+      } else {
+        const refreshExpiration = ms(
+          configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
+        );
 
-      res.cookie("refreshToken", response.getRefreshToken(), {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: refreshExpiration,
-      });
+        res.cookie("refreshToken", response.getRefreshToken(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
 
-      return res.status(response.getStatusCode()).json(response.toJSON());
+        await response.clearRefreshToken();
+
+        return res.status(response.getStatusCode()).json(response.toJSON());
+      }
     }
 
     return res.status(response.getStatusCode()).json(response);
@@ -80,18 +88,25 @@ class AuthController {
   async refreshToken(req: Request, res: Response): Promise<Response> {
     const response = await service.AuthService.refreshToken(req);
     if (response instanceof ResponseWithToken) {
-      const refreshExpiration = ms(
-        configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
-      );
+      //if mobile set refreshToken in frontend
+      if (isMobileDevice(req)) {
+        return res.status(response.getStatusCode()).json(response.toJSON());
+      } else {
+        const refreshExpiration = ms(
+          configs.general.TOKEN_REFRESH_EXPIRED_TIME || "15d"
+        );
 
-      res.cookie("refreshToken", response.getRefreshToken(), {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: refreshExpiration,
-      });
+        res.cookie("refreshToken", response.getRefreshToken(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
 
-      return res.status(response.getStatusCode()).json(response.toJSON());
+        await response.clearRefreshToken();
+
+        return res.status(response.getStatusCode()).json(response.toJSON());
+      }
     }
 
     return res.status(response.getStatusCode()).json(response);
@@ -101,7 +116,11 @@ class AuthController {
     const response = await service.AuthService.logout(req);
 
     if (response.getStatusCode() === 200) {
-      res.clearCookie("refreshToken");
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
     }
 
     return res.status(response.getStatusCode()).json(response);

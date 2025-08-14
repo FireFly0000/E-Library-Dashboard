@@ -1,7 +1,7 @@
 name: Deploy to Cloud Run
 
 env:
-  SERVICE_NAME: custom-nodejs-service
+  SERVICE_NAME: e-shelf-app-backend-service
   PROJECT_ID: elite-frame-468619-h2
   DOCKER_IMAGE_URL: us-central1-docker.pkg.dev/elite-frame-468619-h2/e-shelf-app-artifact-registry-repo/e_shelf_backend
 
@@ -50,4 +50,4 @@ jobs:
             --memory 2G \
             --timeout=300s
 
-#Testing 5
+#Testing 9
