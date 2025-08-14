@@ -11,13 +11,12 @@ React, TailwindCSS, Redux, RTK query, Nodejs, Prisma, JWT, PostgreSQL, Redis, Do
 ## Deployed Demo
 Check out the working deployment here: [My Deployed Full-stack App](https://e-library-dashboard-fe-deployed.vercel.app/)
 
-## 📦 Frontend Getting Started
-Follow these steps to set up and run the project locally:
+## 📦 Current Features
 
-### 1. Clone the repository
+### 1. Searching and Sharing Books/BookVersions
 
 ```bash
-git clone https://github.com/FireFly0000/E-commerce-FE-test.git
+asdasd
 ```
 
 ### 2. Navigate to the project directory
