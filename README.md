@@ -27,4 +27,4 @@ Check out the live app here: [E-Library App](https://e-library-dashboard-fe-depl
 | 🤖 **Enhanced AI Assistant** | Let users interact with the AI agent through chat or questionnaires to recommend trending books — even those not yet on the app |
 | 📖 **Users As Authors** | Allow users to publish their own books by implementing a stricter Role-Based Access Control (RBAC) |
 
-![AI-demo](https://drive.google.com/file/d/1eg_0dtmr2fCW1TZMwKZxg3GwOkFp-pw5/view?usp=sharing)
+![AI-demo](/ai-demo.gif)
