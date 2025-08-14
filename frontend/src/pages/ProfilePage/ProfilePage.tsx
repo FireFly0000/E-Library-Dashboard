@@ -296,7 +296,7 @@ const ProfilePage = () => {
                       </div>
 
                       {/*Actions menu dropdown (delete version, etc..) */}
-                      {isLogin && (
+                      {isLogin && user.id === Number(userId) && (
                         <ItemActionsMenu
                           item={version}
                           actions={bookVersionActionsMenu}
