@@ -42,7 +42,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState(String(currentPage));
   const [manuallySetPage, setManuallySetPage] = useState(false);
-  const [scale, setScale] = useState(width >= 820 ? 1.2 : 0.8); // zoom level
+  const [scale, setScale] = useState(width >= 820 ? 1.2 : 0.6); // zoom level
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]); // Ref for each page
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   //const width = useWindowWidth();
@@ -358,7 +358,7 @@ const PDFReader: React.FC<PDFReaderProps> = ({
             </div>
 
             <button
-              className="absolute top-0 right-5 text-foreground hover:text-destructive cursor-pointer"
+              className="absolute text-xl top-2 right-4 text-foreground hover:text-destructive cursor-pointer"
               onClick={closeReader}
               aria-label="Close modal"
             >
