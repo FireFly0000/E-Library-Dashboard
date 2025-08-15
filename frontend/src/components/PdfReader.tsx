@@ -368,7 +368,9 @@ const PDFReader: React.FC<PDFReaderProps> = ({
 
           {/*AI language selector*/}
           <div className="flex w-fit flex-col gap-1 z-80 px-2 select-none">
-            <label className="text-foreground">AI Language</label>
+            <label className="text-foreground">
+              AI Language (Highlight text to use)
+            </label>
             <Select
               options={languageList}
               onChange={(e) => {
