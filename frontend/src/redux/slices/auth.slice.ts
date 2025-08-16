@@ -180,7 +180,6 @@ export const authSlice = createSlice({
           expires: 15, // days
           path: "/",
         });
-        localStorage.setItem("refreshToken", refreshToken);
       }
       state.isLogin = true;
 
@@ -201,7 +200,6 @@ export const authSlice = createSlice({
       Cookies.remove("refreshToken", {
         path: "/",
       });
-      localStorage.removeItem("refreshToken");
       state.user.email = "";
       state.user.id = undefined;
       state.user.username = "";

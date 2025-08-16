@@ -92,7 +92,6 @@ axiosInstance.interceptors.response.use(
               expires: 15, // days
               path: "/",
             });
-            localStorage.setItem("refreshToken", refreshToken);
           }
           if (originalRequest.headers) {
             originalRequest.headers = {
@@ -166,7 +165,7 @@ export const RtkBaseQuery =
         headers: {
           "Access-Control-Allow-Credentials": true,
           "Access-Control-Allow-Origin": "*",
-          rfrTk: `RfrTk:${localStorage.getItem("refreshToken") || ""}`,
+          rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
         },
         url: baseUrl + `${url}`,
         data,
