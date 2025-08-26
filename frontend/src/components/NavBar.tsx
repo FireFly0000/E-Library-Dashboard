@@ -13,6 +13,7 @@ import {
   LogIn,
   LogOut,
   Settings,
+  LoaderCircle,
 } from "lucide-react";
 import { useState } from "react";
 import BlankProfilePic from "@/assets/blank-profile-picture.png";
@@ -39,7 +40,9 @@ const NavBar = () => {
     (state) => state.authSlice.isAuthChecked
   );
   if (!isAuthChecked) {
-    return null;
+    return (
+      <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
+    );
   }
 
   return (

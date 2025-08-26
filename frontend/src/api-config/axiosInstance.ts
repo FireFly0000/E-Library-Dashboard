@@ -9,6 +9,7 @@ import store from "@/redux/store";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
+import { AuthApis } from "@/apis";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -76,14 +77,16 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.get(`${baseURL}/auth/refresh`, {
-          withCredentials: true,
-        });
+        const response = await AuthApis.refreshToken();
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
 
         if (accessToken) {
-          Cookies.set("accessToken", accessToken);
+          Cookies.set("accessToken", accessToken, {
+            secure: true,
+            sameSite: "None",
+            expires: 15, // 15 mins
+          });
           //set refreshToken in frontend only if device is mobile (BE sent back none empty)
           if (refreshToken !== "") {
             Cookies.set("refreshToken", refreshToken, {
@@ -135,7 +138,7 @@ export const apiCaller = (
     headers: {
       "Access-Control-Allow-Credentials": true,
       "Access-Control-Allow-Origin": "*",
-      rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
+      //rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
     },
     url: `${path}`,
     data,
@@ -165,7 +168,7 @@ export const RtkBaseQuery =
         headers: {
           "Access-Control-Allow-Credentials": true,
           "Access-Control-Allow-Origin": "*",
-          rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
+          //rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
         },
         url: baseUrl + `${url}`,
         data,

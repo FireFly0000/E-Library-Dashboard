@@ -59,6 +59,12 @@ const login = async (values: LoginType) => {
   return response;
 };
 
+const refreshToken = async () => {
+  const path = "auth/refresh";
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
 const logout = async () => {
   const path = "auth/logout";
 
@@ -66,4 +72,12 @@ const logout = async () => {
   return response;
 };
 
-export { register, verifyEmail, resendVerifyEmail, getMe, login, logout };
+export {
+  register,
+  verifyEmail,
+  resendVerifyEmail,
+  getMe,
+  login,
+  refreshToken,
+  logout,
+};

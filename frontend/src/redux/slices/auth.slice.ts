@@ -170,7 +170,11 @@ export const authSlice = createSlice({
       state.isLoading = true;
     });
     builder.addCase(login.fulfilled, (state, action) => {
-      Cookies.set("accessToken", "");
+      Cookies.set("accessToken", action.payload.data?.accessToken as string, {
+        secure: true,
+        sameSite: "None",
+        expires: 15, // 15 mins
+      });
       //set refreshToken in frontend only if device is mobile (BE sent back none empty)
       const refreshToken = action.payload.data?.refreshToken || "";
       if (refreshToken && refreshToken !== "") {
