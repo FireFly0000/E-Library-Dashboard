@@ -80,7 +80,15 @@ class AuthController {
           maxAge: refreshExpiration,
         });
 
+        res.cookie("sessionId", response.getSessionId(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
+
         await response.clearRefreshToken();
+        await response.clearSessionId();
 
         return res.status(response.getStatusCode()).json(response.toJSON());
       }
@@ -108,7 +116,15 @@ class AuthController {
           maxAge: refreshExpiration,
         });
 
+        res.cookie("sessionId", response.getSessionId(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
+
         await response.clearRefreshToken();
+        await response.clearSessionId();
 
         return res.status(response.getStatusCode()).json(response.toJSON());
       }
@@ -122,6 +138,17 @@ class AuthController {
 
     if (response.getStatusCode() === 200) {
       res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("sessionId", {
         httpOnly: true,
         secure: true,
         sameSite: "none",

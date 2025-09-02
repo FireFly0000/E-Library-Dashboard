@@ -89,7 +89,7 @@ axiosInstance.interceptors.response.use(
             expires: 15, // 15 mins
           });
           //set refreshToken in frontend only if device is mobile (BE sent back none empty)
-          if (refreshToken !== "") {
+          if (refreshToken && refreshToken !== "") {
             Cookies.set("refreshToken", refreshToken, {
               secure: true,
               sameSite: "None",
@@ -97,11 +97,13 @@ axiosInstance.interceptors.response.use(
               path: "/",
             });
           }
-          Cookies.set("sessionId", sessionId, {
-            secure: true,
-            sameSite: "None",
-            expires: 15, // days
-          });
+          if (sessionId && sessionId !== "") {
+            Cookies.set("sessionId", sessionId, {
+              secure: true,
+              sameSite: "None",
+              expires: 15, // days
+            });
+          }
           if (originalRequest.headers) {
             originalRequest.headers = {
               ...originalRequest.headers,

@@ -339,6 +339,7 @@ const resendVerificationEmail = async (req: Request): Promise<ResponseBase> => {
 const refreshToken = async (req: Request): Promise<ResponseBase> => {
   try {
     let oldToken = req.cookies.refreshToken;
+    console.log("Old Token:", oldToken);
     const sessionId = req.cookies.sessionId;
     if (!oldToken) {
       const rfrHeader = req.headers.rfrTk;
@@ -348,6 +349,7 @@ const refreshToken = async (req: Request): Promise<ResponseBase> => {
       } else if (Array.isArray(rfrHeader)) {
         oldToken = rfrHeader[0].split(":")[1];
       }
+      console.log("Old Token from header:", oldToken);
     }
 
     if (!oldToken) {
@@ -364,7 +366,12 @@ const refreshToken = async (req: Request): Promise<ResponseBase> => {
     }
 
     //validate against session info as well
+    console.log("Session ID:", sessionId);
+    console.log("cookies", req.cookies);
     const session = await redis.hgetall(`session_${sessionId}`);
+    console.log("Session Data:", session);
+    console.log("Session Hashed Token:", session.refreshTokenHash);
+    console.log("Hashed Old Token:", hashedOldToken);
     if (!session || session.refreshTokenHash !== hashedOldToken) {
       console.log("Session not found or token hash mismatch");
       return new ResponseError(400, i18n.t("errorMessages.badRequest"), false);

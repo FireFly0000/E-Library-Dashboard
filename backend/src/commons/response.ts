@@ -123,4 +123,10 @@ export class ResponseWithToken extends ResponseBase {
       this.data.refreshToken = "";
     }
   }
+
+  public clearSessionId() {
+    if (this.data) {
+      this.data.sessionId = "";
+    }
+  }
 }

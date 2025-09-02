@@ -103,9 +103,9 @@ export const getMe = () => async (dispatch: AppDispatch) => {
       if (response.status === 200) {
         dispatch(setUser(response.data.data));
       } else {
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken", { path: "/" });
-        Cookies.remove("sessionId", { path: "/" });
+        //Cookies.remove("accessToken");
+        //Cookies.remove("refreshToken", { path: "/" });
+        //Cookies.remove("sessionId", { path: "/" });
       }
     }
   } catch (error) {
@@ -241,23 +241,26 @@ export const authSlice = createSlice({
       Cookies.set("accessToken", action.payload.data?.accessToken as string, {
         secure: true,
         sameSite: "None",
-        expires: 15, // 15 mins
+        expires: 15,
       });
       //set refreshToken in frontend only if device is mobile (BE sent back none empty)
       const refreshToken = action.payload.data?.refreshToken || "";
-      if (refreshToken && refreshToken !== "") {
+      if (typeof refreshToken === "string" && refreshToken.trim().length > 0) {
         Cookies.set("refreshToken", refreshToken, {
           secure: true,
           sameSite: "None",
-          expires: 15, // days
+          expires: 15,
           path: "/",
         });
       }
-      Cookies.set("sessionId", action.payload.data?.sessionId as string, {
-        secure: true,
-        sameSite: "None",
-        expires: 15, // days
-      });
+      const sessionId = action.payload.data?.sessionId || "";
+      if (typeof sessionId === "string" && sessionId.trim().length > 0) {
+        Cookies.set("sessionId", sessionId, {
+          secure: true,
+          sameSite: "None",
+          expires: 15,
+        });
+      }
       state.isLogin = true;
 
       state.isLoading = false;
