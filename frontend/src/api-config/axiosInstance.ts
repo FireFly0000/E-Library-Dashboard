@@ -80,6 +80,7 @@ axiosInstance.interceptors.response.use(
         const response = await AuthApis.refreshToken();
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
+        const sessionId = response.data.data.sessionId;
 
         if (accessToken) {
           Cookies.set("accessToken", accessToken, {
@@ -88,12 +89,19 @@ axiosInstance.interceptors.response.use(
             expires: 15, // 15 mins
           });
           //set refreshToken in frontend only if device is mobile (BE sent back none empty)
-          if (refreshToken !== "") {
+          if (refreshToken && refreshToken !== "") {
             Cookies.set("refreshToken", refreshToken, {
               secure: true,
               sameSite: "None",
               expires: 15, // days
               path: "/",
+            });
+          }
+          if (sessionId && sessionId !== "") {
+            Cookies.set("sessionId", sessionId, {
+              secure: true,
+              sameSite: "None",
+              expires: 15, // days
             });
           }
           if (originalRequest.headers) {
@@ -117,6 +125,7 @@ axiosInstance.interceptors.response.use(
         }); // need to use store outside of component
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
+        Cookies.remove("sessionId");
         window.location.href = "/";
         return Promise.reject(refreshError);
       } finally {

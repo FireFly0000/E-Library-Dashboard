@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import { ValidationError } from "joi";
 import { convertJoiErrorToString } from "../commons/index";
-import { registrationSchema, loginSchema } from "../validations/auth";
+import {
+  registrationSchema,
+  loginSchema,
+  updateEmailSchema,
+  updatePasswordSchema,
+} from "../validations/auth";
 import service from "../services/index";
 import { ResponseWithToken } from "../commons/response";
 import ms from "ms";
@@ -75,7 +80,15 @@ class AuthController {
           maxAge: refreshExpiration,
         });
 
+        res.cookie("sessionId", response.getSessionId(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
+
         await response.clearRefreshToken();
+        await response.clearSessionId();
 
         return res.status(response.getStatusCode()).json(response.toJSON());
       }
@@ -103,7 +116,15 @@ class AuthController {
           maxAge: refreshExpiration,
         });
 
+        res.cookie("sessionId", response.getSessionId(), {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: refreshExpiration,
+        });
+
         await response.clearRefreshToken();
+        await response.clearSessionId();
 
         return res.status(response.getStatusCode()).json(response.toJSON());
       }
@@ -121,6 +142,17 @@ class AuthController {
         secure: true,
         sameSite: "none",
       });
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("sessionId", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
     }
 
     return res.status(response.getStatusCode()).json(response);
@@ -129,6 +161,81 @@ class AuthController {
   //getMe (get user info) controller
   async getMe(req: Request, res: Response): Promise<Response> {
     const response = await service.AuthService.getMe(req);
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  async getUserSessions(req: Request, res: Response): Promise<Response> {
+    const response = await service.AuthService.getUserSessions(req);
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  async logoutSession(req: Request, res: Response): Promise<Response> {
+    const response = await service.AuthService.logoutSession(req);
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  async updateEmail(req: Request, res: Response): Promise<Response> {
+    const { error, value } = updateEmailSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        status_code: 400,
+        message: convertJoiErrorToString(error),
+        success: false,
+      });
+    }
+    const response = await service.AuthService.updateEmail(req, value);
+    if (response.getStatusCode() === 200) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("sessionId", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+    }
+    return res.status(response.getStatusCode()).json(response);
+  }
+
+  async updatePassword(req: Request, res: Response): Promise<Response> {
+    const { error, value } = updatePasswordSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        status_code: 400,
+        message: convertJoiErrorToString(error),
+        success: false,
+      });
+    }
+    const response = await service.AuthService.updatePassword(req, value);
+    if (response.getStatusCode() === 200) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+
+      res.clearCookie("sessionId", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
+    }
     return res.status(response.getStatusCode()).json(response);
   }
 }
