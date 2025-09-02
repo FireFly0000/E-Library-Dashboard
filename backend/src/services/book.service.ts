@@ -321,6 +321,7 @@ const getAllBooksPaging = async (
       pageSize // Page size
     );
   } catch (error) {
+    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);
     }

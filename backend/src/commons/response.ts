@@ -1,3 +1,5 @@
+import { use } from "i18next";
+
 export class ResponseBase {
   //[x: string]: any;
   private status_code: number;
@@ -71,6 +73,7 @@ export class ResponseSuccessPaginated<T> extends ResponseBase {
 type TokenPayload = {
   accessToken: string;
   refreshToken: string;
+  sessionId: string;
 };
 
 export class ResponseWithToken extends ResponseBase {
@@ -90,6 +93,10 @@ export class ResponseWithToken extends ResponseBase {
     return this.data?.refreshToken;
   }
 
+  public getSessionId() {
+    return this.data?.sessionId;
+  }
+
   public toJSON() {
     return {
       status_code: this.getStatusCode(),
@@ -100,10 +107,12 @@ export class ResponseWithToken extends ResponseBase {
           ? {
               accessToken: this.data.accessToken,
               refreshToken: this.data.refreshToken,
+              sessionId: this.data.sessionId,
             }
           : this.data && this.data.refreshToken === ""
           ? {
               accessToken: this.data.accessToken,
+              sessionId: this.data.sessionId,
             }
           : undefined,
     };

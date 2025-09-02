@@ -143,22 +143,22 @@ export const uploadFileToS3 = async (file): Promise<string> => {
 
 export const getFileUrlFromS3 = async (fileName): Promise<string> => {
   // Check if the URL is already cached in Redis
-  const cacheKey = `S3Url_${fileName}`;
+  /*const cacheKey = `S3Url_${fileName}`;
   const cachedUrl = await redis.get(cacheKey);
   if (cachedUrl) {
     return cachedUrl;
-  }
+  }*/
   const getObjectParams = {
     Bucket: configs.general.AWS_S3_BUCKET_NAME,
     Key: fileName,
   };
   const command = new GetObjectCommand(getObjectParams);
   const signedUrl = await getSignedUrl(s3, command, {
-    expiresIn: 3600, // URL expiration time in seconds (1 hour)
+    expiresIn: 6 * 24 * 60 * 60, // URL expiration time in seconds (1 hour)
   });
 
   // Store the signed URL in Redis for 55 minutes
-  await redis.set(cacheKey, signedUrl, "EX", 3300);
+  //await redis.set(cacheKey, signedUrl, "EX", 3300);
 
   return signedUrl;
 };
@@ -233,4 +233,8 @@ export function isMobileDevice(req) {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     ua
   );
+}
+
+export function hashedToken(raw: string): string {
+  return crypto.createHash("sha256").update(raw).digest("hex");
 }

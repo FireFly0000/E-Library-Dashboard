@@ -1,6 +1,7 @@
 import { Router } from "express";
 import controllers from "../controllers/index";
 import { isLogin } from "../middlewares/isLogin";
+import { auth } from "google-auth-library";
 
 const authRouter: Router = Router();
 
@@ -24,6 +25,18 @@ authRouter.get("/me", isLogin, (req, res) => {
 });
 authRouter.get("/logout", isLogin, (req, res) => {
   controllers.authController.logout(req, res);
+});
+authRouter.get("/sessions", isLogin, (req, res) => {
+  controllers.authController.getUserSessions(req, res);
+});
+authRouter.get("/logout-session", isLogin, (req, res) => {
+  controllers.authController.logoutSession(req, res);
+});
+authRouter.post("/update-email", isLogin, (req, res) => {
+  controllers.authController.updateEmail(req, res);
+});
+authRouter.post("/update-password", isLogin, (req, res) => {
+  controllers.authController.updatePassword(req, res);
 });
 
 export default authRouter;

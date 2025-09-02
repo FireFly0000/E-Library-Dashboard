@@ -5,6 +5,7 @@ import {
   Register as RegisterType,
   Login as LoginType,
   LoginResponse,
+  SessionInfo,
 } from "@/types/auth";
 import Cookies from "js-cookie";
 import { AuthApis } from "@/apis";
@@ -19,6 +20,9 @@ type AuthSlice = {
   error: string;
   success: string;
   isAuthChecked: boolean;
+  sessions: SessionInfo[];
+  isSessionLoggedOut: boolean;
+  isEmailUpdated: boolean;
 };
 
 export const register = createAsyncThunk<
@@ -77,6 +81,20 @@ export const resendVerifyEmail = createAsyncThunk<
   }
 });
 
+export const getUserSessions = createAsyncThunk<
+  Response<SessionInfo[]>,
+  void,
+  { rejectValue: Response<null> }
+>("auth/getUserSessions", async (_, ThunkAPI) => {
+  try {
+    const response = await AuthApis.getUserSessions();
+    return response.data as Response<SessionInfo[]>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
 export const getMe = () => async (dispatch: AppDispatch) => {
   try {
     const response = await AuthApis.getMe();
@@ -87,6 +105,7 @@ export const getMe = () => async (dispatch: AppDispatch) => {
       } else {
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken", { path: "/" });
+        Cookies.remove("sessionId", { path: "/" });
       }
     }
   } catch (error) {
@@ -110,6 +129,52 @@ export const logout = createAsyncThunk<
   }
 });
 
+export const logoutSession = createAsyncThunk<
+  Response<null>,
+  string,
+  { rejectValue: Response<null> }
+>("auth/logoutSession", async (sessionId, ThunkAPI) => {
+  try {
+    const response = await AuthApis.logoutSession(sessionId);
+    return response.data as Response<null>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
+export const updateEmail = createAsyncThunk<
+  Response<null>,
+  { newEmail: string; password: string },
+  { rejectValue: Response<null> }
+>("auth/updateEmail", async (body, ThunkAPI) => {
+  try {
+    const response = await AuthApis.updateEmail(body.newEmail, body.password);
+    return response.data as Response<null>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
+export const updatePassword = createAsyncThunk<
+  Response<null>,
+  { currentPassword: string; newPassword: string; confirmNewPassword: string },
+  { rejectValue: Response<null> }
+>("auth/updatePassword", async (body, ThunkAPI) => {
+  try {
+    const response = await AuthApis.updatePassword(
+      body.currentPassword,
+      body.newPassword,
+      body.confirmNewPassword
+    );
+    return response.data as Response<null>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
 const initialState: AuthSlice = {
   user: {
     email: "",
@@ -124,6 +189,9 @@ const initialState: AuthSlice = {
   error: "",
   success: "",
   isAuthChecked: false,
+  sessions: [],
+  isSessionLoggedOut: false,
+  isEmailUpdated: false,
 };
 
 export const authSlice = createSlice({
@@ -185,6 +253,11 @@ export const authSlice = createSlice({
           path: "/",
         });
       }
+      Cookies.set("sessionId", action.payload.data?.sessionId as string, {
+        secure: true,
+        sameSite: "None",
+        expires: 15, // days
+      });
       state.isLogin = true;
 
       state.isLoading = false;
@@ -202,6 +275,9 @@ export const authSlice = createSlice({
     builder.addCase(logout.fulfilled, (state) => {
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken", {
+        path: "/",
+      });
+      Cookies.remove("sessionId", {
         path: "/",
       });
       state.user.email = "";
@@ -244,6 +320,91 @@ export const authSlice = createSlice({
     builder.addCase(resendVerifyEmail.rejected, (state, action) => {
       state.error = action.payload?.message as string;
       state.isLoading = false;
+    });
+
+    //getUserSessions
+    builder.addCase(getUserSessions.pending, (state) => {
+      state.error = "";
+      state.success = "";
+      state.isLoading = true;
+    });
+    builder.addCase(getUserSessions.fulfilled, (state, action) => {
+      state.sessions = action.payload.data || [];
+
+      state.error = "";
+      state.success = "";
+      state.isLoading = false;
+    });
+    builder.addCase(getUserSessions.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message as string);
+    });
+
+    //logout session
+    builder.addCase(logoutSession.pending, (state) => {
+      state.error = "";
+      state.success = "";
+      state.isLoading = true;
+      state.isSessionLoggedOut = false;
+    });
+    builder.addCase(logoutSession.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload.message as string);
+      state.isSessionLoggedOut = true;
+    });
+    builder.addCase(logoutSession.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message as string);
+      state.isSessionLoggedOut = false;
+    });
+
+    //update email
+    builder.addCase(updateEmail.pending, (state) => {
+      state.error = "";
+      state.success = "";
+      state.isLoading = true;
+      state.isEmailUpdated = false;
+    });
+    builder.addCase(updateEmail.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload.message as string);
+      state.isEmailUpdated = true;
+
+      state.user.email = "";
+      state.user.id = undefined;
+      state.user.username = "";
+
+      state.isLogin = false;
+      state.isLoading = false;
+      state.isAuthChecked = true;
+    });
+    builder.addCase(updateEmail.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message as string);
+      state.isEmailUpdated = false;
+    });
+
+    //update password
+    builder.addCase(updatePassword.pending, (state) => {
+      state.error = "";
+      state.success = "";
+      state.isLoading = true;
+    });
+    builder.addCase(updatePassword.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload.message as string);
+
+      state.user.email = "";
+      state.user.id = undefined;
+      state.user.username = "";
+
+      state.isLogin = false;
+      state.isLoading = false;
+      state.isAuthChecked = true;
+    });
+    builder.addCase(updatePassword.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message as string);
     });
   },
 });

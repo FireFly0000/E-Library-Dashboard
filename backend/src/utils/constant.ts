@@ -1,3 +1,5 @@
+import { get } from "http";
+
 export const errorMessages = {
   validationFail: "Validation fail",
   internalServer: "Internal server",
@@ -209,6 +211,7 @@ export const successMessages = {
   getTrashedVersions: "Get trashed book versions successfully",
   recoverVersionSuccess: "Recover version successfully",
   deleteBookVersionSuccess: "Delete book version successfully",
+  getUserSessionsSuccess: "Get user sessions successfully",
 
   //system
   dailyCleanUpSuccess: "Daily clean up succeeds",
