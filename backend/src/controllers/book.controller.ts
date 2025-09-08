@@ -163,6 +163,23 @@ class BookController {
     const response = await services.BookService.getBooksPagingByAuthorID(value);
     return res.status(response.getStatusCode()).json(response);
   };
+
+  bookSuggestionAIService = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { prompt } = req.query;
+    if (!prompt || typeof prompt !== "string" || prompt.trim() === "") {
+      return res.status(400).json({
+        status_code: 400,
+        message: "Invalid prompt",
+        success: false,
+      });
+    }
+    const params = { prompt: prompt.trim() };
+    const response = await services.BookService.AIBookSuggestion(params);
+    return res.status(response.getStatusCode()).json(response);
+  };
 }
 
 export default BookController;

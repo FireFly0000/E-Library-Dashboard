@@ -20,4 +20,5 @@ export const general = {
   EMAIL_SERVER: process.env.EMAIL_SERVER,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
   GOOGLE_AI_KEY: process.env.GOOGLE_AI_KEY,
+  NY_TIMES_API_KEY: process.env.NY_TIMES_API_KEY,
 };
