@@ -72,3 +72,54 @@ export const loginSchema: ObjectSchema<Login> = Joi.object({
       "any.required": i18n.t("errorMessages.passwordIsRequired"),
     }),
 });
+
+export const updateEmailSchema: ObjectSchema<{
+  newEmail: string;
+  password: string;
+}> = Joi.object({
+  newEmail: Joi.string()
+    .trim()
+    .regex(/^\S+@\S+\.\S+$/)
+    .required()
+    .messages({
+      "string.base": i18n.t("errorMessages.emailMustBeString"),
+      "any.required": i18n.t("errorMessages.emailIsRequired"),
+      "string.regex": i18n.t("errorMessages.invalidEmail"),
+    }),
+  password: Joi.string()
+    .trim()
+    .required()
+    .messages({
+      "string.base": i18n.t("errorMessages.passwordMustBeString"),
+      "any.required": i18n.t("errorMessages.passwordIsRequired"),
+    }),
+});
+
+export const updatePasswordSchema: ObjectSchema<{
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}> = Joi.object({
+  currentPassword: Joi.string()
+    .trim()
+    .required()
+    .messages({
+      "string.base": i18n.t("errorMessages.passwordMustBeString"),
+      "any.required": i18n.t("errorMessages.passwordIsRequired"),
+    }),
+  newPassword: Joi.string()
+    .trim()
+    .required()
+    .messages({
+      "string.base": i18n.t("errorMessages.passwordMustBeString"),
+      "any.required": i18n.t("errorMessages.passwordIsRequired"),
+    }),
+  confirmNewPassword: Joi.string()
+    .trim()
+    .valid(Joi.ref("newPassword"))
+    .required()
+    .messages({
+      "any.only": i18n.t("errorMessages.confirmPasswordDifferentPassword"),
+      "any.required": i18n.t("errorMessages.confirmPasswordIsRequired"),
+    }),
+});

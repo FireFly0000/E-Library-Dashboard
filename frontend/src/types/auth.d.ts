@@ -6,6 +6,7 @@ export type Login = {
 export type LoginResponse = {
   accessToken: string;
   refreshToken: string;
+  sessionId: string;
 };
 
 export type Token = {
@@ -28,4 +29,9 @@ export type Register = {
   email: string;
   password: string;
   confirm_password: string;
+};
+
+export type SessionInfo = {
+  sessionId: string;
+  userAgent: string;
 };

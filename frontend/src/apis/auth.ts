@@ -59,6 +59,12 @@ const login = async (values: LoginType) => {
   return response;
 };
 
+const refreshToken = async () => {
+  const path = "auth/refresh";
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
 const logout = async () => {
   const path = "auth/logout";
 
@@ -66,4 +72,46 @@ const logout = async () => {
   return response;
 };
 
-export { register, verifyEmail, resendVerifyEmail, getMe, login, logout };
+const getUserSessions = async () => {
+  const path = "auth/sessions";
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
+const logoutSession = async (sessionId: string) => {
+  const path = `auth/logout-session?sessionId=${sessionId}`;
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
+const updateEmail = async (email: string, password: string) => {
+  const path = "auth/update-email";
+  const data = { newEmail: email, password: password };
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_POST"), path, data);
+  return response;
+};
+
+const updatePassword = async (
+  currentPassword: string,
+  newPassword: string,
+  confirmNewPassword: string
+) => {
+  const path = "auth/update-password";
+  const data = { currentPassword, newPassword, confirmNewPassword };
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_POST"), path, data);
+  return response;
+};
+
+export {
+  register,
+  verifyEmail,
+  resendVerifyEmail,
+  getMe,
+  login,
+  refreshToken,
+  logout,
+  getUserSessions,
+  logoutSession,
+  updateEmail,
+  updatePassword,
+};

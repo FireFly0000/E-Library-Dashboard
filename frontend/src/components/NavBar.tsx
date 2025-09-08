@@ -13,6 +13,8 @@ import {
   LogIn,
   LogOut,
   Settings,
+  LoaderCircle,
+  Bot,
 } from "lucide-react";
 import { useState } from "react";
 import BlankProfilePic from "@/assets/blank-profile-picture.png";
@@ -39,7 +41,9 @@ const NavBar = () => {
     (state) => state.authSlice.isAuthChecked
   );
   if (!isAuthChecked) {
-    return null;
+    return (
+      <LoaderCircle className="text-foreground w-[70px] lg:w-[90px] animate-spin mt-4" />
+    );
   }
 
   return (
@@ -127,6 +131,16 @@ const NavBar = () => {
                 >
                   <UserRoundPen className="w-[24px] h-[24px]" />
                   <span className="text-2xl">Authors</span>
+
+                  <span className="absolute left-0 bottom-[-2px] h-[2px] w-0 bg-foreground/90 transition-all duration-200 group-hover:w-full" />
+                </div>
+
+                <div
+                  className="relative group inline-flex items-center gap-2 text-foreground hover:cursor-pointer"
+                  onClick={() => navigate("/chatbot")}
+                >
+                  <Bot className="w-[24px] h-[24px]" />
+                  <span className="text-2xl">AI Chatbot</span>
 
                   <span className="absolute left-0 bottom-[-2px] h-[2px] w-0 bg-foreground/90 transition-all duration-200 group-hover:w-full" />
                 </div>

@@ -3,7 +3,7 @@ import { Response } from "@/types/response";
 import { AxiosResponse } from "axios";
 import { BookApis } from "@/apis";
 import toast from "react-hot-toast";
-import { UpdateViewsParams } from "@/types/books";
+import { BookSuggestion, UpdateViewsParams } from "@/types/books";
 import { BookAIServicesParams } from "@/types/books";
 
 type BookSlice = {
@@ -12,6 +12,7 @@ type BookSlice = {
   isLoading: boolean;
   success: string;
   error: string;
+  booksSuggestionAIResponse: BookSuggestion | string | null;
 };
 
 export const createBook = createAsyncThunk<
@@ -59,12 +60,27 @@ export const bookAIServices = createAsyncThunk<
   }
 });
 
+export const bookSuggestionAIService = createAsyncThunk<
+  Response<BookSuggestion>,
+  { prompt: string },
+  { rejectValue: Response<null> }
+>("books/ai-suggestion-services", async (body, ThunkAPI) => {
+  try {
+    const response = await BookApis.bookSuggestionAIService(body);
+    return response.data as Response<BookSuggestion>;
+  } catch (error) {
+    const axiosError = error as AxiosResponse<Response<null>>;
+    return ThunkAPI.rejectWithValue(axiosError.data as Response<null>);
+  }
+});
+
 const initialState: BookSlice = {
   bookUploaded: false,
   viewCountUpdated: false,
   isLoading: false,
   error: "",
   success: "",
+  booksSuggestionAIResponse: null,
 };
 
 export const bookSlice = createSlice({
@@ -126,6 +142,23 @@ export const bookSlice = createSlice({
     builder.addCase(bookAIServices.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action?.payload?.message ?? "Unknown error";
+    });
+
+    //bookSuggestionAIService
+    builder.addCase(bookSuggestionAIService.pending, (state) => {
+      state.isLoading = true;
+      state.booksSuggestionAIResponse = null;
+    });
+
+    builder.addCase(bookSuggestionAIService.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.booksSuggestionAIResponse = action.payload.data || null;
+    });
+
+    builder.addCase(bookSuggestionAIService.rejected, (state) => {
+      state.isLoading = false;
+      state.booksSuggestionAIResponse =
+        "No suggestions available, please try again";
     });
   },
 });

@@ -47,7 +47,7 @@ const Modal: React.FC<ModalProps> = ({
       >
         {/* Close button */}
         <button
-          className="absolute top-3 right-3 text-foreground hover:text-destructive cursor-pointer"
+          className="absolute text-xl top-2 right-4 text-foreground hover:text-destructive cursor-pointer"
           onClick={onClose}
           aria-label="Close modal"
         >

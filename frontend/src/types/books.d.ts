@@ -105,3 +105,23 @@ export type BookByAuthorDashboardResponse = {
   totalViews: number;
   books: BookByAuthorId[];
 };
+
+//For books suggestions by Gemini AI chatbot
+type AIBooksList = {
+  title: string;
+  author: string;
+  genre: string;
+  description: string;
+};
+
+type NewYorkTimesBestSellerBooks = {
+  title: string;
+  author: string;
+  genre: string;
+  description: string;
+};
+
+export type BookSuggestion = {
+  AIBooksList: AIBooksList[];
+  NewYorkTimesBestSellerBooks: NewYorkTimesBestSellerBooks[];
+};

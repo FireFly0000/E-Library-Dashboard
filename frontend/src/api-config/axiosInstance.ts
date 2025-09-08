@@ -9,6 +9,7 @@ import store from "@/redux/store";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
+import { AuthApis } from "@/apis";
 
 const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -76,21 +77,31 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.get(`${baseURL}/auth/refresh`, {
-          withCredentials: true,
-        });
+        const response = await AuthApis.refreshToken();
         const accessToken = response.data.data.accessToken;
         const refreshToken = response.data.data.refreshToken;
+        const sessionId = response.data.data.sessionId;
 
         if (accessToken) {
-          Cookies.set("accessToken", accessToken);
+          Cookies.set("accessToken", accessToken, {
+            secure: true,
+            sameSite: "None",
+            expires: 15, // 15 mins
+          });
           //set refreshToken in frontend only if device is mobile (BE sent back none empty)
-          if (refreshToken !== "") {
+          if (refreshToken && refreshToken !== "") {
             Cookies.set("refreshToken", refreshToken, {
               secure: true,
               sameSite: "None",
               expires: 15, // days
               path: "/",
+            });
+          }
+          if (sessionId && sessionId !== "") {
+            Cookies.set("sessionId", sessionId, {
+              secure: true,
+              sameSite: "None",
+              expires: 15, // days
             });
           }
           if (originalRequest.headers) {
@@ -114,6 +125,7 @@ axiosInstance.interceptors.response.use(
         }); // need to use store outside of component
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
+        Cookies.remove("sessionId");
         window.location.href = "/";
         return Promise.reject(refreshError);
       } finally {
@@ -135,7 +147,7 @@ export const apiCaller = (
     headers: {
       "Access-Control-Allow-Credentials": true,
       "Access-Control-Allow-Origin": "*",
-      rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
+      //rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
     },
     url: `${path}`,
     data,
@@ -165,7 +177,7 @@ export const RtkBaseQuery =
         headers: {
           "Access-Control-Allow-Credentials": true,
           "Access-Control-Allow-Origin": "*",
-          rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
+          //rfrTk: `RfrTk:${Cookies.get("refreshToken")}`,
         },
         url: baseUrl + `${url}`,
         data,

@@ -13,8 +13,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "../configs/aws.config";
 import slugify from "slugify";
 import sharp from "sharp";
-import redis from "../configs/redis.config";
 import crypto from "crypto";
+import axios from "axios";
+import redis from "../configs/redis.config";
 
 export const sendVerificationEmail = async (
   payload: MyJwtPayload
@@ -143,22 +144,22 @@ export const uploadFileToS3 = async (file): Promise<string> => {
 
 export const getFileUrlFromS3 = async (fileName): Promise<string> => {
   // Check if the URL is already cached in Redis
-  const cacheKey = `S3Url_${fileName}`;
+  /*const cacheKey = `S3Url_${fileName}`;
   const cachedUrl = await redis.get(cacheKey);
   if (cachedUrl) {
     return cachedUrl;
-  }
+  }*/
   const getObjectParams = {
     Bucket: configs.general.AWS_S3_BUCKET_NAME,
     Key: fileName,
   };
   const command = new GetObjectCommand(getObjectParams);
   const signedUrl = await getSignedUrl(s3, command, {
-    expiresIn: 3600, // URL expiration time in seconds (1 hour)
+    expiresIn: 6 * 24 * 60 * 60, // URL expiration time in seconds (1 hour)
   });
 
   // Store the signed URL in Redis for 55 minutes
-  await redis.set(cacheKey, signedUrl, "EX", 3300);
+  //await redis.set(cacheKey, signedUrl, "EX", 3300);
 
   return signedUrl;
 };
@@ -233,4 +234,52 @@ export function isMobileDevice(req) {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     ua
   );
+}
+
+export function hashedToken(raw: string): string {
+  return crypto.createHash("sha256").update(raw).digest("hex");
+}
+
+export async function fetchBestSellerNewYorkTimesBooks() {
+  const apiKey = configs.general.NY_TIMES_API_KEY;
+  if (!apiKey) return null;
+  try {
+    //return cached new york times best sellers books if available in redis
+    const cacheKey = "nyt-bestsellers_books";
+    const cached = await redis.get(cacheKey);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    //if not available in redis fetch books list from NYT API
+    const bestSellersData = await axios.get(
+      `https://api.nytimes.com/svc/books/v3/lists/overview.json?api-key=${apiKey}`
+    );
+
+    let formattedBooksList = [];
+    bestSellersData.data.results.lists.forEach((list) => {
+      const currentBooksList = list.books.map((item) => {
+        return {
+          title: item.title,
+          author: item.author,
+          description: item.description,
+        };
+      });
+      formattedBooksList = [...formattedBooksList, ...currentBooksList];
+    });
+
+    // Save to Redis for 1 week
+    await redis.set(
+      cacheKey,
+      JSON.stringify(formattedBooksList),
+      "EX",
+      60 * 60 * 24 * 7
+    );
+
+    return formattedBooksList;
+  } catch (error) {
+    console.error("Error fetching NY Times Best Sellers:", error);
+  }
+  return null;
 }
