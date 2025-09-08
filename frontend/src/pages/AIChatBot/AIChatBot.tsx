@@ -15,6 +15,7 @@ const AIChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const dispatch = useAppDispatch();
   const booksSuggestionAIResponse = useAppSelector(
     (state) => state.bookSlice.booksSuggestionAIResponse
@@ -65,6 +66,9 @@ const AIChatBot = () => {
     if (input.trim() === "") return;
     sendMessage(input);
     setInput("");
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto"; // shrink back
+    }
   };
 
   return (
@@ -153,6 +157,7 @@ const AIChatBot = () => {
         {/*user's chat input */}
         <div className="flex items-end gap-4 p-2 lg:p-4 w-full">
           <textarea
+            ref={textAreaRef}
             className="flex-1 border-border border-2 w-full rounded-lg focus:outline-none 
                 text-foreground bg-card max-h-[150px] resize-none text-area"
             placeholder="Type your message..."
