@@ -39,6 +39,9 @@ bookRouter.get("/ai-services", (req, res) => {
 bookRouter.get("/books-by-author-id", (req, res) => {
   controllers.bookController.getBooksPagingByAuthorID(req, res);
 });
+bookRouter.get("/ai-books-suggestion", (req, res) => {
+  controllers.bookController.bookSuggestionAIService(req, res);
+});
 //bookRouter.put("/:id", updateBook);
 //bookRouter.delete("/:id", deleteBook);
 

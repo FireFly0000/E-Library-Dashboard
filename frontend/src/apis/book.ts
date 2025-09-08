@@ -29,4 +29,11 @@ const bookAiServices = async (values: BookAIServicesParams) => {
   return response;
 };
 
-export { createBook, updateViews, bookAiServices };
+const bookSuggestionAIService = async (values: { prompt: string }) => {
+  const { prompt } = values;
+  const path = `books/ai-books-suggestion?prompt=${prompt}`;
+  const response = await apiCaller(i18n.t("HTTP_CALL.HTTP_GET"), path);
+  return response;
+};
+
+export { createBook, updateViews, bookAiServices, bookSuggestionAIService };

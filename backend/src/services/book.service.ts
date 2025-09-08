@@ -6,7 +6,10 @@ import {
 } from "../commons/response";
 import { db } from "../configs/db.config";
 import i18n from "../utils/i18next";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import {
+  PrismaClientKnownRequestError,
+  raw,
+} from "@prisma/client/runtime/library";
 import { RequestHasLogin } from "../types/request.type";
 import {
   BookSchema,
@@ -22,6 +25,7 @@ import {
   getFileUrlFromS3,
   parseSearchTitleAndAuthor,
   hashAIRedisKey,
+  fetchBestSellerNewYorkTimesBooks,
 } from "../utils/helper";
 import { generateBookSlug } from "../utils/helper";
 import { CategoryCode } from "@prisma/client";
@@ -225,9 +229,6 @@ const createBook = async (
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);
     }
-
-    console.log(error);
-
     return new ResponseError(
       500,
       i18n.t("errorMessages.internalServer"),
@@ -321,7 +322,6 @@ const getAllBooksPaging = async (
       pageSize // Page size
     );
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(400, error.toString(), false);
     }
@@ -777,9 +777,76 @@ const getBooksPagingByAuthorID = async (
       pageSize // Page size
     );
   } catch (error) {
-    console.log(error);
     if (error instanceof PrismaClientKnownRequestError) {
       return new ResponseError(405, error.toString(), false);
+    }
+    return new ResponseError(
+      500,
+      i18n.t("errorMessages.internalServer"),
+      false
+    );
+  }
+};
+
+const AIBookSuggestion = async (params: {
+  prompt: string;
+}): Promise<ResponseBase> => {
+  try {
+    const { prompt } = params;
+
+    const bestSellersNewYorkTimesBooksList =
+      await fetchBestSellerNewYorkTimesBooks();
+
+    const myPrompt = `You are an expert book recommender. Suggest a JSON object with two lists of books based on the user's description in the last paragraph. 
+    Must provide the respond with ONLY a valid JSON object with two arrays. Do not include any explanations, no Markdown, no code blocks, or extra formatting.
+
+    The first array must be named "AIBooksList", with each item having "title", "author", "genre", and "description" fields. 
+    Ensure the suggestions are relevant and diverse. 
+    
+    The second array must be selected from this books list that only has the "title", "author", and "description" fields. Must assigned a "genre" field based on
+    title and description. Must select only books that fit the user's description. If There is no book that fits the user's description must return an empty list.
+    this list must be named "NewYorkTimesBestSellerBooks". 
+    
+    Here is the list to be selected from ${JSON.stringify(
+      bestSellersNewYorkTimesBooksList
+    )} 
+
+    If the user input is irrelevant must says "No suggestions available, please try again".
+    
+    Here is the description: ${prompt}
+    `;
+
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: myPrompt,
+    });
+    const rawJson =
+      response.candidates?.[0]?.content?.parts?.[0]?.text ?? response.text;
+
+    let suggestions;
+    try {
+      suggestions = JSON.parse(rawJson);
+      if (typeof suggestions !== "object") {
+        throw new Error("Parsed response is not a JSON object");
+      }
+    } catch (parseError) {
+      console.error("Error parsing AI response:", parseError);
+      return new ResponseError(
+        500,
+        i18n.t("errorMessages.AIBookSuggestionParsingFailed"),
+        false
+      );
+    }
+
+    return new ResponseSuccess(
+      200,
+      i18n.t("successMessages.AIBookSuggestionFetchedSuccessfully"),
+      true,
+      suggestions
+    );
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      return new ResponseError(400, error.toString(), false);
     }
     return new ResponseError(
       500,
@@ -797,6 +864,7 @@ const BookService = {
   updateBooksViews,
   AIContentServices,
   getBooksPagingByAuthorID,
+  AIBookSuggestion,
 };
 
 export default BookService;

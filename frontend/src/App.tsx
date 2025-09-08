@@ -16,6 +16,7 @@ import BookVersionsDashboard from "./pages/BookVersionsDashboard/BookVersionsDas
 import AuthorsDashboard from "./pages/AuthorsDashboard/AuthorsDashboard";
 import BooksByAuthorIdDashboard from "./pages/BooksByAuthorIdDashboard/BooksByAuthorIdDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard/SettingsDashboard";
+import AIChatBot from "./pages/AIChatBot/AIChatBot";
 
 //testing new backend
 //axios.defaults.baseURL = "https://bkdelibserver.duckdns.org";
@@ -61,6 +62,7 @@ function App() {
                 path="/books-by-author-id/:authorId/:authorName/:authorCountry/"
                 element={<BooksByAuthorIdDashboard />}
               />
+              <Route path="/chatbot" element={<AIChatBot />} />
             </Route>
 
             <Route
