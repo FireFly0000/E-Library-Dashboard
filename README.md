@@ -17,7 +17,7 @@ Demo video using the app: [Demo](https://www.youtube.com/watch?v=_gGqr-Li2Js)
 | 📚 **Search & Share** | Upload books with multiple versions (illustrated, plain text, etc.) |
 | 👁 **View Tracking** | Tracks views per version and total per book, with anti-spam measures via IP/user ID blacklisting in Redis with set time frame |
 | 🤖 **Reading AI Assistant** | Translate, summarize, and analyze selected text in real-time with Google's Gemini |
-| 🤖 **Books Discovery AI Assistant** | A tailored chat bot powered by Google Gemini, integrating with the weekly updated New York Times best seller books API. Enabling real-time awareness of trending and popular books through dynamic user’s input prompt|
+| 🤖 **Books Discovery AI Assistant** | A tailored chat bot powered by Google Gemini, integrating with the weekly updated New York Times best seller books API. Enabling real-time awareness of trending and popular books through dynamic context injection|
 | 📄 **In-App PDF Reading** | Read e-books (PDF files) directly in the browser without leaving the app |
 
 ### 🚀 Future Features
