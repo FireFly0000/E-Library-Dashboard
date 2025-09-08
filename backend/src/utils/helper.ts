@@ -246,7 +246,7 @@ export async function fetchBestSellerNewYorkTimesBooks() {
   try {
     //return cached new york times best sellers books if available in redis
     const cacheKey = "nyt-bestsellers_books";
-    let cached = await redis.get(cacheKey);
+    const cached = await redis.get(cacheKey);
 
     if (cached) {
       return JSON.parse(cached);
