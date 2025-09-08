@@ -820,8 +820,14 @@ const AIBookSuggestion = async (params: {
       model: "gemini-2.5-flash",
       contents: myPrompt,
     });
-    const rawJson =
+    let rawJson =
       response.candidates?.[0]?.content?.parts?.[0]?.text ?? response.text;
+
+    rawJson = rawJson.trim();
+    if (rawJson.startsWith("```")) {
+      rawJson = rawJson.replace(/^```[a-zA-Z]*\n?/, ""); // remove opening ```json or ```
+      rawJson = rawJson.replace(/```$/, ""); // remove closing ```
+    }
 
     let suggestions;
     try {
