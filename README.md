@@ -4,8 +4,7 @@ An AI-powered e-library where readers can search, share, and enjoy e-books with 
 ### 🛠 Technologies Used
 React, TailwindCSS, ShadCn, Redux, RTK Query, Node.js, Prisma, JWT, PostgreSQL, Redis, Docker, CI/CD, Google Cloud, AWS S3, and Google Gemini API.
 
-### 🌐 Deployed Demo
-Check out the live app here: [E-Library App](https://e-library-dashboard-fe-deployed.vercel.app/) \
+### 🌐 Demo
 Demo video using the app: [Demo](https://www.youtube.com/watch?v=_gGqr-Li2Js)
 
 **Note:** The server deployed on Google Cloud run uses cold starts, so initial load may take a moment
